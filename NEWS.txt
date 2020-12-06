@@ -1,3 +1,7 @@
+Version JET
+- Unlock minimal zoom level to 100m instead of 2 minutes distance
+
+------------------------
 Version 7.26 - 2022/09/03
 * user interface
   - fix pressed InfoBox colors in inverted mode
