@@ -1,3 +1,7 @@
+Version JET
+- Unlock minimal zoom level to 100m instead of 2 minutes distance
+
+=================================================================
 Version 7.3 - not yet released
 - fix zoom button label in Traffic Radar View
 
