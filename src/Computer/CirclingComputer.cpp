@@ -29,8 +29,8 @@ Copyright_License {
 #include "Math/LowPassFilter.hpp"
 #include "util/Clamp.hpp"
 
-static constexpr Angle MIN_TURN_RATE = Angle::Degrees(4);
-static constexpr double CRUISE_CLIMB_SWITCH(15);
+static constexpr Angle MIN_TURN_RATE = Angle::Degrees(10);
+static constexpr double CRUISE_CLIMB_SWITCH(5);
 static constexpr double CLIMB_CRUISE_SWITCH(10);
 
 void
