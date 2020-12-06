@@ -1,3 +1,8 @@
+Version JET
+- Unlock minimal zoom level to 100m instead of 2 minutes distance
+
+------------------------
+
 Version 7.42 - 2024/03/01
 * ui
   - new terrain ramp High Contrast
