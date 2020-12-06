@@ -1,3 +1,7 @@
+Version JET
+- Unlock minimal zoom level to 100m instead of 2 minutes distance
+
+------------------------
 Version 7.43-rc0 - 2024-06-02
 * map
   - reachable map labels show correct altitude with head wind #1424
