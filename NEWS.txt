@@ -1,3 +1,7 @@
+Version JET
+- Unlock minimal zoom level to 100m instead of 2 minutes distance
+
+------------------------
 Version 7.28 - 2022/10/29
 * data files
   - fix crash after loading new map file
