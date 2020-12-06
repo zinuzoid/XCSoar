@@ -1,5 +1,6 @@
 Version JET
 - Unlock minimal zoom level to 100m instead of 2 minutes distance
+- Fix XCTracer GPS from return null island position
 
 ------------------------
 Version 7.36 - 2023/07/02
