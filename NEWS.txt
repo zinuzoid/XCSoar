@@ -1,3 +1,7 @@
+Version JET
+- Unlock minimal zoom level to 100m instead of 2 minutes distance
+
+------------------------
 Version 7.23 - 2022/02/10
 * user interface
   - add "Set Frequency" buttons to alternates list
