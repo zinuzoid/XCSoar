@@ -1,3 +1,7 @@
+Version JET
+- Unlock minimal zoom level to 100m instead of 2 minutes distance
+
+------------------------
 Version 7.10 - 2021/07/09
 * weather
   - work around connection problems to NOAA server (for METAR/TAF)
