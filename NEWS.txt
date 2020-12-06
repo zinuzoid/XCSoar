@@ -1,3 +1,7 @@
+Version JET
+- Unlock minimal zoom level to 100m instead of 2 minutes distance
+
+------------------------
 Version 7.9 - not yet released
 * settings
   - allow LiveTrack24 tracking intervals smaller than 5 seconds
