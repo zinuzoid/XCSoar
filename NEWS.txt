@@ -1,3 +1,7 @@
+Version JET
+- Unlock minimal zoom level to 100m instead of 2 minutes distance
+
+=================================================================
 Version 7.4 - not yet released
 
 Version 7.3 - 2021/04/07
