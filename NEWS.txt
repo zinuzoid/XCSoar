@@ -1,3 +1,8 @@
+Version JET
+- Unlock minimal zoom level to 100m instead of 2 minutes distance
+
+------------------------
+
 Version 7.6 - 2021/05/01
 * user interface
   - fix disappearing aircraft symbol
