@@ -1,3 +1,7 @@
+Version JET
+- Unlock minimal zoom level to 100m instead of 2 minutes distance
+
+------------------------
 Version 7.36 - 2023/07/02
 * task
   - save outer radius and angle of custom keyholes in task files
