@@ -26,6 +26,8 @@ Copyright_License {
 #include "NMEA/InputLine.hpp"
 #include "NMEA/Info.hpp"
 
+static unsigned c_sec_seq = 0;
+
 /**
  * Parser for the XCTracer Vario
  * For the XCTracer Protocol
@@ -185,6 +187,11 @@ XCTracerDevice::XCTRC(NMEAInputLine &line, NMEAInfo &info)
   valid_fields += ReadCheckedRange(line,minute,0,59);
   valid_fields += ReadCheckedRange(line,second,0,59);
   valid_fields += ReadCheckedRange(line,centisecond,0,99);
+
+  /**
+   * XCTracer centisecond always 0 so the UI never get update, we randomize here for a temp fix
+   */
+  centisecond = c_sec_seq++ % 100;
 
   /**
    * parse the GPS fix
