@@ -33,7 +33,7 @@ Copyright_License {
  * @param _glide_computer The GlideComputer used for the CalculationThread
  */
 CalculationThread::CalculationThread(GlideComputer &_glide_computer)
-  :WorkerThread("CalcThread", 450, 100, 50),
+  :WorkerThread("CalcThread", 300, 100, 50),
    force(false),
    glide_computer(_glide_computer) {
 }
