@@ -3,6 +3,7 @@ Version 7.0 JET
 - Fix XCTracer GPS from return null island position
 - New setting "Cruise/Circling mode switch period". Recommended to set 5 secs for Paragliding instead of default 15 secs
 - Fix full screen for device's aspect ratio > 16:9
+- Reduce Trail length from 60min/5min to 10min/2min
 
 Version 7.0 - not yet released
 * LUA scripting
