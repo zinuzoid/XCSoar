@@ -1,7 +1,12 @@
-XCSoar
+XCSoar JET
 ======
-.. image:: https://circleci.com/gh/XCSoar/XCSoar.svg?style=svg
-    :target: https://circleci.com/gh/XCSoar/XCSoar
+.. image:: https://circleci.com/gh/zinuzoid/XCSoar/tree/master.svg?style=svg
+    :target: https://circleci.com/gh/zinuzoid/XCSoar
+
+XCSoar JET is an extended version of the original XCSoar (https://xcsoar.org) with additional features that gear toward Paragliding.
+I was a Glider pilot, then I moved to Paraglide recently so most features will come from the idea of how we can do better with XCSoar on Paragliding.
+
+------------------
 
 XCSoar is a tactical glide computer for Android, Linux, Mac OS X,
 and Windows.
@@ -18,7 +23,7 @@ Getting the source
 The XCSoar source code is managed with `git <http://git-scm.com/>`__.  It
 can be downloaded with the following command::
 
- git clone --recursive git://github.com/XCSoar/XCSoar
+ git clone --recursive git://github.com/zinuzoid/XCSoar
 
 To update your repository, type::
 
