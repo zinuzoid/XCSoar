@@ -3,6 +3,7 @@ Version 7.0 JET
 - Fix XCTracer GPS from return null island position
 - Fix full screen for device's aspect ratio > 16:9
 - Reduce Trail length from 60min/5min to 10min/2min
+- Google Pixel 5: show status bar while in full screen
 
 Version 7.0 - not yet released
 * LUA scripting

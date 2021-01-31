@@ -30,6 +30,9 @@ class ImmersiveFullScreenMode {
    * Screen Mode.  Requires API level 19 (Android 4.4 "KitKat").
    */
   public static void enable(View decorView) {
+    if (XCSoar.IS_PIXEL_5) {
+      return;
+    }
     decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN|
                                     View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|
                                     View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY|
