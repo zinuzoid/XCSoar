@@ -63,6 +63,8 @@ public class XCSoar extends Activity {
 
   BatteryReceiver batteryReceiver;
 
+  public static final boolean IS_PIXEL_5 = "Pixel 5".equals(Build.MODEL);
+
   @Override protected void onCreate(Bundle savedInstanceState) {
     if (serviceClass == null)
       serviceClass = MyService.class;
@@ -101,7 +103,7 @@ public class XCSoar extends Activity {
 
     // fullscreen mode
     requestWindowFeature(Window.FEATURE_NO_TITLE);
-    getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN|
+    getWindow().addFlags((IS_PIXEL_5 ? 0 : WindowManager.LayoutParams.FLAG_FULLSCREEN)|
                          WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
     /* Workaround for layout problems in Android KitKat with immersive full
@@ -110,7 +112,7 @@ public class XCSoar extends Activity {
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN|
                          WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS|
                          WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR|
-                         WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+                         (IS_PIXEL_5 ? 0 : WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION));
 
     enableImmersiveModeIfSupported();
 
