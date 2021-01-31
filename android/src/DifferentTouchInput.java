@@ -42,18 +42,26 @@ abstract class DifferentTouchInput {
       private static final MultiTouchInput sInstance = new MultiTouchInput();
     }
 
+    private int getY(MotionEvent event) {
+      int y = (int) event.getY();
+      if (XCSoar.IS_PIXEL_5) {
+        y -= 48.0 * (440.0 / 160.0); // Nav bar height
+      }
+      return y;
+    }
+
     public void process(final MotionEvent event) {
       switch (event.getActionMasked()) {
       case MotionEvent.ACTION_DOWN:
-        EventBridge.onMouseDown((int)event.getX(), (int)event.getY());
+        EventBridge.onMouseDown((int)event.getX(), getY(event));
         break;
 
       case MotionEvent.ACTION_UP:
-        EventBridge.onMouseUp((int)event.getX(), (int)event.getY());
+        EventBridge.onMouseUp((int)event.getX(), getY(event));
         break;
 
       case MotionEvent.ACTION_MOVE:
-        EventBridge.onMouseMove((int)event.getX(), (int)event.getY());
+        EventBridge.onMouseMove((int)event.getX(), getY(event));
         break;
 
       case MotionEvent.ACTION_POINTER_DOWN:
