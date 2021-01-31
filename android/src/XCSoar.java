@@ -72,6 +72,8 @@ public class XCSoar extends Activity {
 
   boolean fullScreen = false;
 
+  public static final boolean IS_PIXEL_5 = "Pixel 5".equals(Build.MODEL);
+
   @Override protected void onCreate(Bundle savedInstanceState) {
     if (serviceClass == null)
       serviceClass = MyService.class;
