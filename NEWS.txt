@@ -2,6 +2,8 @@ Version JET
 - Unlock minimal zoom level to 100m instead of 2 minutes distance
 - Fix XCTracer GPS from return null island position
 - Reduce Trail length from 60min/5min to 10min/2min
+- Google phone: show status bar while in full screen
+- CrossSection view: fix scaling for feets unit, remove unit text padding
 
 ------------------------
 Version 7.29 - 2023/05/03
