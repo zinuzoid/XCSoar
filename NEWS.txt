@@ -1,6 +1,7 @@
 Version 7.0 JET
 - Unlock minimal zoom level to 100m instead of 2 minutes distance
 - Fix XCTracer GPS from return null island position
+- Fix full screen for device's aspect ratio > 16:9
 
 Version 7.0 - not yet released
 * LUA scripting
