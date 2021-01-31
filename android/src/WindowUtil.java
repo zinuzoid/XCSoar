@@ -31,7 +31,7 @@ import android.view.View;
  */
 class WindowUtil {
   static final int FULL_SCREEN_WINDOW_FLAGS =
-    WindowManager.LayoutParams.FLAG_FULLSCREEN|
+  (XCSoar.IS_GOOGLE_PHONE ? 0 : WindowManager.LayoutParams.FLAG_FULLSCREEN)|
 
     /* Workaround for layout problems in Android KitKat with immersive full
        screen mode: Sometimes the content view was not initialized with the
@@ -39,13 +39,16 @@ class WindowUtil {
     WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN|
     WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS|
     WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR|
-    WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
+    (XCSoar.IS_GOOGLE_PHONE ? 0 : WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
 
   /**
    * Set / Reset the System UI visibility flags for Immersive Full
    * Screen Mode.
    */
   static void enableImmersiveMode(Window window) {
+    if (XCSoar.IS_GOOGLE_PHONE) {
+      return;
+    }
     View decorView = window.getDecorView();
     decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN|
                                     View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|
@@ -56,6 +59,9 @@ class WindowUtil {
   }
 
   static void disableImmersiveMode(Window window) {
+    if (XCSoar.IS_GOOGLE_PHONE) {
+      return;
+    }
     View decorView = window.getDecorView();
     decorView.setSystemUiVisibility(0);
   }
