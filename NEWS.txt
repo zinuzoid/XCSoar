@@ -4,6 +4,7 @@ Version 7.0 JET
 - Fix full screen for device's aspect ratio > 16:9
 - Reduce Trail length from 60min/5min to 10min/2min
 - Google Pixel 5: show status bar while in full screen
+- CrossSection view: fix scaling for feets unit, remove unit text padding
 
 Version 7.0 - not yet released
 * LUA scripting

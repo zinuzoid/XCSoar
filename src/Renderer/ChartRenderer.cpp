@@ -26,6 +26,7 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Math/LeastSquares.hpp"
 #include "util/StaticString.hxx"
+#include "Units/Units.hpp"
 
 #include <cassert>
 #include <windef.h> /* for MAX_PATH */
@@ -424,7 +425,7 @@ ChartRenderer::DrawXGrid(double tic_step, double unit_step, UnitFormat unit_form
   line[2].y += minor_tick_size;
   line[3].y -= minor_tick_size;
 
-  const int y = line[1].y + padding_text;
+  const int y = line[1].y - padding_text - 5 * padding_text;
 
   auto start = (int)(x.min / tic_step) * tic_step;
 
@@ -484,8 +485,6 @@ ChartRenderer::DrawYGrid(double tic_step, double unit_step, UnitFormat unit_form
   line[2].x += minor_tick_size;
   line[3].x -= minor_tick_size;
 
-  const int x = line[0].x - padding_text;
-
   auto start = (int)(y.min / tic_step) * tic_step;
 
   for (auto yval = start; yval <= y.max; yval += tic_step) {
@@ -511,7 +510,7 @@ ChartRenderer::DrawYGrid(double tic_step, double unit_step, UnitFormat unit_form
             TCHAR unit_text[MAX_PATH];
             FormatTicText(unit_text, yval * unit_step / tic_step, unit_step, unit_format);
             const auto c = canvas.CalcTextSize(unit_text);
-            canvas.DrawText({std::max(x - (int)c.width, rc.left + padding_text), ymin - (int)c.height / 2}, unit_text);
+            canvas.DrawText({rc.right - (int)c.width - padding_text - 4 * padding_text, ymin - (int)c.height}, unit_text);
           }
         }
       }
