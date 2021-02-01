@@ -36,7 +36,7 @@ CrossSectionLook::Initialise(const Font &_grid_font)
   sea_brush.Create(sea_color);
 
   grid_pen.Create(Pen::DASH2, 1, Color(0x60, 0x60, 0x60));
-  aircraft_brush.Create(text_color);
+  aircraft_brush.Create(Color(0x00, 0xf0, 0xb8));
 
   grid_font = &_grid_font;
 }
