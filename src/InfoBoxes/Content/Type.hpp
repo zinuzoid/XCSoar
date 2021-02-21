@@ -169,6 +169,8 @@ namespace InfoBoxFactory
     e_StandbyRadio, /* Standby Radio Frequency */
     e_Thermal_Time, /* Time in Thermal*/
 
+    e_Speed_GPS_IAS,
+
     e_NUM_TYPES /* Last item */
   };
 
