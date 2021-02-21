@@ -9,6 +9,7 @@
 #include "BackendComponents.hpp"
 #include "Language/Language.hpp"
 #include "Units/Units.hpp"
+#include "Formatter/UserUnits.hpp"
 
 void
 InfoBoxContentSpeedGround::Update(InfoBoxData &data) noexcept
@@ -98,5 +99,21 @@ UpdateInfoBoxSpeedDolphin(InfoBoxData &data) noexcept
     data.SetComment(_("BLOCK"));
   else
     data.SetComment(_("DOLPHIN"));
+
+}
+
+void
+UpdateInfoBoxSpeedGroundAndTAS(InfoBoxData &data) noexcept
+{
+  const NMEAInfo &basic = CommonInterface::Basic();
+  if (!basic.ground_speed_available) {
+    data.SetInvalid();
+    return;
+  }
+  data.SetValueFromSpeed(basic.ground_speed);
+
+  if (basic.airspeed_available) {
+    data.SetCommentFromSpeed(basic.true_airspeed, false, _T("TAS:"));
+  }
 
 }
