@@ -91,7 +91,7 @@ WindArrowRenderer::Draw(Canvas &canvas, const Angle screen_angle,
                         const PixelRect &rc,
                         WindArrowStyle arrow_style) noexcept
 {
-  constexpr unsigned arrow_width = 6;
+  constexpr unsigned arrow_width = 9;
   constexpr unsigned arrow_tail_length = 3;
   constexpr unsigned arrow_offset = 23;
 

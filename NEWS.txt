@@ -7,6 +7,7 @@ Version JET
 - New Infobox V GND and TAS in the same Infobox
 - New Infobox Baro and GPS altitude in the same Infobox
 - New Infobox H AGL and H T/O in the same Infobox
+- Update Wind Infobox to include wind_estimation data age
 
 ------------------------
 Version 7.28 - 2022/10/29
