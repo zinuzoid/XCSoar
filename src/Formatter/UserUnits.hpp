@@ -130,7 +130,8 @@ FormatUserMapScale(double value, TCHAR *buffer,
  */
 void
 FormatUserSpeed(double value, TCHAR *buffer,
-                bool include_unit = true, bool Precision = true);
+                bool include_unit = true, bool Precision = true,
+                const TCHAR *affix = NULL);
 
 [[gnu::const]]
 static inline BasicStringBuffer<TCHAR, 32>
