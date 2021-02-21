@@ -111,10 +111,11 @@ FormatUserMapScale(double value, TCHAR *buffer, bool include_unit)
 }
 
 void
-FormatUserSpeed(double value, TCHAR *buffer, bool include_unit, bool precision)
+FormatUserSpeed(double value, TCHAR *buffer, bool include_unit, bool precision,
+                const TCHAR *affix)
 {
   FormatSpeed(buffer, value, Units::GetUserSpeedUnit(), include_unit,
-              precision);
+              precision, affix);
 }
 
 void
