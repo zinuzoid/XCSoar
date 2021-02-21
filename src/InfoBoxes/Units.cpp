@@ -74,9 +74,9 @@ InfoBoxData::SetCommentFromAlternateAltitude(double new_value)
 }
 
 void
-InfoBoxData::SetCommentFromSpeed(double new_value, bool precision)
+InfoBoxData::SetCommentFromSpeed(double new_value, bool precision, const TCHAR *affix)
 {
-  FormatUserSpeed(new_value, comment.buffer(), true, precision);
+  FormatUserSpeed(new_value, comment.buffer(), true, precision, affix);
 }
 
 void
