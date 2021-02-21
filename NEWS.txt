@@ -6,6 +6,7 @@ Version JET
 - CrossSection view: fix scaling for feets unit, remove unit text padding
 - Scale up Vario bar to see more details
 - New Infobox V GND and TAS in the same Infobox
+- Update Wind Infobox to include wind_estimation data age
 
 =================================================================
 Version 7.4 - not yet released
