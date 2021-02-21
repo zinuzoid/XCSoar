@@ -45,4 +45,7 @@ UpdateInfoBoxSpeedMacCready(InfoBoxData &data);
 void
 UpdateInfoBoxSpeedDolphin(InfoBoxData &data);
 
+void
+UpdateInfoBoxSpeedGroundAndTAS(InfoBoxData &data);
+
 #endif

@@ -1097,6 +1097,14 @@ static constexpr MetaData meta_data[] = {
     N_("Altn2 GR"),
     N_("Geometric gradient to the arrival height above the second alternate. This is not adjusted for total energy."),
     IBFHelperInt<InfoBoxContentAlternateGR, 1>::Create,
+  // e_Speed_GPS_IAS
+  },
+  
+  {
+    N_("Speed ground and TAS"),
+    N_("V GND_TAS"),
+    N_("Ground speed by GPS and TAS"),
+    UpdateInfoBoxSpeedGroundAndTAS,
   },
 
 };
