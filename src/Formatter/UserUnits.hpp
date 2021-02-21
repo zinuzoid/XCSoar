@@ -143,7 +143,8 @@ FormatUserMapScale(double value, TCHAR *buffer,
  */
 void
 FormatUserSpeed(double value, TCHAR *buffer,
-                bool include_unit = true, bool Precision = true) noexcept;
+                bool include_unit = true, bool Precision = true,
+                const TCHAR *affix = NULL) noexcept;
 
 [[gnu::const]]
 static inline auto
