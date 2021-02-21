@@ -158,7 +158,8 @@ struct InfoBoxData {
   /**
    * Set the InfoBox comment to the specified horizontal speed.
    */
-  void SetCommentFromSpeed(double value, bool precision=true);
+  void SetCommentFromSpeed(double value, bool precision=true,
+                           const TCHAR *affix = NULL);
 
   /**
    * Set the InfoBox comment to the specified task speed.
