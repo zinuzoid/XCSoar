@@ -5,6 +5,7 @@
 
 #include "Units/Unit.hpp"
 
+#include <cstddef>
 #include <tchar.h>
 
 class AtmosphericPressure;
@@ -112,7 +113,8 @@ FormatDistanceSmart(TCHAR *buffer, double value, Unit unit,
  */
 void
 FormatSpeed(TCHAR *buffer, double value, const Unit unit,
-            bool include_unit = true, bool precision = false);
+            bool include_unit = true, bool precision = false,
+            const TCHAR *affix = NULL);
 
 /**
  * Returns the proper format to display the vertical speed

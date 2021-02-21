@@ -141,12 +141,18 @@ FormatDistanceSmart(TCHAR *buffer, double value, Unit unit,
 
 void
 FormatSpeed(TCHAR *buffer,
-            double value, const Unit unit, bool include_unit, bool precision)
+            double value, const Unit unit, bool include_unit, bool precision,
+            const TCHAR *affix)
 {
   value = Units::ToUserUnit(value, unit);
 
   const int prec = precision && value < 100;
-  if (include_unit)
+  if (affix != NULL && include_unit)
+    StringFormatUnsafe(buffer, _T("%s%.*f %s"), affix, prec, (double)value,
+                       Units::GetUnitName(unit));
+  else if (affix != NULL && !include_unit)
+    StringFormatUnsafe(buffer, _T("%s%.*f"), affix, prec, (double)value);
+  else if (include_unit)
     StringFormatUnsafe(buffer, _T("%.*f %s"), prec, (double)value,
                        Units::GetUnitName(unit));
   else
