@@ -164,6 +164,8 @@ namespace InfoBoxFactory
     e_HeartRate9, /* dummy item */
     e_HeartRate10, /* dummy item */
 
+    e_Speed_GPS_TAS, // first Jet item
+
     e_NUM_TYPES /* Last item */
   };
 

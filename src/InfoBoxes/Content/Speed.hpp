@@ -23,3 +23,6 @@ UpdateInfoBoxSpeedMacCready(InfoBoxData &data) noexcept;
 
 void
 UpdateInfoBoxSpeedDolphin(InfoBoxData &data) noexcept;
+
+void
+UpdateInfoBoxSpeedGroundAndTAS(InfoBoxData &data) noexcept;

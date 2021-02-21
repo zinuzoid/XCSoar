@@ -1168,6 +1168,14 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxHeartRate,
   },
 
+  // e_Speed_GPS_TAS
+  {
+    N_("Speed ground and TAS"),
+    N_("V GND_TAS"),
+    N_("Ground speed by GPS and TAS"),
+    UpdateInfoBoxSpeedGroundAndTAS,
+  },
+
 };
 
 static_assert(ARRAY_SIZE(meta_data) == NUM_TYPES,
