@@ -183,6 +183,24 @@ InfoBoxContentWindArrow::Update(InfoBoxData &data) noexcept
                 FormatBearing(info.wind.bearing).c_str(),
                 speed_buffer);
   data.SetComment(buffer);
+
+  if(!basic.track_available.IsValid()) {
+    return;
+  }
+
+  auto wind_available_ttl =
+    basic.track_available.GetTimeDifference(info.wind_available);
+  auto wind_available_ttl_min =
+    std::chrono::duration_cast<std::chrono::minutes>(wind_available_ttl);
+
+  if(wind_available_ttl_min.count() > 0) {
+    TCHAR title_buffer[16];
+    StringFormat(title_buffer, 16, "%s (%dm)", _("Wind"),
+                 wind_available_ttl_min.count());
+    data.SetTitle(title_buffer);
+  } else {
+    data.SetTitle(_("Wind"));
+  }
 }
 
 void
@@ -211,7 +229,7 @@ InfoBoxContentWindArrow::OnCustomPaint(Canvas &canvas,
   auto angle = info.wind.bearing - CommonInterface::Basic().attitude.heading;
 
   const int length =
-    std::min(size, std::max(10u, uround(4 * info.wind.norm)));
+    std::min(size, std::max(10u, uround(8 * info.wind.norm)));
 
   const int offset = -length / 2;
 
