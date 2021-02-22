@@ -60,7 +60,8 @@ FormatUserMass(double value, TCHAR *buffer,
  */
 void
 FormatUserAltitude(double value, TCHAR *buffer,
-                   bool include_unit = true);
+                   bool include_unit = true,
+                   const TCHAR *prefix = NULL);
 
 gcc_const
 static inline BasicStringBuffer<TCHAR, 32>
