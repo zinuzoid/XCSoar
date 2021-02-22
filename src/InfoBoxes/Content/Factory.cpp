@@ -1176,6 +1176,15 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxSpeedGroundAndTAS,
   },
 
+  // e_H_Baro_GPS
+  {
+    N_("Barometric altitude with GPS line"),
+    N_("Alt Baro_GPS"),
+    N_("Altitude from barometric pressure sensor and GPS altitude on the 2nd line"),
+    UpdateInfoBoxAltitudeBaroGPS,
+    altitude_infobox_panels,
+  },
+
 };
 
 static_assert(ARRAY_SIZE(meta_data) == NUM_TYPES,

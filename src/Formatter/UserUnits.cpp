@@ -22,9 +22,9 @@ FormatUserMass(double value, TCHAR *buffer, bool include_unit) noexcept
 }
 
 void
-FormatUserAltitude(double value, TCHAR *buffer, bool include_unit) noexcept
+FormatUserAltitude(double value, TCHAR *buffer, bool include_unit, const TCHAR *prefix) noexcept
 {
-  FormatAltitude(buffer, value, Units::GetUserAltitudeUnit(), include_unit);
+  FormatAltitude(buffer, value, Units::GetUserAltitudeUnit(), include_unit, prefix);
 }
 
 static constexpr Unit
