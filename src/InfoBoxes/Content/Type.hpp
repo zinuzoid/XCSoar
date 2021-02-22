@@ -170,6 +170,7 @@ namespace InfoBoxFactory
     e_Thermal_Time, /* Time in Thermal*/
 
     e_Speed_GPS_IAS,
+    e_H_Baro_GPS,
 
     e_NUM_TYPES /* Last item */
   };
