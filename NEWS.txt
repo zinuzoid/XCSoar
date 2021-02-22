@@ -6,6 +6,7 @@ Version JET
 - CrossSection view: fix scaling for feets unit, remove unit text padding
 - New Infobox V GND and TAS in the same Infobox
 - New Infobox Baro and GPS altitude in the same Infobox
+- New Infobox H AGL and H T/O in the same Infobox
 
 ------------------------
 Version 7.43-rc0 - 2024-06-02

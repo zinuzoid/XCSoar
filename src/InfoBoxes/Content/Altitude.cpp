@@ -94,6 +94,30 @@ UpdateInfoBoxAltitudeAGL(InfoBoxData &data) noexcept
 }
 
 void
+UpdateInfoBoxAltitudeAGLQFE(InfoBoxData &data) noexcept
+{
+  const NMEAInfo &basic = CommonInterface::Basic();
+  const auto &calculated = CommonInterface::Calculated();
+  if (!calculated.altitude_agl_valid) {
+    data.SetValueInvalid();
+  } else {
+    data.SetValueFromAltitude(calculated.altitude_agl);
+    // Set Color (red/black)
+    data.SetValueColor(calculated.altitude_agl < 
+      CommonInterface::GetComputerSettings().task.route_planner.safety_height_terrain ? 1 : 0);
+  }
+
+  const auto any_altitude = basic.GetAnyAltitude();
+  if (!any_altitude || !calculated.flight.HasTakenOff()) {
+    data.SetInvalid();
+    data.SetCommentInvalid();
+  } else {
+    const double value = *any_altitude - calculated.flight.takeoff_altitude;
+    data.SetCommentFromAltitude(value, N_("T/O:"));
+  }
+}
+
+void
 UpdateInfoBoxAltitudeBaro(InfoBoxData &data) noexcept
 {
   const NMEAInfo &basic = CommonInterface::Basic();
