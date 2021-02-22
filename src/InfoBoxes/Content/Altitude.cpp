@@ -117,6 +117,36 @@ UpdateInfoBoxAltitudeAGL(InfoBoxData &data)
 }
 
 void
+UpdateInfoBoxAltitudeAGLQFE(InfoBoxData &data)
+{
+  const DerivedInfo &calculated = CommonInterface::Calculated();
+  if (!calculated.altitude_agl_valid) {
+    data.SetValueInvalid();
+  } else {
+    data.SetValueFromAltitude(calculated.altitude_agl);
+    // Set Color (red/black)
+    data.SetValueColor(calculated.altitude_agl < 
+      CommonInterface::GetComputerSettings().task.route_planner.safety_height_terrain ? 1 : 0);
+  }
+
+  const NMEAInfo &basic = CommonInterface::Basic();
+  const auto home_waypoint = way_points.GetHome();
+  const auto takeoff_point = way_points.LookupName(_T("(takeoff)"));
+
+  if (!basic.gps_altitude_available || !(home_waypoint || takeoff_point)) {
+    data.SetCommentInvalid();
+  } else {
+    double takeoff_alt;
+    if(home_waypoint) {
+      takeoff_alt = home_waypoint->elevation;
+    } else {
+      takeoff_alt = takeoff_point->elevation;
+    }
+    data.SetCommentFromAltitude(basic.gps_altitude - takeoff_alt, N_("T/O:"));
+  }
+}
+
+void
 UpdateInfoBoxAltitudeBaro(InfoBoxData &data)
 {
   const NMEAInfo &basic = CommonInterface::Basic();
