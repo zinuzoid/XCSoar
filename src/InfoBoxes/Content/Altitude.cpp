@@ -112,6 +112,24 @@ UpdateInfoBoxAltitudeBaro(InfoBoxData &data) noexcept
 }
 
 void
+UpdateInfoBoxAltitudeBaroGPS(InfoBoxData &data) noexcept
+{
+  const NMEAInfo &basic = CommonInterface::Basic();
+
+  if(basic.gps_altitude_available) {
+    data.SetCommentFromAltitude(basic.gps_altitude, N_("GPS:"));
+  } else {
+    data.SetCommentInvalid();
+  }
+
+  if (basic.baro_altitude_available) {
+    data.SetValueFromAltitude(basic.baro_altitude);
+  } else {
+    data.SetValueInvalid();
+  }
+}
+
+void
 UpdateInfoBoxAltitudeQFE(InfoBoxData &data) noexcept
 {
   const NMEAInfo &basic = CommonInterface::Basic();
