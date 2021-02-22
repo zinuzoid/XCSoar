@@ -172,6 +172,7 @@ namespace InfoBoxFactory
     e_Alternate_2_GR, /* Geometric gradient to the arrival height above the second alternate. This is not adjusted for total energy */
     e_Speed_GPS_IAS,
     e_H_Baro_GPS,
+    e_HeightAGL_T_O,
 
     e_NUM_TYPES /* Last item */
   };
