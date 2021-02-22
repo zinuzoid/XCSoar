@@ -40,7 +40,7 @@ class AtmosphericPressure;
  */
 void
 FormatAltitude(TCHAR *buffer, double value, Unit unit,
-               bool include_unit = true);
+               bool include_unit = true, const TCHAR *prefix = NULL);
 
 /**
  * Converts a mass into a formatted string

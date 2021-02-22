@@ -43,9 +43,9 @@ FormatUserMass(double value, TCHAR *buffer, bool include_unit)
 }
 
 void
-FormatUserAltitude(double value, TCHAR *buffer, bool include_unit)
+FormatUserAltitude(double value, TCHAR *buffer, bool include_unit, const TCHAR *prefix)
 {
-  FormatAltitude(buffer, value, Units::GetUserAltitudeUnit(), include_unit);
+  FormatAltitude(buffer, value, Units::GetUserAltitudeUnit(), include_unit, prefix);
 }
 
 [[gnu::const]]
