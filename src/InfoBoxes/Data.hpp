@@ -223,6 +223,11 @@ struct InfoBoxData {
   void SetCommentFromAlternateAltitude(double value) noexcept;
 
   /**
+   * Set the InfoBox comment to the specified altitude.
+   */
+  void SetCommentFromAltitude(double value, const TCHAR *prefix=NULL) noexcept;
+
+  /**
    * Set the InfoBox comment value to the specified vertical speed.
    */
   void SetCommentFromVerticalSpeed(double value, bool include_sign=true) noexcept;
