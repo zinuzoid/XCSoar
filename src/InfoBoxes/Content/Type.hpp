@@ -169,7 +169,7 @@ namespace InfoBoxFactory
     e_Thermal_Time, /* Time in Thermal*/
 
     e_Alternate_2_GR, /* Geometric gradient to the arrival height above the second alternate. This is not adjusted for total energy */
-
+    
     e_HeartRate,
 
     e_HeartRate1, /* dummy item */
@@ -184,6 +184,7 @@ namespace InfoBoxFactory
     e_HeartRate10, /* dummy item */
 
     e_Speed_GPS_TAS, // first Jet item
+    e_H_Baro_GPS,
 
     e_NUM_TYPES /* Last item */
   };
