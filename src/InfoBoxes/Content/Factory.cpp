@@ -1204,6 +1204,15 @@ static constexpr MetaData meta_data[] = {
     altitude_infobox_panels,
   },
 
+  // e_HeightAGL_T_O
+  {
+    N_("Height AGL with T/O line"),
+    N_("H AGL_T/O"),
+    N_("This is the navigation altitude minus the terrain elevation obtained from the terrain file. The 2nd line is altitude from takeoff."),
+    UpdateInfoBoxAltitudeAGLQFE,
+    altitude_infobox_panels,
+  },
+
 };
 
 static_assert(ARRAY_SIZE(meta_data) == NUM_TYPES,
