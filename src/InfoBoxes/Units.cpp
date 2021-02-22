@@ -54,6 +54,12 @@ InfoBoxData::SetCommentFromAlternateAltitude(double new_value) noexcept
 }
 
 void
+InfoBoxData::SetCommentFromAltitude(double new_value, const TCHAR *prefix) noexcept
+{
+  FormatUserAltitude(new_value, comment.buffer(), true, prefix);
+}
+
+void
 InfoBoxData::SetCommentFromSpeed(double new_value, bool precision, const TCHAR *affix) noexcept
 {
   FormatUserSpeed(new_value, comment.buffer(), true, precision, affix);
