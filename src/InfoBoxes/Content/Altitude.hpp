@@ -50,6 +50,9 @@ void
 UpdateInfoBoxAltitudeBaro(InfoBoxData &data);
 
 void
+UpdateInfoBoxAltitudeBaroGPS(InfoBoxData &data);
+
+void
 UpdateInfoBoxAltitudeQFE(InfoBoxData &data);
 
 void

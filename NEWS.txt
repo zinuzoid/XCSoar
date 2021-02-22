@@ -8,6 +8,7 @@ Version 7.0 JET
 - Scale up Vario bar to see more details
 - New Infobox V GND and TAS in the same Infobox
 - Update Wind Infobox to include wind_estimation data age
+- New Infobox Baro and GPS altitude in the same Infobox
 
 Version 7.0 - not yet released
 * LUA scripting
