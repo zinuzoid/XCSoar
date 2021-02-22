@@ -47,6 +47,9 @@ void
 UpdateInfoBoxAltitudeAGL(InfoBoxData &data);
 
 void
+UpdateInfoBoxAltitudeAGLQFE(InfoBoxData &data);
+
+void
 UpdateInfoBoxAltitudeBaro(InfoBoxData &data);
 
 void
