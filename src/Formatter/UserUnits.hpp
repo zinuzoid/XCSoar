@@ -39,7 +39,8 @@ FormatUserMass(double value, TCHAR *buffer,
  */
 void
 FormatUserAltitude(double value, TCHAR *buffer,
-                   bool include_unit = true);
+                   bool include_unit = true,
+                   const TCHAR *prefix = NULL);
 
 [[gnu::const]]
 static inline BasicStringBuffer<TCHAR, 32>
