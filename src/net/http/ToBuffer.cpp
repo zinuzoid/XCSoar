@@ -28,9 +28,17 @@ Copyright_License {
 #include "Operation/Operation.hpp"
 #include "thread/AsyncWaiter.hxx"
 #include "util/ScopeExit.hxx"
+#include "util/ConstBuffer.hxx"
+#include "LogFile.hpp"
 
 #include <cstdint>
 #include <string.h>
+
+#ifdef ANDROID
+#include "java/Global.hxx"
+#include "java/URL.hxx"
+#include "java/InputStream.hxx"
+#endif
 
 class DownloadToBufferHandler final : public CurlResponseHandler {
   uint8_t *buffer;
@@ -95,6 +103,50 @@ Net::DownloadToBuffer(CurlGlobal &curl, const char *url,
                       OperationEnvironment &env)
 {
   DownloadToBufferHandler handler(_buffer, max_length);
+
+#ifdef ANDROID
+  try {
+    jobject connection = Java::URL::openConnection(Java::GetEnv(), url);
+    if(Java::GetEnv()->ExceptionCheck()) {
+      throw Java::GetEnv()->ExceptionOccurred();
+      return -1;
+    }
+    if (connection == nullptr) {
+      return -1;
+    }
+
+    Java::URLConnection::setConnectTimeout(Java::GetEnv(), connection, 10000);
+    if(Java::GetEnv()->ExceptionCheck()) {
+      throw Java::GetEnv()->ExceptionOccurred();
+      return -1;
+    }
+
+    jobject is = Java::URLConnection::getInputStream(Java::GetEnv(), connection);
+    if(Java::GetEnv()->ExceptionCheck()) {
+      throw Java::GetEnv()->ExceptionOccurred();
+      return -1;
+    }
+    if (is == nullptr) {
+      return -1;
+    }
+
+    jbyteArray jbufferArr = Java::GetEnv()->NewByteArray(max_length);
+    int64_t len = Java::InputStream::read(Java::GetEnv(), is, jbufferArr);
+
+    jbyte *jbuffer = Java::GetEnv()->GetByteArrayElements(jbufferArr, nullptr);
+    jbuffer[len] = 0;
+    char *buffer =  (char*) jbuffer;
+
+    handler.OnData(ConstBuffer<void>(buffer, len));
+  }
+  catch (...) {
+    LogError(std::current_exception(), "DownloadToBuffer ANDROID");
+    Java::GetEnv()->ExceptionClear();
+    #ifdef DEBUG
+    throw std::current_exception();
+    #endif
+  }
+#else
   CurlRequest request(curl, url, handler);
   AtScopeExit(&request) { request.StopIndirect(); };
 
@@ -116,6 +168,7 @@ Net::DownloadToBuffer(CurlGlobal &curl, const char *url,
 
   request.StartIndirect();
   handler.Wait();
+#endif
 
   return handler.GetReceived();
 }
