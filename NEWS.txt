@@ -8,6 +8,7 @@ Version JET
 - New Infobox Baro and GPS altitude in the same Infobox
 - New Infobox H AGL and H T/O in the same Infobox
 - Update Wind Infobox to include wind_estimation data age
+- The initial goto task will always be a takeoff site instead of nearest landable
 
 ------------------------
 
