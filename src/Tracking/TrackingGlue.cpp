@@ -28,6 +28,7 @@ Copyright_License {
 #include "Operation/Operation.hpp"
 #include "LogFile.hpp"
 #include "util/Macros.hpp"
+#include "Interface.hpp"
 
 static LiveTrack24::VehicleType
 MapVehicleTypeToLivetrack24(LiveTrack24::Settings::VehicleType vt)
@@ -52,7 +53,8 @@ TrackingGlue::TrackingGlue(EventLoop &event_loop,
                            CurlGlobal &curl) noexcept
   :StandbyThread("Tracking"),
    curl(curl),
-   skylines(event_loop, this)
+   skylines(event_loop, this),
+   jet_provider(curl, this)
 {
   settings.SetDefaults();
   LiveTrack24::SetServer(settings.livetrack24.server);
@@ -63,6 +65,7 @@ TrackingGlue::StopAsync()
 {
   std::lock_guard<Mutex> lock(mutex);
   StandbyThread::StopAsync();
+  jet_provider.StopAsync();
 }
 
 void
@@ -70,6 +73,7 @@ TrackingGlue::WaitStopped()
 {
   std::lock_guard<Mutex> lock(mutex);
   StandbyThread::WaitStopped();
+  jet_provider.WaitStopped();
 }
 
 void
@@ -102,6 +106,12 @@ TrackingGlue::OnTimer(const MoreData &basic, const DerivedInfo &calculated)
     skylines.Tick(basic, calculated);
   } catch (...) {
     LogError(std::current_exception(), "SkyLines error");
+  }
+
+  try {
+    jet_provider.OnTimer(basic, calculated);
+  } catch (...) {
+    LogError(std::current_exception(), "JETProvider error");
   }
 
   if (!settings.livetrack24.enabled)
@@ -241,6 +251,22 @@ TrackingGlue::OnTraffic(uint32_t pilot_id, unsigned time_of_day_ms,
     skylines.RequestUserName(pilot_id);
 }
 
+void TrackingGlue::OnJETTraffic(std::vector<JETProvider::Data::Traffic> traffics, bool success)
+{
+  const std::lock_guard<Mutex> lock(jet_provider_data.mutex);
+
+  jet_provider_data.success = success;
+  if (success) {
+    jet_provider_data.traffics.clear();
+    for (JETProvider::Data::Traffic traffic : traffics) {
+      jet_provider_data.traffics[traffic.traffic_id] = traffic;
+    }
+  }
+
+  LogFormat("OnJETTraffic size:%d success:%d",
+    (int) jet_provider_data.traffics.size(), success);
+}
+
 void
 TrackingGlue::OnUserName(uint32_t user_id, const TCHAR *name)
 {
@@ -283,4 +309,10 @@ void
 TrackingGlue::OnSkyLinesError(std::exception_ptr e)
 {
   LogError(e, "SkyLines error");
+}
+
+void
+TrackingGlue::OnJETProviderError(std::exception_ptr e)
+{
+  LogError(e, "JETProvider error");
 }

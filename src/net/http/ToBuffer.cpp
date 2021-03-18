@@ -150,6 +150,11 @@ Net::DownloadToBuffer(CurlGlobal &curl, const char *url,
 
     jbyteArray jbufferArr = Java::GetEnv()->NewByteArray(max_length);
     int64_t len = Java::InputStream::read(Java::GetEnv(), is, jbufferArr);
+    if((int)len > (int)max_length) {
+      // buffer overflow
+      LogFormat("DownloadToBufferHandler len (%d) > max_length (%d)", (int)max_length, (int)len);
+      return -1;
+    }
 
     jbyte *jbuffer = Java::GetEnv()->GetByteArrayElements(jbufferArr, nullptr);
     jbuffer[len] = 0;
@@ -160,9 +165,7 @@ Net::DownloadToBuffer(CurlGlobal &curl, const char *url,
   catch (...) {
     LogError(std::current_exception(), "DownloadToBuffer ANDROID");
     Java::GetEnv()->ExceptionClear();
-    #ifdef DEBUG
     throw std::current_exception();
-    #endif
   }
 #else
   CurlRequest request(curl, url, handler);
