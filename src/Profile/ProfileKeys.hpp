@@ -268,6 +268,10 @@ extern const char LiveTrack24TrackingInterval[];
 extern const char LiveTrack24TrackingVehicleType[];
 extern const char LiveTrack24TrackingVehicleName[];
 
+extern const char JETProviderRadarEnabled[];
+extern const char JETProviderRadarInterval[];
+extern const char JETProviderRadarAccessToken[];
+
 extern const char PCMetUsername[];
 extern const char PCMetPassword[];
 extern const char PCMetFtpUsername[];

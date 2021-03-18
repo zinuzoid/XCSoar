@@ -76,6 +76,7 @@ Copyright_License {
 #include "Panels/TrackingConfigPanel.hpp"
 #endif
 
+#include "Panels/JETProviderConfigPanel.hpp"
 #include "Panels/CloudConfigPanel.hpp"
 
 #ifdef HAVE_PCMET
@@ -155,6 +156,7 @@ static constexpr TabMenuPage setup_pages[] = {
 #ifdef HAVE_VOLUME_CONTROLLER
   { N_("Audio"), CreateAudioConfigPanel },
 #endif
+  { N_("JET Provider"), CreateJETProviderConfigPanel },
   { nullptr, nullptr }
 };
 
