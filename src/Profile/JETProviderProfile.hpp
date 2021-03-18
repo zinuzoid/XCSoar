@@ -21,31 +21,14 @@ Copyright_License {
 }
 */
 
-#include "TrafficLook.hpp"
-#include "Screen/Layout.hpp"
-#include "Resources.hpp"
+#ifndef JET_PROVIDER_PROFILE_HPP
+#define JET_PROVIDER_PROFILE_HPP
 
-constexpr Color TrafficLook::team_color_green;
-constexpr Color TrafficLook::team_color_magenta;
-constexpr Color TrafficLook::team_color_blue;
-constexpr Color TrafficLook::team_color_yellow;
+#include "Tracking/JETProvider/Settings.hpp"
+#include "Map.hpp"
 
-void
-TrafficLook::Initialise(const Font &_font)
-{
-  safe_above_brush.Create(safe_above_color);
-  safe_below_brush.Create(safe_below_color);
-  warning_brush.Create(warning_color);
-  warning_in_altitude_range_brush.Create(warning_in_altitude_range_color);
-  alarm_brush.Create(alarm_color);
+namespace Profile {
+  void Load(const ProfileMap &map, JETProviderSettings &settings);
+};
 
-  unsigned width = Layout::ScalePenWidth(1);
-  team_pen_green.Create(width, team_color_green);
-  team_pen_blue.Create(width, team_color_blue);
-  team_pen_yellow.Create(width, team_color_yellow);
-  team_pen_magenta.Create(width, team_color_magenta);
-
-  teammate_icon.LoadResource(IDB_TEAMMATE_POS, IDB_TEAMMATE_POS_HD);
-
-  font = &_font;
-}
+#endif
