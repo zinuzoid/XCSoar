@@ -471,6 +471,9 @@ Startup()
   if (map_window != nullptr)
     map_window->SetSkyLinesData(&tracking->GetSkyLinesData());
 #endif
+  if (map_window != nullptr)
+    map_window->SetJETProviderData(&tracking->GetJETProviderData());
+
 #endif
 
   assert(!global_running);

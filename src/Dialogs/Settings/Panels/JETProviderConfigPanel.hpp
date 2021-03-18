@@ -21,33 +21,36 @@ Copyright_License {
 }
 */
 
-#include "TrafficLook.hpp"
-#include "Screen/Layout.hpp"
-#include "Resources.hpp"
+#ifndef JET_PROVIDER_CONFIG_PANEL_HPP
+#define JET_PROVIDER_CONFIG_PANEL_HPP
 
-constexpr Color TrafficLook::team_color_green;
-constexpr Color TrafficLook::team_color_magenta;
-constexpr Color TrafficLook::team_color_blue;
-constexpr Color TrafficLook::team_color_yellow;
+#include "Widget/Widget.hpp"
+#include "Widget/RowFormWidget.hpp"
+#include "UIGlobals.hpp"
 
-void
-TrafficLook::Initialise(const Font &_font)
-{
-  safe_color = Color(0x1d,0x9b,0xc5);
-  warning_color = Color(0xfe,0x84,0x38);
-  alarm_color = Color(0xfb,0x35,0x2f);
+#include <memory>
 
-  safe_brush.Create(safe_color);
-  warning_brush.Create(warning_color);
-  alarm_brush.Create(alarm_color);
+class JETProviderConfigPanel final
+  : public RowFormWidget {
+public:
+  JETProviderConfigPanel()
+    :RowFormWidget(UIGlobals::GetDialogLook()) {}
 
-  unsigned width = Layout::ScalePenWidth(1);
-  team_pen_green.Create(width, team_color_green);
-  team_pen_blue.Create(width, team_color_blue);
-  team_pen_yellow.Create(width, team_color_yellow);
-  team_pen_magenta.Create(width, team_color_magenta);
+public:
+  /* methods from Widget */
+  void Prepare(ContainerWindow &parent, const PixelRect &rc) noexcept override;
+  bool Save(bool &changed) noexcept override;
+};
 
-  teammate_icon.LoadResource(IDB_TEAMMATE_POS, IDB_TEAMMATE_POS_HD);
+enum ControlIndex {
+  RADAR_WARNING_TEXT1,
+  RADAR_WARNING_TEXT2,
+  RADAR_WARNING_TEXT3,
+  RADAR_ENABLED,
+  RADAR_INTERVAL,
+  RADAR_ACCESS_TOKEN,
+};
 
-  font = &_font;
-}
+std::unique_ptr<Widget> CreateJETProviderConfigPanel();
+
+#endif

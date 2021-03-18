@@ -32,6 +32,7 @@ Copyright_License {
 #include "Tracking/SkyLines/Handler.hpp"
 #include "Tracking/SkyLines/Glue.hpp"
 #include "Tracking/SkyLines/Data.hpp"
+#include "Tracking/JETProvider/JETProvider.hpp"
 #include "thread/StandbyThread.hpp"
 #include "Tracking/LiveTrack24.hpp"
 #include "time/PeriodClock.hpp"
@@ -44,7 +45,8 @@ class CurlGlobal;
 
 class TrackingGlue final
   : protected StandbyThread,
-    private SkyLinesTracking::Handler
+    private SkyLinesTracking::Handler,
+    private JETProvider::Handler
 {
   struct LiveTrack24State
   {
@@ -69,6 +71,10 @@ class TrackingGlue final
   SkyLinesTracking::Glue skylines;
 
   SkyLinesTracking::Data skylines_data;
+
+  JETProvider::Glue jet_provider;
+  
+  JETProvider::Data jet_provider_data;
 
   LiveTrack24State state;
 
@@ -108,10 +114,15 @@ private:
                  const AGeoPoint &bottom, const AGeoPoint &top,
                  double lift) override;
   void OnSkyLinesError(std::exception_ptr e) override;
+  void OnJETTraffic(std::vector<JETProvider::Data::Traffic> traffics) override;
+  void OnJETProviderError(std::exception_ptr e) override;
 
 public:
   const SkyLinesTracking::Data &GetSkyLinesData() const {
     return skylines_data;
+  }
+  const JETProvider::Data &GetJETProviderData() const {
+    return jet_provider_data;
   }
 };
 

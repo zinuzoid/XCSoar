@@ -21,33 +21,14 @@ Copyright_License {
 }
 */
 
-#include "TrafficLook.hpp"
-#include "Screen/Layout.hpp"
-#include "Resources.hpp"
+#ifndef XCSOAR_INLINE_JOB_RUNNER_HPP
+#define XCSOAR_INLINE_JOB_RUNNER_HPP
 
-constexpr Color TrafficLook::team_color_green;
-constexpr Color TrafficLook::team_color_magenta;
-constexpr Color TrafficLook::team_color_blue;
-constexpr Color TrafficLook::team_color_yellow;
+#include "Job/Runner.hpp"
 
-void
-TrafficLook::Initialise(const Font &_font)
-{
-  safe_color = Color(0x1d,0x9b,0xc5);
-  warning_color = Color(0xfe,0x84,0x38);
-  alarm_color = Color(0xfb,0x35,0x2f);
+class InlineJobRunner : public JobRunner {
+public:
+  virtual bool Run(Job &job);
+};
 
-  safe_brush.Create(safe_color);
-  warning_brush.Create(warning_color);
-  alarm_brush.Create(alarm_color);
-
-  unsigned width = Layout::ScalePenWidth(1);
-  team_pen_green.Create(width, team_color_green);
-  team_pen_blue.Create(width, team_color_blue);
-  team_pen_yellow.Create(width, team_color_yellow);
-  team_pen_magenta.Create(width, team_color_magenta);
-
-  teammate_icon.LoadResource(IDB_TEAMMATE_POS, IDB_TEAMMATE_POS_HD);
-
-  font = &_font;
-}
+#endif
