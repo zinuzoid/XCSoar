@@ -271,6 +271,10 @@ const char LiveTrack24TrackingInterval[] = "TrackingInterval";
 const char LiveTrack24TrackingVehicleType[] = "TrackingVehicleType";
 const char LiveTrack24TrackingVehicleName[] = "TrackingVehicleName";
 
+const char JETProviderRadarEnabled[] = "JETProviderRadarEnabled";
+const char JETProviderRadarInterval[] = "JETProviderRadarInterval";
+const char JETProviderRadarAccessToken[] = "JETProviderRadarAccessToken";
+
 const char PCMetUsername[] = "PCMetUsername";
 const char PCMetPassword[] = "PCMetPassword";
 const char PCMetFtpUsername[] = "PCMetFtpUsername";

@@ -40,6 +40,7 @@ Copyright_License {
 #include "util/Compiler.h"
 #include "Weather/Features.hpp"
 #include "Tracking/SkyLines/Features.hpp"
+#include "Tracking/JETProvider/JETProvider.hpp"
 
 #include <memory>
 
@@ -164,6 +165,8 @@ protected:
   const TIM::Glue *tim_glue = nullptr;
 #endif
 
+  const JETProvider::Data *jet_provider_data = nullptr;
+
   bool compass_visible = true;
 
 #ifndef ENABLE_OPENGL
@@ -261,6 +264,10 @@ public:
   }
 #endif
 
+  void SetJETProviderData(const JETProvider::Data *_data) {
+    jet_provider_data = _data;
+  }
+
   void FlushCaches();
 
   using MapWindowBlackboard::ReadBlackboard;
@@ -319,6 +326,7 @@ protected:
   void DrawTerrainAbove(Canvas &canvas);
   void DrawFLARMTraffic(Canvas &canvas, PixelPoint aircraft_pos) const;
   void DrawGLinkTraffic(Canvas &canvas, PixelPoint aircraft_pos) const;
+  void DrawJETProviderTraffic(Canvas &canvas, const PixelPoint aircraft_pos) const;
 
   // thread, main functions
   /**
