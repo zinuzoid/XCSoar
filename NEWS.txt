@@ -11,6 +11,8 @@ Version JET
 - New Infobox H AGL and H T/O in the same Infobox
 - Fix Android DownloadToBuffer issue with dns permission
 - The initial goto task will always be a takeoff site instead of nearest landable
+- JETProvider :)
+- JETProvider fixes: Offline mode will draw black, fix interval setting saving
 
 ------------------------
 Version 7.10 - 2021/07/09
