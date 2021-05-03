@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.zinuzoid.xcsoar_jet"
           android:installLocation="auto"
-          android:versionCode="132"
-          android:versionName="7.6">
+          android:versionCode="128"
+          android:versionName="7.6_JET_1.5">
   <application
       android:requestLegacyExternalStorage="true"
       android:icon="@drawable/icon"
