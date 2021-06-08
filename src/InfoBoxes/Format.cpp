@@ -75,6 +75,12 @@ InfoBoxData::SetValueFromTimeTwoLines(int dd)
 }
 
 void
+InfoBoxData::SetValueFromFuelRemainTwoLines(int time, double quantity)
+{
+  FormatFuelRemainTwoLines(value.buffer(), comment.buffer(), time, quantity);
+}
+
+void
 InfoBoxData::SetValueFromPercent(double dd)
 {
   UnsafeFormatValue(_T("%d"), (int)(dd));

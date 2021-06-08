@@ -75,6 +75,8 @@ FormatSignedTimeHHMM(int time)
  */
 void FormatTimeTwoLines(TCHAR *buffer1, TCHAR *buffer2, int time);
 
+void FormatFuelRemainTwoLines(TCHAR *buffer1, TCHAR *buffer2, int time, double quantity);
+
 void FormatTimespanSmart(TCHAR *buffer, int timespan,
                          unsigned max_tokens = 1,
                          const TCHAR *separator = _T(" "));
