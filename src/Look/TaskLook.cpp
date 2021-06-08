@@ -57,6 +57,9 @@ TaskLook::Initialise()
 
   highlight_pen.Create(Layout::ScalePenWidth(4), COLOR_BLACK);
 
+  fuel_range_pen.Create(Layout::ScalePenWidth(2), COLOR_WHITE);
+  fuel_range_brush.Create(ColorWithAlpha(COLOR_WHITE, 0));
+
   target_icon.LoadResource(IDB_TARGET, IDB_TARGET_HD);
 
   hbGray.Create(COLOR_GRAY);

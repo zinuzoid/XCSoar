@@ -136,6 +136,33 @@ FormatTimeTwoLines(TCHAR *buffer1, TCHAR *buffer2, std::chrono::seconds _time) n
   }
 }
 
+void
+FormatFuelRemainTwoLines(TCHAR *buffer1, TCHAR *buffer2, int _time, double quantity)
+{
+  if (_time >= 24 * 3600) {
+    _tcscpy(buffer1, _T(">24h"));
+    return;
+  }
+  if (_time <= -24 * 3600) {
+    _tcscpy(buffer1, _T("<-24h"));
+    return;
+  }
+  if (_time < 0) {
+    *buffer1++ = _T('-');
+    _time = -_time;
+  }
+
+  const BrokenTime time = BrokenTime::FromSecondOfDay(_time);
+
+  if (time.hour > 0) { // hh:mm
+    _stprintf(buffer1, _T("%02u:%02u"), time.hour, time.minute);
+  } else { // mm'ss
+    _stprintf(buffer1, _T("%02u'%02u"), time.minute, time.second);
+  }
+
+  _stprintf(buffer2, _T("%.3f ltr"), quantity);
+}
+
 static void
 CalculateTimespanComponents(unsigned timespan, unsigned &days, unsigned &hours,
                             unsigned &minutes, unsigned &seconds) noexcept

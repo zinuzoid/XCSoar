@@ -46,6 +46,10 @@ class PlaneEditWidget final
     DUMP_TIME,
     MAX_SPEED,
     WEGLIDE_ID,
+    IS_POWERED,
+    AVERAGE_TAS,
+    FUEL_CONSUMPTION,
+    FUEL_ONBOARD,
   };
 
   WndForm *dialog;
@@ -145,6 +149,18 @@ PlaneEditWidget::Prepare([[maybe_unused]] ContainerWindow &parent, [[maybe_unuse
   else
     AddDummy();
 
+  AddBoolean(_("Is Powered"), nullptr,
+           plane.is_powered);
+  AddFloat(_("Average TAS"), nullptr,
+           _T("%.0f %s"), _T("%.0f"), 0, 100, 1,
+           false, UnitGroup::HORIZONTAL_SPEED, plane.average_tas);
+  AddFloat(_("Fuel Consumption"), nullptr,
+           _T("%.1f ltr/hr"), _T("%.1f ltr/hr"), 1.0, 5.0, 0.1,
+           true, plane.fuel_consumption);
+  AddFloat(_("Fuel Onboard"), nullptr,
+           _T("%.1f ltr"), _T("%.1f ltr"), 0.1, 30.0, 0.1,
+           true, plane.fuel_onboard);
+
   UpdateCaption();
   UpdatePolarButton();
 }
@@ -167,6 +183,11 @@ PlaneEditWidget::Save(bool &_changed) noexcept
 
   if (CommonInterface::GetComputerSettings().weglide.enabled)
     changed |= SaveValueInteger(WEGLIDE_ID, plane.weglide_glider_type);
+
+  changed |= SaveValue(IS_POWERED, plane.is_powered);
+  changed |= SaveValue(AVERAGE_TAS, UnitGroup::HORIZONTAL_SPEED, plane.average_tas);
+  changed |= SaveValue(FUEL_CONSUMPTION, plane.fuel_consumption);
+  changed |= SaveValue(FUEL_ONBOARD, plane.fuel_onboard);
 
   _changed |= changed;
   return true;

@@ -194,4 +194,6 @@ private:
 
   void CalculateWorkingBand();
   void CalculateVarioScale();
+
+  void CalculateFuelBurnTimeRemain(DerivedInfo &calculated);
 };

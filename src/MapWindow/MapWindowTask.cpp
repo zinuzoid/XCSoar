@@ -32,6 +32,22 @@ Copyright_License {
 #include "Screen/Layout.hpp"
 #include "Math/Screen.hpp"
 #include "Look/MapLook.hpp"
+#include "LogFile.hpp"
+#include "Task/Points/TaskWaypoint.hpp"
+#include "Task/Ordered/Points/OrderedTaskPoint.hpp"
+#include "Interface.hpp"
+#include "util/Macros.hpp"
+
+PixelPoint
+MapWindow::CalculatePixelPoint(
+  PixelPoint p1,
+  PixelPoint p2,
+  double percent)
+{
+  return PixelPoint(
+    iround(((p1.x-p2.x) * percent) + p2.x),
+    iround(((p1.y-p2.y) * percent) + p2.y));
+}
 
 void
 MapWindow::DrawTask(Canvas &canvas)
@@ -77,6 +93,8 @@ MapWindow::DrawTask(Canvas &canvas)
     tpv.SetTaskFinished(Calculated().task_stats.task_finished);
     TaskRenderer dv(tpv, render_projection.GetScreenBounds());
     dv.Draw(*task);
+
+    DrawFuelBurnTask(canvas, *task);
   }
 
   if (draw_route)
@@ -100,6 +118,87 @@ MapWindow::DrawRoute(Canvas &canvas)
 
   canvas.Select(look.task.bearing_pen);
   canvas.DrawPolyline(p, r_size);
+}
+
+void
+MapWindow::DrawFuelBurnTask(Canvas &canvas, const TaskInterface &task)
+{
+  const auto &plane = CommonInterface::GetComputerSettings().plane;
+
+  if(
+    !plane.is_powered ||
+    !Basic().airspeed_available ||
+    task.GetType() != TaskType::ORDERED) {
+    return;
+  }
+  
+  canvas.Select(look.task.fuel_range_pen);
+  canvas.Select(look.task.fuel_range_brush);
+
+  auto &ordered_task = (const OrderedTask &)task;
+  auto current_pos = Basic().location;
+  auto true_airspeed = plane.average_tas;
+  auto fuel_burn_time_remain = Calculated().fuel_burn_time_remain;
+  auto wind = Calculated().wind;
+
+  auto active_index = ordered_task.GetActiveTaskPointIndex();
+ for (auto i = active_index; i < ordered_task.TaskSize(); i++) {
+    const OrderedTaskPoint &tp = ordered_task.GetTaskPoint(i);
+    auto effective_wind_angle = wind.bearing.Reciprocal() - tp.GetVectorRemaining(current_pos).bearing;
+    auto head_wind = -wind.norm * effective_wind_angle.cos();
+    auto estimated_gs = true_airspeed - head_wind;
+    if (fabs(estimated_gs) <= std::numeric_limits<double>::epsilon()) {
+      LogFormat("DrawFuelBurnTask estimated_gs: %f", estimated_gs);
+      return;
+    }
+    double route_distance;
+    if (i == active_index) {
+      route_distance = tp.Distance(current_pos);
+    } else {
+      route_distance = tp.Distance(ordered_task.GetTaskPoint(i - 1).GetLocation());
+    }
+    auto t = route_distance / estimated_gs;
+    // LogFormat("%d/%d: estimated_gs: %f, dis: %f, t: %f", i, ordered_task->TaskSize(), estimated_gs, route_distance, t);
+    if (fuel_burn_time_remain - t <= 0) {
+      auto waypoint_location = tp.GetLocation();
+      auto to_pixel_point = render_projection.GeoToScreen(waypoint_location);
+      PixelPoint from_pixel_point;
+      if (i == active_index) {
+        from_pixel_point = render_projection.GeoToScreen(current_pos);
+      } else {
+        from_pixel_point = render_projection.GeoToScreen(tp.GetPrevious()->GetLocation());
+      }
+
+      double dd = estimated_gs * fuel_burn_time_remain;
+
+      auto mid = CalculatePixelPoint(to_pixel_point, from_pixel_point, dd / route_distance);
+      BulkPixelPoint line[] = {
+        { (int) +render_projection.GeoToScreenDistance(1000), (int) -render_projection.GeoToScreenDistance(2500) },
+        { 0, (int) -render_projection.GeoToScreenDistance(2500) },
+        { 0, (int) +render_projection.GeoToScreenDistance(2500) },
+        { (int) +render_projection.GeoToScreenDistance(1000), (int) +render_projection.GeoToScreenDistance(2500) },
+      };
+
+      PolygonRotateShift({line, ARRAY_SIZE(line)}, mid, tp.GetVectorRemaining(current_pos).bearing + Angle::Degrees(90));
+
+      canvas.DrawCircle(mid, render_projection.GeoToScreenDistance(2000));
+      canvas.DrawPolyline(line, 4);
+
+      fuel_burn_time_remain = 0;
+      break;
+    }
+    fuel_burn_time_remain -= t;
+  }
+
+  if (fuel_burn_time_remain > 0) {
+    const OrderedTaskPoint &tp = ordered_task.GetTaskPoint(ordered_task.TaskSize() - 1);
+    auto waypoint_location = tp.GetLocation();
+    auto to_pixel_point = render_projection.GeoToScreen(waypoint_location);
+
+    canvas.DrawCircle(to_pixel_point, render_projection.GeoToScreenDistance(1000 + fuel_burn_time_remain * (1000.0 / 300.0)));
+
+    LogFormat("Too much fuel %d", fuel_burn_time_remain);
+  }
 }
 
 void

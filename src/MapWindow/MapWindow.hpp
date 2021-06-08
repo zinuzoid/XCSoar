@@ -39,6 +39,7 @@ Copyright_License {
 #include "Weather/Features.hpp"
 #include "Tracking/SkyLines/Features.hpp"
 #include "Tracking/JETProvider/JETProvider.hpp"
+#include "Engine/Task/TaskInterface.hpp"
 
 #include <memory>
 
@@ -316,6 +317,7 @@ protected:
   void DrawContest(Canvas &canvas);
   void DrawTask(Canvas &canvas);
   void DrawRoute(Canvas &canvas);
+  void DrawFuelBurnTask(Canvas &canvas, const TaskInterface &task);
   void DrawTaskOffTrackIndicator(Canvas &canvas);
   void DrawWaves(Canvas &canvas);
   virtual void DrawThermalEstimate(Canvas &canvas) const;
@@ -325,6 +327,8 @@ protected:
   void DrawFLARMTraffic(Canvas &canvas, PixelPoint aircraft_pos) const;
   void DrawGLinkTraffic(Canvas &canvas, PixelPoint aircraft_pos) const;
   void DrawJETProviderTraffic(Canvas &canvas, const PixelPoint aircraft_pos) const;
+
+  PixelPoint CalculatePixelPoint(PixelPoint p1, PixelPoint p2, double percent);
 
   // thread, main functions
   /**

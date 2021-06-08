@@ -159,6 +159,12 @@ ActionInterface::SetBugs(double bugs, bool to_devices) noexcept
 }
 
 void
+ActionInterface::SetFuelOnboard(double fuel_onboard) noexcept
+{
+  CommonInterface::SetComputerSettings().plane.fuel_onboard = fuel_onboard;
+}
+
+void
 ActionInterface::SetMacCready(double mc, bool to_devices) noexcept
 {
   // Repeated adjustment of MC with the +/- UI elements could result in

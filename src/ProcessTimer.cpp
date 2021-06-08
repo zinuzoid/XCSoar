@@ -42,6 +42,7 @@ Copyright_License {
 #include "net/client/tim/Glue.hpp"
 #include "ui/event/Idle.hpp"
 #include "Dialogs/Tracking/CloudEnableDialog.hpp"
+#include "LogFile.hpp"
 
 static void
 MessageProcessTimer() noexcept
@@ -175,11 +176,39 @@ ProcessAutoBugs() noexcept
 }
 
 static void
+ProcessFuelBurn() noexcept
+{
+  const auto &flight = CommonInterface::Calculated().flight;
+  const auto &plane = CommonInterface::GetComputerSettings().plane;
+
+  static int last_flight_time = std::chrono::duration_cast<std::chrono::seconds>(flight.flight_time).count();
+
+  if (!plane.is_powered || !flight.flying) {
+    return;
+  }
+
+  if (last_flight_time == std::chrono::duration_cast<std::chrono::seconds>(flight.flight_time).count()) {
+    return;
+  }
+  last_flight_time = std::chrono::duration_cast<std::chrono::seconds>(flight.flight_time).count();
+
+  if (plane.fuel_consumption <= 0.0 || plane.fuel_onboard <= 0.0) {
+    return;
+  }
+  
+  {
+    const double decremental = plane.fuel_consumption / 60.0 / 60.0;
+    ActionInterface::SetFuelOnboard(plane.fuel_onboard - decremental);
+  }
+}
+
+static void
 SettingsProcessTimer() noexcept
 {
   CloudEnableDialog();
   BallastDumpProcessTimer();
   ProcessAutoBugs();
+  ProcessFuelBurn();
 }
 
 static void
