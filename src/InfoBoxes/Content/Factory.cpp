@@ -1194,6 +1194,14 @@ static constexpr MetaData meta_data[] = {
     altitude_infobox_panels,
   },
 
+  // e_Fuel_Remain
+  {
+    N_("Fuel Remain time / quantity"),
+    N_("Fuel"),
+    N_("Fuel Calculator"),
+    UpdateInfoBoxFuelRemain,
+  },
+
 };
 
 static_assert(ARRAY_SIZE(meta_data) == NUM_TYPES,

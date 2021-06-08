@@ -167,6 +167,8 @@ namespace InfoBoxFactory
     e_Speed_GPS_TAS, // first Jet item
     e_H_Baro_GPS,
     e_HeightAGL_T_O,
+    
+    e_Fuel_Remain,
 
     e_NUM_TYPES /* Last item */
   };
