@@ -49,6 +49,12 @@ InfoBoxData::SetValueFromTimeTwoLines(std::chrono::seconds dd) noexcept
 }
 
 void
+InfoBoxData::SetValueFromFuelRemainTwoLines(int time, double quantity) noexcept
+{
+  FormatFuelRemainTwoLines(value.buffer(), comment.buffer(), time, quantity);
+}
+
+void
 InfoBoxData::SetValueFromPercent(double dd) noexcept
 {
   FmtValue(_T("{}"), (int)dd);
