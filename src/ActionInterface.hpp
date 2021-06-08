@@ -49,6 +49,8 @@ namespace ActionInterface {
    */
   void SetBugs(double mc, bool to_devices=true);
 
+  void SetFuelOnboard(double fuel_onboard);
+
   /**
    * Configure a new MacCready setting in #ComputerSettings, and
    * forward it to all XCSoar modules that want it.
