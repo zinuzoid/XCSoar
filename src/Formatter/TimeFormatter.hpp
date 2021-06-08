@@ -91,6 +91,12 @@ FormatTimespanSmart(TCHAR *buffer, int timespan,
                     unsigned max_tokens = 1,
                     const TCHAR *separator = _T(" ")) noexcept;
 
+void
+FormatFuelRemainTwoLines(TCHAR *buffer1,
+                         TCHAR *buffer2,
+                         int time,
+                         double quantity);
+
 gcc_const
 static inline BasicStringBuffer<TCHAR, 64>
 FormatTimespanSmart(int timespan, unsigned max_tokens = 1,

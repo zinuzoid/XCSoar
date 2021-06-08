@@ -41,6 +41,7 @@ Copyright_License {
 #include "Tracking/TrackingGlue.hpp"
 #include "ui/event/Idle.hpp"
 #include "Dialogs/Tracking/CloudEnableDialog.hpp"
+#include "LogFile.hpp"
 
 static void
 MessageProcessTimer() noexcept
@@ -174,11 +175,39 @@ ProcessAutoBugs() noexcept
 }
 
 static void
+ProcessFuelBurn() noexcept
+{
+  const auto &flight = CommonInterface::Calculated().flight;
+  const auto &plane = CommonInterface::GetComputerSettings().plane;
+
+  static int last_flight_time = flight.flight_time;
+
+  if (!plane.is_powered || !flight.flying) {
+    return;
+  }
+
+  if (last_flight_time == (int) flight.flight_time) {
+    return;
+  }
+  last_flight_time = flight.flight_time;
+
+  if (plane.fuel_consumption <= 0.0 || plane.fuel_onboard <= 0.0) {
+    return;
+  }
+  
+  {
+    const double decremental = plane.fuel_consumption / 60.0 / 60.0;
+    ActionInterface::SetFuelOnboard(plane.fuel_onboard - decremental);
+  }
+}
+
+static void
 SettingsProcessTimer() noexcept
 {
   CloudEnableDialog();
   BallastDumpProcessTimer();
   ProcessAutoBugs();
+  ProcessFuelBurn();
 }
 
 static void

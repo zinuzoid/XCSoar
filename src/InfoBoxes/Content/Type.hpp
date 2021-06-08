@@ -173,6 +173,8 @@ namespace InfoBoxFactory
     e_Speed_GPS_IAS,
     e_H_Baro_GPS,
     e_HeightAGL_T_O,
+    
+    e_Fuel_Remain,
 
     e_NUM_TYPES /* Last item */
   };

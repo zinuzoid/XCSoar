@@ -187,6 +187,8 @@ struct InfoBoxData {
    */
   void SetValueFromTimeTwoLines(int dd);
 
+  void SetValueFromFuelRemainTwoLines(int time, double quantity);
+
   /**
    * Set the InfoBox comment to the specified percentage value.
    */

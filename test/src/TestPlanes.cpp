@@ -81,6 +81,10 @@ TestWriter()
   plane.dump_time = 90;
   plane.max_speed = 41.666;
   plane.wing_area = 9.8;
+  plane.is_powered = true;
+  plane.average_tas = 1.2;
+  plane.fuel_onboard = 2.3;
+  plane.fuel_consumption = 3.4;
 
   PlaneGlue::WriteFile(plane, Path(_T("output/D-4449.xcp")));
 
@@ -90,6 +94,7 @@ TestWriter()
   bool found1 = false, found2 = false, found3 = false, found4 = false;
   bool found5 = false, found6 = false, found7 = false, found8 = false;
   bool found9 = false, found10 = false, found11 = false, found12 = false;
+  bool found13 = false, found14 = false, found15 = false, found16 = false;
 
   TCHAR *line;
   while ((line = reader.ReadLine()) != NULL) {
@@ -117,11 +122,19 @@ TestWriter()
       found11 = true;
     if (StringIsEqual(line, _T("WingArea=\"9.800000\"")))
       found12 = true;
+    if (StringIsEqual(line, _T("IsPowered=\"1\"")))
+      found13 = true;
+    if (StringIsEqual(line, _T("AverageTAS=\"1.200000\"")))
+      found14 = true;
+    if (StringIsEqual(line, _T("FuelOnboard=\"2.300000\"")))
+      found15 = true;
+    if (StringIsEqual(line, _T("FuelConsumption=\"3.400000\"")))
+      found16 = true;
 
     count++;
   }
 
-  ok1(count == 12);
+  ok1(count == 16);
   ok1(found1);
   ok1(found2);
   ok1(found3);
@@ -134,11 +147,15 @@ TestWriter()
   ok1(found10);
   ok1(found11);
   ok1(found12);
+  ok1(found13);
+  ok1(found14);
+  ok1(found15);
+  ok1(found16);
 }
 
 int main(int argc, char **argv)
 try {
-  plan_tests(30);
+  plan_tests(34);
 
   TestReader();
   TestWriter();

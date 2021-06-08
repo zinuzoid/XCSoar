@@ -77,3 +77,14 @@ UpdateInfoBoxTimeFlight(InfoBoxData &data)
   }
   data.SetValueFromTimeTwoLines((int)flight.flight_time);
 }
+
+void
+UpdateInfoBoxFuelRemain(InfoBoxData &data)
+{
+  int fuel_burn_time_remain = -1;
+  if(CommonInterface::Calculated().fuel_burn_time_remain_available) {
+    fuel_burn_time_remain = CommonInterface::Calculated().fuel_burn_time_remain;;
+  }
+  const auto &plane = CommonInterface::GetComputerSettings().plane;
+  data.SetValueFromFuelRemainTwoLines(fuel_burn_time_remain, plane.fuel_onboard);
+}

@@ -35,4 +35,7 @@ UpdateInfoBoxTimeUTC(InfoBoxData &data);
 void
 UpdateInfoBoxTimeFlight(InfoBoxData &data);
 
+void
+UpdateInfoBoxFuelRemain(InfoBoxData &data);
+
 #endif
