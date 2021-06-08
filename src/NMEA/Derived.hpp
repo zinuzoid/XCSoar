@@ -236,6 +236,9 @@ struct DerivedInfo:
    */
   double next_leg_eq_thermal;
 
+  int fuel_burn_time_remain;
+  Validity fuel_burn_time_remain_available;
+
   /**
    * @todo Reset to cleared state
    */

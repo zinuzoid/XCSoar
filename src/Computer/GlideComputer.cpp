@@ -135,7 +135,22 @@ GlideComputer::ProcessGPS(bool force)
   // Update the ConditionMonitors
   condition_monitors.Update(Basic(), Calculated(), settings);
 
+  CalculateFuelBurnTimeRemain(calculated);
+
   return idle_clock.CheckUpdate(milliseconds(500));
+}
+
+void
+GlideComputer::CalculateFuelBurnTimeRemain(DerivedInfo &calculated)
+{
+  const auto &plane = GetComputerSettings().plane;
+
+  if (plane.fuel_consumption < 0 || fabs(plane.fuel_consumption) <= std::numeric_limits<double>::epsilon()) {
+    return;
+  }
+
+  calculated.fuel_burn_time_remain = plane.fuel_onboard / plane.fuel_consumption * 60.0 * 60.0;
+  calculated.fuel_burn_time_remain_available.Update(Basic().clock);
 }
 
 void
