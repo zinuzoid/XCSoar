@@ -41,6 +41,10 @@ struct Plane
   double max_ballast;
   double max_speed;
   double wing_area;
+  bool is_powered;
+  double average_tas;
+  double fuel_consumption;
+  double fuel_onboard;
 
   /** Time to drain full ballast (s) */
   unsigned dump_time;

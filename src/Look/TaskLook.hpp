@@ -44,6 +44,9 @@ struct TaskLook {
 
   Pen highlight_pen;
 
+  Pen fuel_range_pen;
+  Brush fuel_range_brush;
+
   MaskedIcon target_icon;
 
   /**

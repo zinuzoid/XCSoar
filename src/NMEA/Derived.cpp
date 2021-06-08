@@ -96,6 +96,8 @@ DerivedInfo::Reset()
   airspace_warnings.Clear();
 
   planned_route.clear();
+
+  fuel_burn_time_remain_available.Clear();
 }
 
 void
@@ -114,6 +116,7 @@ DerivedInfo::Expire(TimeStamp Time) noexcept
 
   auto_mac_cready_available.Expire(Time, std::chrono::hours(1));
   sun_data_available.Expire(Time, std::chrono::hours(1));
+  fuel_burn_time_remain_available.Expire(Time, std::chrono::seconds(3));
 }
 
 
