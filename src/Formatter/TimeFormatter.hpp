@@ -104,6 +104,12 @@ FormatTimespanSmart(TCHAR *buffer, std::chrono::seconds timespan,
                     unsigned max_tokens = 1,
                     const TCHAR *separator = _T(" ")) noexcept;
 
+void
+FormatFuelRemainTwoLines(TCHAR *buffer1,
+                         TCHAR *buffer2,
+                         int time,
+                         double quantity);
+
 [[gnu::const]]
 static inline BasicStringBuffer<TCHAR, 64>
 FormatTimespanSmart(std::chrono::seconds timespan, unsigned max_tokens = 1,

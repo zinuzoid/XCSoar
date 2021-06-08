@@ -42,6 +42,18 @@ ReadUnsigned(const char *string, unsigned &out)
   return true;
 }
 
+static bool
+ReadBool(const char *string, bool &out)
+{
+  char *endptr;
+  unsigned tmp = ParseUnsigned(string, &endptr, 0);
+  if (endptr == string)
+    return false;
+
+  out = tmp != 0;
+  return true;
+}
+
 bool
 PlaneGlue::Read(Plane &plane, KeyValueFileReader &reader)
 {
@@ -59,6 +71,10 @@ PlaneGlue::Read(Plane &plane, KeyValueFileReader &reader)
   bool has_dump_time = false;
   bool has_max_speed = false;
   bool has_wing_area = false;
+  bool has_is_powered = false;
+  bool has_average_tas = false;
+  bool has_fuel_consumption = false;
+  bool has_fuel_onboard = false;
 
   KeyValuePair pair;
   while (reader.Read(pair)) {
@@ -95,6 +111,14 @@ PlaneGlue::Read(Plane &plane, KeyValueFileReader &reader)
       has_max_speed = ReadDouble(pair.value, plane.max_speed);
     } else if (!has_wing_area && StringIsEqual(pair.key, "WingArea")) {
       has_wing_area = ReadDouble(pair.value, plane.wing_area);
+    } else if (!has_is_powered && StringIsEqual(pair.key, "IsPowered")) {
+      has_is_powered = ReadBool(pair.value, plane.is_powered);
+    } else if (!has_average_tas && StringIsEqual(pair.key, "AverageTAS")) {
+      has_average_tas = ReadDouble(pair.value, plane.average_tas);
+    } else if (!has_fuel_consumption && StringIsEqual(pair.key, "FuelConsumption")) {
+      has_fuel_consumption = ReadDouble(pair.value, plane.fuel_consumption);
+    } else if (!has_fuel_onboard && StringIsEqual(pair.key, "FuelOnboard")) {
+      has_fuel_onboard = ReadDouble(pair.value, plane.fuel_onboard);
     }
   }
 
@@ -127,6 +151,14 @@ PlaneGlue::Read(Plane &plane, KeyValueFileReader &reader)
     plane.max_speed = 55.555;
   if (!has_wing_area)
     plane.wing_area = 0;
+  if (!has_is_powered)
+    plane.is_powered = false;
+  if (!has_average_tas)
+    plane.average_tas = 10;
+  if (!has_fuel_consumption)
+    plane.fuel_consumption = 4;
+  if (!has_fuel_onboard)
+    plane.fuel_onboard = 5;
 
   return true;
 }
@@ -176,6 +208,14 @@ PlaneGlue::Write(const Plane &plane, KeyValueFileWriter &writer)
   writer.Write("WingArea", tmp);
   tmp.Format("%u", (unsigned)plane.weglide_glider_type);
   writer.Write("WeGlideAircraftType", tmp);
+  tmp.Format("%d", plane.is_powered);
+  writer.Write("IsPowered", tmp);
+  tmp.Format("%f", (double)plane.average_tas);
+  writer.Write("AverageTAS", tmp);
+  tmp.Format("%f", (double)plane.fuel_consumption);
+  writer.Write("FuelConsumption", tmp);
+  tmp.Format("%f", (double)plane.fuel_onboard);
+  writer.Write("FuelOnboard", tmp);
 }
 
 void
