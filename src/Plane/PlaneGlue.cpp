@@ -88,4 +88,8 @@ PlaneGlue::Synchronize(const Plane &plane, ComputerSettings &settings,
   settings.plane.registration = plane.registration;
   settings.plane.type = plane.type;
   settings.plane.weglide_glider_type = plane.weglide_glider_type;
+  settings.plane.is_powered = plane.is_powered;
+  settings.plane.average_tas = plane.average_tas;
+  settings.plane.fuel_consumption = plane.fuel_consumption;
+  settings.plane.fuel_onboard = plane.fuel_onboard;
 }
