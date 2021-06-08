@@ -241,6 +241,8 @@ struct InfoBoxData {
     SetValueFromTimeTwoLines(std::chrono::duration_cast<std::chrono::seconds>(dd));
   }
 
+  void SetValueFromFuelRemainTwoLines(int time, double quantity) noexcept;
+
   /**
    * Set the InfoBox comment to the specified percentage value.
    */

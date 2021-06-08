@@ -11,6 +11,7 @@ Version JET
 - The initial goto task will always be a takeoff site instead of nearest landable
 - JETProvider :)
 - JETProvider fixes: Offline mode will draw black, fix interval setting saving
+- Fuel Burn calculation for PPG (Fuel burn time widget and task range estimation)
 
 ------------------------
 
