@@ -31,6 +31,9 @@ SetBallast(double ballast, bool to_devices=true) noexcept;
 void
 SetBugs(double mc, bool to_devices=true) noexcept;
 
+void
+SetFuelOnboard(double fuel_onboard) noexcept;
+
 /**
  * Configure a new MacCready setting in #ComputerSettings, and
  * forward it to all XCSoar modules that want it.
