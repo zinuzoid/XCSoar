@@ -18,6 +18,7 @@ namespace Profile {
   static void Load(const ProfileMap &map, DialogSettings &settings);
   static void Load(const ProfileMap &map, SoundSettings &settings);
   static void Load(const ProfileMap &map, VarioSoundSettings &settings);
+  static void LoadAudioTaskBearing(const ProfileMap &map, VarioSoundSettings &settings);
 };
 
 void
@@ -86,6 +87,24 @@ Profile::Load(const ProfileMap &map, VarioSoundSettings &settings)
 }
 
 void
+Profile::LoadAudioTaskBearing(const ProfileMap &map, VarioSoundSettings &settings)
+{
+  map.Get(ProfileKeys::AudioTaskBearingEnable, settings.enabled);
+  map.Get(ProfileKeys::AudioTaskBearingVolume, settings.volume);
+  map.Get(ProfileKeys::AudioTaskBearingDeadBandEnabled, settings.dead_band_enabled);
+
+  map.Get(ProfileKeys::AudioTaskBearingMinFrequency, settings.min_frequency);
+  map.Get(ProfileKeys::AudioTaskBearingZeroFrequency, settings.zero_frequency);
+  map.Get(ProfileKeys::AudioTaskBearingMaxFrequency, settings.max_frequency);
+
+  map.Get(ProfileKeys::AudioTaskBearingMinPeriod, settings.min_period_ms);
+  map.Get(ProfileKeys::AudioTaskBearingMaxPeriod, settings.max_period_ms);
+
+  map.Get(ProfileKeys::AudioTaskBearingDeadBandMin, settings.min_dead);
+  map.Get(ProfileKeys::AudioTaskBearingDeadBandMax, settings.max_dead);
+}
+
+void
 Profile::Load(const ProfileMap &map, SoundSettings &settings)
 {
   map.Get(ProfileKeys::SoundTask, settings.sound_task_enabled);
@@ -95,6 +114,7 @@ Profile::Load(const ProfileMap &map, SoundSettings &settings)
   map.Get(ProfileKeys::MasterAudioVolume, settings.master_volume);
 
   Load(map, settings.vario);
+  LoadAudioTaskBearing(map, settings.task_bearing);
 }
 
 void
