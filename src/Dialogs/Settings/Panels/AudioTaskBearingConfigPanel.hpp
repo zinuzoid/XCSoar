@@ -21,29 +21,14 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_SOUND_SETTINGS_HPP
-#define XCSOAR_SOUND_SETTINGS_HPP
+#ifndef AUDIO_TASK_BEARING_CONFIGPANEL_HPP
+#define AUDIO_TASK_BEARING_CONFIGPANEL_HPP
 
-#include "VarioSettings.hpp"
+#include <memory>
 
-#include <cstdint>
-#include <type_traits>
+class Widget;
 
-struct SoundSettings {
-  // sound stuff not used?
-  bool sound_task_enabled;
-  bool sound_modes_enabled;
-  uint8_t sound_deadband;
+std::unique_ptr<Widget>
+CreateAudioTaskBearingConfigPanel();
 
-  uint8_t master_volume;
-
-  VarioSoundSettings vario;
-  VarioSoundSettings task_bearing;
-
-  void SetDefaults();
-};
-
-static_assert(std::is_trivial<SoundSettings>::value, "type is not trivial");
-
-#endif
-
+#endif /* AUDIO_TASK_BEARING_CONFIGPANEL_HPP */
