@@ -39,6 +39,7 @@
 #include "Audio/Features.hpp"
 #include "Audio/GlobalVolumeController.hpp"
 #include "Audio/VarioGlue.hpp"
+#include "Audio/AudioTaskBearingGlue.hpp"
 #include "Audio/VolumeController.hpp"
 #include "CommandLine.hpp"
 #include "MainWindow.hpp"
@@ -439,6 +440,9 @@ Startup(UI::Display &display)
   AudioVarioGlue::Initialise();
   AudioVarioGlue::Configure(ui_settings.sound.vario);
 
+  AudioTaskBearingGlue::Initialise();
+  AudioTaskBearingGlue::Configure(ui_settings.sound.task_bearing);
+
   // Start the device thread(s)
   operation.SetText(_("Starting devices"));
   devStartup();
@@ -644,6 +648,7 @@ Shutdown()
 
   // Stop sound
   AudioVarioGlue::Deinitialise();
+  AudioTaskBearingGlue::Deinitialise();
 
   // Save the task for the next time
   operation.SetText(_("Shutdown, saving task..."));
