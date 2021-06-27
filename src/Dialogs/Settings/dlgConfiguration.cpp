@@ -66,6 +66,7 @@ Copyright_License {
 
 #ifdef HAVE_PCM_PLAYER
 #include "Panels/AudioVarioConfigPanel.hpp"
+#include "Panels/AudioTaskBearingConfigPanel.hpp"
 #endif
 
 #ifdef HAVE_VOLUME_CONTROLLER
@@ -118,6 +119,7 @@ static constexpr TabMenuPage gauge_pages[] = {
   { N_("Vario"), CreateVarioConfigPanel },
 #ifdef HAVE_PCM_PLAYER
   { N_("Audio Vario"), CreateAudioVarioConfigPanel },
+  { N_("Audio Task Bearing Vario"), CreateAudioTaskBearingConfigPanel },
 #endif
   { nullptr, nullptr }
 };

@@ -14,6 +14,7 @@ Version JET
 - JETProvider :)
 - JETProvider fixes: Offline mode will draw black, fix interval setting saving
 - Fuel Burn calculation for PPG (Fuel burn time widget and task range estimation)
+- Audio Task Bearing - vario like sound to make sure you're directly on task bearing
 
 ------------------------
 Version 7.10 - 2021/07/09
