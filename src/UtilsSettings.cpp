@@ -35,6 +35,7 @@
 #include "Audio/Features.hpp"
 #include "Audio/GlobalVolumeController.hpp"
 #include "Audio/VarioGlue.hpp"
+#include "Audio/AudioTaskBearingGlue.hpp"
 #include "Audio/VolumeController.hpp"
 #include "PageActions.hpp"
 #include "FLARM/Glue.hpp"
@@ -186,6 +187,7 @@ SettingsLeave(const UISettings &old_ui_settings)
 #endif
 
   AudioVarioGlue::Configure(CommonInterface::GetUISettings().sound.vario);
+  AudioTaskBearingGlue::Configure(CommonInterface::GetUISettings().sound.task_bearing);
 
   operation.Hide();
   InfoBoxManager::SetDirty();

@@ -13,4 +13,5 @@ SoundSettings::SetDefaults()
   master_volume = 50;
 
   vario.SetDefaults();
+  task_bearing.SetDefaults();
 }

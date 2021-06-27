@@ -17,6 +17,7 @@ struct SoundSettings {
   uint8_t master_volume;
 
   VarioSoundSettings vario;
+  VarioSoundSettings task_bearing;
 
   void SetDefaults();
 };
