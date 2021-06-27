@@ -154,7 +154,8 @@ DIALOG_SOURCES = \
 ifeq ($(HAVE_PCM_PLAYER),y)
 DIALOG_SOURCES += \
 	$(SRC)/Dialogs/Settings/Panels/AudioVarioConfigPanel.cpp \
-	$(SRC)/Dialogs/Settings/Panels/AudioConfigPanel.cpp
+	$(SRC)/Dialogs/Settings/Panels/AudioConfigPanel.cpp \
+	$(SRC)/Dialogs/Settings/Panels/AudioTaskBearingConfigPanel.cpp
 endif
 
 ifeq ($(HAVE_HTTP),y)
@@ -668,6 +669,7 @@ XCSOAR_SOURCES += \
 
 ifeq ($(HAVE_PCM_PLAYER),y)
 XCSOAR_SOURCES += $(SRC)/Audio/VarioGlue.cpp
+XCSOAR_SOURCES += $(SRC)/Audio/AudioTaskBearingGlue.cpp
 endif
 
 XCSOAR_DEPENDS = \

@@ -280,6 +280,17 @@ constexpr char VarioDeadBandEnabled[] = "VarioDeadBandEnabled";
 constexpr char VarioDeadBandMin[] = "VarioDeadBandMin";
 constexpr char VarioDeadBandMax[] = "VarioDeadBandMax";
 
+constexpr char AudioTaskBearingEnable[] = "AudioTaskBearingEnable";
+constexpr char AudioTaskBearingVolume[] = "AudioTaskBearingVolume";
+constexpr char AudioTaskBearingMinFrequency[] = "AudioTaskBearingMinFrequency";
+constexpr char AudioTaskBearingZeroFrequency[] = "AudioTaskBearingZeroFrequency";
+constexpr char AudioTaskBearingMaxFrequency[] = "AudioTaskBearingMaxFrequency";
+constexpr char AudioTaskBearingMinPeriod[] = "AudioTaskBearingMinPeriod";
+constexpr char AudioTaskBearingMaxPeriod[] = "AudioTaskBearingMaxPeriod";
+constexpr char AudioTaskBearingDeadBandEnabled[] = "AudioTaskBearingDeadBandEnabled";
+constexpr char AudioTaskBearingDeadBandMin[] = "AudioTaskBearingDeadBandMin";
+constexpr char AudioTaskBearingDeadBandMax[] = "AudioTaskBearingDeadBandMax";
+
 constexpr char PagesDistinctZoom[] = "PagesDistinctZoom";
 
 constexpr char WaveAssistant[] = "WaveAssistant";
