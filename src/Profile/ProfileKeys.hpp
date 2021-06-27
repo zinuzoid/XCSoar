@@ -291,6 +291,17 @@ extern const char VarioDeadBandEnabled[];
 extern const char VarioDeadBandMin[];
 extern const char VarioDeadBandMax[];
 
+extern const char AudioTaskBearingEnable[];
+extern const char AudioTaskBearingVolume[];
+extern const char AudioTaskBearingMinFrequency[];
+extern const char AudioTaskBearingZeroFrequency[];
+extern const char AudioTaskBearingMaxFrequency[];
+extern const char AudioTaskBearingMinPeriod[];
+extern const char AudioTaskBearingMaxPeriod[];
+extern const char AudioTaskBearingDeadBandEnabled[];
+extern const char AudioTaskBearingDeadBandMin[];
+extern const char AudioTaskBearingDeadBandMax[];
+
 extern const char PagesDistinctZoom[];
 
 extern const char WaveAssistant[];

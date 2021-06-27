@@ -87,6 +87,11 @@ class VarioSynthesiser final : public ToneSynthesiser {
    */
   int min_dead, max_dead;
 
+  /**
+   * The minimum and maximum vario range for the constants below [cm/s].
+   */
+  int min_vario, max_vario;
+
 public:
   explicit VarioSynthesiser(unsigned sample_rate)
     :ToneSynthesiser(sample_rate),
@@ -95,7 +100,7 @@ public:
      dead_band_enabled(false),
      min_frequency(200), zero_frequency(500), max_frequency(1500),
      min_period_ms(150), max_period_ms(600),
-     min_dead(-30), max_dead(10) {}
+     min_dead(-30), max_dead(10), min_vario(-500), max_vario(500) {}
 
   /**
    * Update the vario value.  This calculates a new tone frequency and
@@ -124,6 +129,14 @@ public:
     min_frequency = min;
     zero_frequency = zero;
     max_frequency = max;
+  }
+
+  /**
+   * Set the base frequencies for minimum, zero and maximum lift
+   */
+  void SetMinMaxVario(double min, double max) {
+    min_vario = min;
+    max_vario = max;
   }
 
   /**
