@@ -282,6 +282,17 @@ constexpr std::string_view VarioDeadBandEnabled = "VarioDeadBandEnabled";
 constexpr std::string_view VarioDeadBandMin = "VarioDeadBandMin";
 constexpr std::string_view VarioDeadBandMax = "VarioDeadBandMax";
 
+constexpr std::string_view AudioTaskBearingEnable = "AudioTaskBearingEnable";
+constexpr std::string_view AudioTaskBearingVolume = "AudioTaskBearingVolume";
+constexpr std::string_view AudioTaskBearingMinFrequency = "AudioTaskBearingMinFrequency";
+constexpr std::string_view AudioTaskBearingZeroFrequency = "AudioTaskBearingZeroFrequency";
+constexpr std::string_view AudioTaskBearingMaxFrequency = "AudioTaskBearingMaxFrequency";
+constexpr std::string_view AudioTaskBearingMinPeriod = "AudioTaskBearingMinPeriod";
+constexpr std::string_view AudioTaskBearingMaxPeriod = "AudioTaskBearingMaxPeriod";
+constexpr std::string_view AudioTaskBearingDeadBandEnabled = "AudioTaskBearingDeadBandEnabled";
+constexpr std::string_view AudioTaskBearingDeadBandMin = "AudioTaskBearingDeadBandMin";
+constexpr std::string_view AudioTaskBearingDeadBandMax = "AudioTaskBearingDeadBandMax";
+
 constexpr std::string_view PagesDistinctZoom = "PagesDistinctZoom";
 
 constexpr std::string_view WaveAssistant = "WaveAssistant";
