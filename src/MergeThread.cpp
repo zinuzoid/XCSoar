@@ -27,6 +27,7 @@ Copyright_License {
 #include "Components.hpp"
 #include "NMEA/MoreData.hpp"
 #include "Audio/VarioGlue.hpp"
+#include "Audio/AudioTaskBearingGlue.hpp"
 #include "Device/MultipleDevices.hpp"
 
 MergeThread::MergeThread(DeviceBlackboard &_device_blackboard)
@@ -74,6 +75,8 @@ MergeThread::Tick() noexcept
 #ifdef HAVE_PCM_PLAYER
   bool vario_available;
   double vario;
+  bool task_bearing_diff_available;
+  Angle task_bearing_diff;
 #endif
 
   {
@@ -97,8 +100,20 @@ MergeThread::Tick() noexcept
       (bool)last_any.location_available != (bool)basic.location_available;
 
 #ifdef HAVE_PCM_PLAYER
+    const DerivedInfo &calculated = device_blackboard.Calculated();
+
     vario_available = basic.brutto_vario_available;
     vario = vario_available ? basic.brutto_vario : 0;
+
+    const TaskStats &task_stats = calculated.task_stats;
+    const GeoVector &vector_remaining = task_stats.current_leg.vector_remaining;
+    if (calculated.flight.flying && task_stats.task_valid && vector_remaining.IsValid() && basic.track_available) {
+      task_bearing_diff_available = true;
+      task_bearing_diff = vector_remaining.bearing - basic.track;
+    } else {
+      task_bearing_diff_available = false;
+    }
+
 #endif
 
     /* update last_any in every iteration */
@@ -112,6 +127,11 @@ MergeThread::Tick() noexcept
   }
 
 #ifdef HAVE_PCM_PLAYER
+  if (task_bearing_diff_available) {
+    AudioTaskBearingGlue::SetValue(task_bearing_diff.Degrees());
+  } else {
+    AudioTaskBearingGlue::NoValue();
+  }
   if (vario_available)
     AudioVarioGlue::SetValue(vario);
   else

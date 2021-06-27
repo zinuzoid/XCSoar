@@ -294,6 +294,17 @@ const char VarioDeadBandEnabled[] = "VarioDeadBandEnabled";
 const char VarioDeadBandMin[] = "VarioDeadBandMin";
 const char VarioDeadBandMax[] = "VarioDeadBandMax";
 
+const char AudioTaskBearingEnable[] = "AudioTaskBearingEnable";
+const char AudioTaskBearingVolume[] = "AudioTaskBearingVolume";
+const char AudioTaskBearingMinFrequency[] = "AudioTaskBearingMinFrequency";
+const char AudioTaskBearingZeroFrequency[] = "AudioTaskBearingZeroFrequency";
+const char AudioTaskBearingMaxFrequency[] = "AudioTaskBearingMaxFrequency";
+const char AudioTaskBearingMinPeriod[] = "AudioTaskBearingMinPeriod";
+const char AudioTaskBearingMaxPeriod[] = "AudioTaskBearingMaxPeriod";
+const char AudioTaskBearingDeadBandEnabled[] = "AudioTaskBearingDeadBandEnabled";
+const char AudioTaskBearingDeadBandMin[] = "AudioTaskBearingDeadBandMin";
+const char AudioTaskBearingDeadBandMax[] = "AudioTaskBearingDeadBandMax";
+
 const char PagesDistinctZoom[] = "PagesDistinctZoom";
 
 const char WaveAssistant[] = "WaveAssistant";

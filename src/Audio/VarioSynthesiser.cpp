@@ -29,11 +29,6 @@ Copyright_License {
 
 #include <cassert>
 
-/**
- * The minimum and maximum vario range for the constants below [cm/s].
- */
-static constexpr int min_vario = -500, max_vario = 500;
-
 unsigned
 VarioSynthesiser::VarioToFrequency(int ivario)
 {
