@@ -264,7 +264,7 @@ public class XCSoar extends Activity {
     if (!hasAllPermissions()) {
       new AlertDialog.Builder(this)
         .setTitle("Permission request")
-        .setMessage("XCSoar needs to"
+        .setMessage("XCSoar JET needs to"
                      + "\n1.Collect location data to enable live navigation calculation and IGC logger, even when the app is in the background"
                      + "\n2.Bluetooth nearby device permission to connect external peripheral")
         .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
