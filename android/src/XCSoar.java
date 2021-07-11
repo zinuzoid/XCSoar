@@ -276,7 +276,7 @@ public class XCSoar extends Activity {
     if (!hasAllPermissions()) {
       new AlertDialog.Builder(this)
         .setTitle("Location Permission")
-        .setMessage("XCSoar needs to collect location data to enable live navigation calculation and IGC logger, even when the app is in the background")
+        .setMessage("XCSoar JET needs to collect location data to enable live navigation calculation and IGC logger, even when the app is in the background")
         .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
