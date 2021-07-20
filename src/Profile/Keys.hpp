@@ -263,6 +263,10 @@ constexpr char PCMetFtpPassword[] = "PCMetFtpPassword";
 
 constexpr char EnableThermalInformationMap[] = "EnableThermalInformationMap";
 
+constexpr char SkysightEmail[] = "SkysightEmail";
+constexpr char SkysightPassword[] = "SkysightPassword";
+constexpr char SkysightRegion[] = "SkysightRegion";
+
 constexpr char EnableLocationMapItem[] = "EnableLocationMapItem";
 constexpr char EnableArrivalAltitudeMapItem[] = "EnableArrivalAltitudeMapItem";
 
