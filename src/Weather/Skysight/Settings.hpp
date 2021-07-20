@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2022 The XCSoar Project
+  Copyright (C) 2000-2016 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,44 +21,27 @@ Copyright_License {
 }
 */
 
-#pragma once
+#ifndef XCSOAR_WEATHER_SKYSIGHT_SETTINGS_HPP
+#define XCSOAR_WEATHER_SKYSIGHT_SETTINGS_HPP
 
-#include "Weather/Features.hpp"
-#include "net/http/Features.hpp"
+#include "util/StaticString.hxx"
 
-#ifdef HAVE_PCMET
+struct SkysightSettings {
+  StaticString<64> email;
+  StaticString<64> password;
+  StaticString<64> region;
 
-#include "PCMet/Settings.hpp"
-
-#endif
-
-#ifdef HAVE_SKYSIGHT
-#include "Skysight/Settings.hpp"
-#endif
-
-struct WeatherSettings {
-#ifdef HAVE_PCMET
-  PCMetSettings pcmet;
-#endif
-
-#ifdef HAVE_HTTP
-  /**
-   * Enable Thermal Information Map?
-   */
-  bool enable_tim;
-#endif
-
-#ifdef HAVE_SKYSIGHT
-  SkysightSettings skysight;
-#endif
+  bool IsDefined() const {
+    return !email.empty() && !password.empty();
+  }
 
   void SetDefaults() {
-#ifdef HAVE_PCMET
-    pcmet.SetDefaults();
+    email.clear();
+    password.clear();
+    region.clear();
+  }
+
+};
+
 #endif
 
-#ifdef HAVE_HTTP
-    enable_tim = false;
-#endif
-  }
-};
