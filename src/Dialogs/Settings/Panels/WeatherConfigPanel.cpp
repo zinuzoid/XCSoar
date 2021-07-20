@@ -29,13 +29,25 @@ Copyright_License {
 #include "Interface.hpp"
 #include "UIGlobals.hpp"
 #include "util/NumberParser.hpp"
+#include "Form/DataField/Enum.hpp"
+#include "Form/DataField/Listener.hpp"
+#include "DataGlobals.hpp"
+#include "Weather/Skysight/Skysight.hpp"
 
 enum ControlIndex {
 #ifdef HAVE_PCMET
   PCMET_USER,
   PCMET_PASSWORD,
+#if 0
   PCMET_FTP_USER,
   PCMET_FTP_PASSWORD,
+#endif
+#endif
+#ifdef HAVE_SKYSIGHT
+  SPACER,
+  SKYSIGHT_EMAIL,
+  SKYSIGHT_PASSWORD,
+  SKYSIGHT_REGION
 #endif
 };
 
@@ -50,6 +62,20 @@ public:
   void Prepare(ContainerWindow &parent, const PixelRect &rc) noexcept override;
   bool Save(bool &changed) noexcept override;
 };
+
+static void
+FillRegionControl(WndProperty &wp, const TCHAR *setting)
+{
+  DataFieldEnum *df = (DataFieldEnum *)wp.GetDataField();
+  auto skysight = DataGlobals::GetSkysight();
+
+  for (auto &i: skysight->GetRegions())
+    df->addEnumText(i.first.c_str(), i.second.c_str());
+
+  // if old region doesn't exist any more this will fall back to first element
+  df->Set(setting);
+  wp.RefreshDisplay();
+}
 
 void
 WeatherConfigPanel::Prepare(ContainerWindow &parent,
@@ -70,6 +96,17 @@ WeatherConfigPanel::Prepare(ContainerWindow &parent,
           settings.pcmet.ftp_credentials.username);
   AddPassword(_T("pc_met FTP Password"), _T(""),
               settings.pcmet.ftp_credentials.password);
+#endif
+
+#ifdef HAVE_SKYSIGHT
+  AddSpacer();
+
+  AddText(_T("Skysight Email"), _T("The e-mail you use to log in to the skysight.io site."),
+          settings.skysight.email);
+  AddPassword(_T("Skysight Password"), _T("Your Skysight password."),
+              settings.skysight.password);  
+  WndProperty *wp = AddEnum(_T("Skysight Region"), _T("The Skysight region to load data for."), (DataFieldListener*)nullptr);
+  FillRegionControl(*wp, settings.skysight.region);
 #endif
 }
 
@@ -95,6 +132,18 @@ WeatherConfigPanel::Save(bool &_changed) noexcept
   changed |= SaveValue(PCMET_FTP_PASSWORD, ProfileKeys::PCMetFtpPassword,
                        settings.pcmet.ftp_credentials.password);
 #endif
+#endif
+
+#ifdef HAVE_SKYSIGHT
+  changed |= SaveValue(SKYSIGHT_EMAIL, ProfileKeys::SkysightEmail,
+                       settings.skysight.email);
+
+  changed |= SaveValue(SKYSIGHT_PASSWORD, ProfileKeys::SkysightPassword,
+                       settings.skysight.password);
+
+  changed |= SaveValue(SKYSIGHT_REGION, ProfileKeys::SkysightRegion,
+                    settings.skysight.region);        
+  DataGlobals::GetSkysight()->Init();         
 #endif
 
   _changed |= changed;

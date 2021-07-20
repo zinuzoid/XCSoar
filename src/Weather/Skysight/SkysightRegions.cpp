@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2021 The XCSoar Project
+  Copyright (C) 2000-2016 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -21,35 +21,23 @@ Copyright_License {
 }
 */
 
-#ifndef XCSOAR_WEATHER_SETTINGS_HPP
-#define XCSOAR_WEATHER_SETTINGS_HPP
+#include "SkysightRegions.hpp"
 
-#include "Weather/Features.hpp"
-
-#ifdef HAVE_PCMET
-
-#include "PCMet/Settings.hpp"
-
-#endif
-
-#ifdef HAVE_SKYSIGHT
-#include "Skysight/Settings.hpp"
-#endif
-
-struct WeatherSettings {
-#ifdef HAVE_PCMET
-  PCMetSettings pcmet;
-#endif
-
-#ifdef HAVE_SKYSIGHT
-  SkysightSettings skysight;
-#endif
-
-  void SetDefaults() {
-#ifdef HAVE_PCMET
-    pcmet.SetDefaults();
-#endif
-  }
+const SkysightRegionDetails skysight_region_defaults[] = {
+	{_T("Europe"), "EUROPE"},
+	{_T("Brazil"), "BRAZIL"},
+	{_T("Western US"), "WEST_US"},
+	{_T("Italy"), "ITALY"},
+	{_T("Western Australia"), "WA"},
+	{_T("New Zealand"), "NZ"},
+	{_T("Eastern US"), "EAST_US"},
+	{_T("Andes"), "ANDES"},
+	{_T("Eastern Canada"), "EAST_CANADA"},
+	{_T("South Africa"), "SANEW"},
+	{_T("Japan"), "JAPAN"},
+	{_T("Argentina"), "ARGENTINA"},
+	{_T("Eastern Australia"), "EAST_AUS"},
+	{_T("Canada, Mid US"), "CENTRAL_US"},
+	{_T("Spain"), "SPAIN"},
+	{nullptr, nullptr}
 };
-
-#endif

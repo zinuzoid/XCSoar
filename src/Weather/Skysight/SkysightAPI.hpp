@@ -2,7 +2,7 @@
 Copyright_License {
 
   XCSoar Glide Computer - http://www.xcsoar.org/
-  Copyright (C) 2000-2021 The XCSoar Project
+  Copyright (C) 2000-2016 The XCSoar Project
   A detailed list of copyright holders can be found in the file "AUTHORS".
 
   This program is free software; you can redistribute it and/or
@@ -20,36 +20,26 @@ Copyright_License {
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 }
 */
+#ifndef WEATHER_SKYSIGHTAPI_HPP
+#define WEATHER_SKYSIGHTAPI_HPP
 
-#ifndef XCSOAR_WEATHER_SETTINGS_HPP
-#define XCSOAR_WEATHER_SETTINGS_HPP
+#include "Metrics.hpp"
+#include "util/tstring.hpp"
 
-#include "Weather/Features.hpp"
+class SkysightAPI final {
+public:
+  tstring region;
+  std::map<tstring, tstring> regions;
 
-#ifdef HAVE_PCMET
+  SkysightAPI(tstring email, tstring password, tstring _region);
+  ~SkysightAPI();
+  
+  bool IsInited();
+  
+protected:
+  bool inited_regions;
 
-#include "PCMet/Settings.hpp"
-
-#endif
-
-#ifdef HAVE_SKYSIGHT
-#include "Skysight/Settings.hpp"
-#endif
-
-struct WeatherSettings {
-#ifdef HAVE_PCMET
-  PCMetSettings pcmet;
-#endif
-
-#ifdef HAVE_SKYSIGHT
-  SkysightSettings skysight;
-#endif
-
-  void SetDefaults() {
-#ifdef HAVE_PCMET
-    pcmet.SetDefaults();
-#endif
-  }
+  void LoadDefaultRegions();
 };
 
 #endif

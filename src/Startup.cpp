@@ -34,6 +34,7 @@ Copyright_License {
 #include "Terrain/RasterTerrain.hpp"
 #include "Terrain/AsyncLoader.hpp"
 #include "Weather/Rasp/RaspStore.hpp"
+#include "Weather/Skysight/Skysight.hpp"
 #include "Input/InputEvents.hpp"
 #include "Input/InputQueue.hpp"
 #include "Dialogs/StartupDialog.hpp"
@@ -419,6 +420,10 @@ Startup()
   auto rasp = std::make_shared<RaspStore>(LocalPath(_T(RASP_FILENAME)));
   rasp->ScanAll();
 
+  //Initialise Skysight weather forecast
+  LogFormat("Skysight load");
+  auto skysight = std::make_shared<Skysight>();
+
   // Reads the airspace files
   {
     SubOperationEnvironment sub_env(operation, 768, 1024);
@@ -473,6 +478,7 @@ Startup()
     map_window->SetTopography(topography);
     map_window->SetTerrain(terrain);
     map_window->SetRasp(rasp);
+    map_window->SetSkysight(skysight);
 
 #ifdef HAVE_NOAA
     map_window->SetNOAAStore(noaa_store);
