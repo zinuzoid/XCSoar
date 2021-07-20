@@ -280,6 +280,10 @@ extern const char PCMetFtpPassword[];
 
 extern const char EnableThermalInformationMap[];
 
+extern const char SkysightEmail[];
+extern const char SkysightPassword[];
+extern const char SkysightRegion[];
+
 extern const char EnableLocationMapItem[];
 extern const char EnableArrivalAltitudeMapItem[];
 
