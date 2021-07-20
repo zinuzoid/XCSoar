@@ -50,6 +50,7 @@ class CachedTopographyRenderer;
 class RasterTerrain;
 class RaspStore;
 class RaspRenderer;
+class Skysight;
 class MapOverlay;
 class Waypoints;
 class Airspaces;
@@ -126,6 +127,7 @@ protected:
   RasterTerrain *terrain = nullptr;
 
   std::shared_ptr<RaspStore> rasp_store;
+  std::shared_ptr<Skysight> skysight;
 
   /**
    * The current RASP renderer.  Modifications to this pointer (but
@@ -235,7 +237,12 @@ public:
     return rasp_store;
   }
 
+  const std::shared_ptr<Skysight> &GetSkysight() const {
+    return skysight;
+  }
+
   void SetRasp(const std::shared_ptr<RaspStore> &_rasp_store);
+  void SetSkysight(const std::shared_ptr<Skysight> &_skysight);
 
 #ifdef ENABLE_OPENGL
   void SetOverlay(std::unique_ptr<MapOverlay> &&_overlay);
