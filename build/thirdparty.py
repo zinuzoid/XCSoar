@@ -71,6 +71,8 @@ elif toolchain.is_darwin:
 elif toolchain.is_android:
     thirdparty_libs = [
         libfmt,
+        netcdf,
+        netcdfcxx,
         libsodium,
         openssl,
         cares,
