@@ -154,6 +154,8 @@ elif 'apple-darwin' in actual_host_triplet:
     ]
 elif 'android' in actual_host_triplet:
     thirdparty_libs = [
+        netcdf,
+        netcdfcxx,
         libsodium,
         openssl,
         cares,
