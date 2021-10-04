@@ -1,95 +1,244 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="90"
-   height="15"
-   id="svg3040"
-   version="1.1"
-   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
-   sodipodi:docname="title_red.svg">
-  <defs
-     id="defs3042" />
-  <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="5.6568542"
-     inkscape:cx="44.53605"
-     inkscape:cy="7.3327195"
-     inkscape:document-units="px"
-     inkscape:current-layer="layer4"
-     showgrid="false"
-     inkscape:window-width="681"
-     inkscape:window-height="741"
-     inkscape:window-x="683"
-     inkscape:window-y="25"
-     inkscape:window-maximized="0" />
-  <metadata
-     id="metadata3045">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <g
-     inkscape:label="XCSoar"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(0,-1037.3622)">
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;line-height:0%;font-family:Arial;-inkscape-font-specification:Arial;fill:#3f76a8;fill-opacity:1;stroke:none"
-       x="0.15871964"
-       y="1051.1925"
-       id="text9393-9-1"
-       transform="scale(0.99960475,1.0003954)"
-       inkscape:export-filename="C:\Documents and Settings\Administrator\Desktop\loadhorz.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90"><tspan
-         sodipodi:role="line"
-         id="tspan9395-4-7"
-         x="0.15871964"
-         y="1051.1925"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:17.93197632px;line-height:1.25;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans Bold';fill:#3f76a8;fill-opacity:1"><tspan
-           style="fill:#000000"
-           id="tspan11171-4">XCSoar</tspan></tspan></text>
-  </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer4"
-     inkscape:label="Version"
-     transform="translate(0,1)">
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;line-height:0%;font-family:Arial;-inkscape-font-specification:Arial;fill:#d01717;fill-opacity:1;stroke:none"
-       x="77.828217"
-       y="13.240745"
-       id="versionno"
-       transform="scale(0.99960475,1.0003954)"
-       inkscape:export-filename="C:\Documents and Settings\Administrator\Desktop\loadhorz.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90"
-       inkscape:label="versionno"><tspan
-         sodipodi:role="line"
-         id="tspan9395-4-7-2"
-         x="77.828217"
-         y="13.240745"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:17.93197632px;line-height:1.25;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans Bold';fill:#d01717;fill-opacity:1">7</tspan></text>
-  </g>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 25.4.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg3040" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 110 15"
+	 style="enable-background:new 0 0 110 15;" xml:space="preserve">
+<style type="text/css">
+	.st0{font-family:'Arial-BoldMT';}
+	.st1{font-size:17.9391px;}
+	.st2{fill:#00C99A;}
+	.st3{fill:#FF3D51;}
+	.st4{font-size:5.9996px;}
+	.st5{clip-path:url(#SVGID_00000125604092729538542470000008063480670708110248_);}
+	.st6{clip-path:url(#SVGID_00000017492744592419163990000001953914213885205664_);}
+	.st7{clip-path:url(#SVGID_00000067940772193456855580000007532659657318861220_);fill:#EB464A;}
+	.st8{clip-path:url(#SVGID_00000145766454772063441910000004554973818179907255_);fill:#EB464A;}
+	.st9{clip-path:url(#SVGID_00000003071313193089085480000009423069824110988425_);fill:#FEC514;}
+	.st10{opacity:0.5;clip-path:url(#SVGID_00000139272629605194574590000010084361590934751105_);}
+	.st11{clip-path:url(#SVGID_00000098203809686972065760000002649133688132778920_);fill:#FFFFFF;}
+	.st12{clip-path:url(#SVGID_00000072261006900958148550000009918719386459890066_);fill:#D6D5D2;}
+	.st13{clip-path:url(#SVGID_00000109012015082952976480000006374630224215703227_);fill:#4AA1AF;}
+	.st14{clip-path:url(#SVGID_00000110446783457130757160000009589653046754904743_);fill:#EB464A;}
+	.st15{clip-path:url(#SVGID_00000073680618431563321430000001977389528498981276_);fill:#4AA1AF;}
+	.st16{clip-path:url(#SVGID_00000039101610050307552080000006794235839652343431_);fill:#EB464A;}
+	.st17{clip-path:url(#SVGID_00000010301290429062414760000002882492655915208346_);fill:#EB464A;}
+</style>
+<sodipodi:namedview  bordercolor="#666666" borderopacity="1.0" id="base" inkscape:current-layer="layer4" inkscape:cx="44.53605" inkscape:cy="7.3327195" inkscape:document-units="px" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:window-height="573" inkscape:window-maximized="0" inkscape:window-width="1169" inkscape:window-x="22" inkscape:window-y="29" inkscape:zoom="5.6568542" pagecolor="#ffffff" showgrid="false">
+	</sodipodi:namedview>
+<g id="layer1" transform="translate(0,-1037.3622)" inkscape:groupmode="layer" inkscape:label="XCSoar">
+	<text transform="matrix(0.9992 0 0 1 7.7731 1051.6083)" class="st0 st1">XCSoar</text>
+</g>
+<g id="layer4" transform="translate(0,1)" inkscape:groupmode="layer" inkscape:label="Version">
+	<text transform="matrix(0.9992 0 0 1 72.7535 13.2461)" class="st2 st0 st1">7</text>
+</g>
+<g id="layer1_1_" transform="translate(0,-1037.3622)" inkscape:groupmode="layer" inkscape:label="XCSoar">
+</g>
+<g id="layer1_2_" transform="translate(0,-1037.3622)" inkscape:groupmode="layer" inkscape:label="XCSoar">
+	<text transform="matrix(0.8033 -0.5943 0.5947 0.8039 95.66 1050.6101)" class="st3 st0 st4">JET</text>
+</g>
+<g>
+	<g>
+		<g>
+			<g>
+				<g>
+					<defs>
+						
+							<rect id="SVGID_1_" x="83" y="-4.3" transform="matrix(0.8039 -0.5947 0.5947 0.8039 13.7653 55.3589)" width="15.7" height="22.2"/>
+					</defs>
+					<clipPath id="SVGID_00000132076324118497808050000006704697979389303219_">
+						<use xlink:href="#SVGID_1_"  style="overflow:visible;"/>
+					</clipPath>
+					<g style="clip-path:url(#SVGID_00000132076324118497808050000006704697979389303219_);">
+						<g>
+							<g>
+								<g>
+									<defs>
+										
+											<rect id="SVGID_00000010310574848075848710000009012810517319073190_" x="83" y="-4.3" transform="matrix(0.8039 -0.5947 0.5947 0.8039 13.7653 55.3589)" width="15.7" height="22.2"/>
+									</defs>
+									<clipPath id="SVGID_00000043424384878893455860000004300433509595208334_">
+										<use xlink:href="#SVGID_00000010310574848075848710000009012810517319073190_"  style="overflow:visible;"/>
+									</clipPath>
+									<g style="clip-path:url(#SVGID_00000043424384878893455860000004300433509595208334_);">
+										<g>
+											<g>
+												<g>
+													<defs>
+														
+															<rect id="SVGID_00000077298070134464725430000008356675074850630077_" x="83" y="-4.3" transform="matrix(0.8039 -0.5947 0.5947 0.8039 13.7653 55.3589)" width="15.7" height="22.2"/>
+													</defs>
+													<clipPath id="SVGID_00000022549848596001426250000009209985932636678066_">
+														<use xlink:href="#SVGID_00000077298070134464725430000008356675074850630077_"  style="overflow:visible;"/>
+													</clipPath>
+													<path style="clip-path:url(#SVGID_00000022549848596001426250000009209985932636678066_);fill:#EB464A;" d="M90,5.1
+														c0,0-1.2-0.4-2.7,0.6c0.7,0.2,1.1,0.7,1.4,1L90,6L90,5.1z"/>
+												</g>
+											</g>
+										</g>
+										<g>
+											<g>
+												<g>
+													<defs>
+														
+															<rect id="SVGID_00000170984447501111112810000008611061902480704407_" x="83" y="-4.3" transform="matrix(0.8039 -0.5947 0.5947 0.8039 13.7653 55.3589)" width="15.7" height="22.2"/>
+													</defs>
+													<clipPath id="SVGID_00000161629337626153098340000009162967709155009439_">
+														<use xlink:href="#SVGID_00000170984447501111112810000008611061902480704407_"  style="overflow:visible;"/>
+													</clipPath>
+													<path style="clip-path:url(#SVGID_00000161629337626153098340000009162967709155009439_);fill:#EB464A;" d="M92.2,8
+														c0,0,0,1.3-1.4,2.4c0-0.7-0.3-1.3-0.5-1.6l1.1-1.1L92.2,8z"/>
+												</g>
+											</g>
+										</g>
+										<g>
+											<g>
+												<g>
+													<defs>
+														
+															<rect id="SVGID_00000072253092814213183290000003957505656394187705_" x="83" y="-4.3" transform="matrix(0.8039 -0.5947 0.5947 0.8039 13.7653 55.3589)" width="15.7" height="22.2"/>
+													</defs>
+													<clipPath id="SVGID_00000170988539956723317380000018435575145657492666_">
+														<use xlink:href="#SVGID_00000072253092814213183290000003957505656394187705_"  style="overflow:visible;"/>
+													</clipPath>
+													<path style="clip-path:url(#SVGID_00000170988539956723317380000018435575145657492666_);fill:#FEC514;" d="M88.5,7.7
+														c0,0-1.1,0.1-2.6,2.9c2.9-0.8,3.4-1.8,3.4-1.8S89,8.1,88.5,7.7"/>
+												</g>
+											</g>
+										</g>
+										<g>
+											<g>
+												<g>
+													<defs>
+														
+															<rect id="SVGID_00000028318777083233947720000012627693093048292013_" x="83" y="-4.3" transform="matrix(0.8039 -0.5947 0.5947 0.8039 13.7653 55.3589)" width="15.7" height="22.2"/>
+													</defs>
+													<clipPath id="SVGID_00000066491951092895248240000002437154672294090392_">
+														<use xlink:href="#SVGID_00000028318777083233947720000012627693093048292013_"  style="overflow:visible;"/>
+													</clipPath>
+													<g style="opacity:0.5;clip-path:url(#SVGID_00000066491951092895248240000002437154672294090392_);">
+														<g>
+															<g>
+																<g>
+																	<g>
+																		<defs>
+																			
+																				<rect id="SVGID_00000044866290167176750880000000957577011235835816_" x="87.5" y="8.3" transform="matrix(0.8039 -0.5947 0.5947 0.8039 12.1381 54.221)" width="1.6" height="0.8"/>
+																		</defs>
+																		<clipPath id="SVGID_00000024000713266625454720000015826354605364196001_">
+																			<use xlink:href="#SVGID_00000044866290167176750880000000957577011235835816_"  style="overflow:visible;"/>
+																		</clipPath>
+																		<path style="clip-path:url(#SVGID_00000024000713266625454720000015826354605364196001_);fill:#FFFFFF;" d="
+																			M88.6,8c0,0-0.7,0.2-1,1.2c1,0,1.5-0.6,1.5-0.6S89.1,8.2,88.6,8"/>
+																	</g>
+																</g>
+															</g>
+														</g>
+													</g>
+												</g>
+											</g>
+										</g>
+										<g>
+											<g>
+												<g>
+													<defs>
+														
+															<rect id="SVGID_00000113315491758188124100000001648217994920688810_" x="83" y="-4.3" transform="matrix(0.8039 -0.5947 0.5947 0.8039 13.7653 55.3589)" width="15.7" height="22.2"/>
+													</defs>
+													<clipPath id="SVGID_00000163068222679126743660000012458929892339118764_">
+														<use xlink:href="#SVGID_00000113315491758188124100000001648217994920688810_"  style="overflow:visible;"/>
+													</clipPath>
+													<path style="clip-path:url(#SVGID_00000163068222679126743660000012458929892339118764_);fill:#D6D5D2;" d="M93.6,7.2
+														c-1.3,1-2.6,1.5-3.3,1.7c-0.4,0.1-0.7,0.2-0.7,0.2s-0.4-0.2-0.8-0.8s-0.5-1-0.5-1s0.1-0.2,0.4-0.6
+														c0.4-0.6,1.2-1.6,2.6-2.6c1.1-0.8,2.3-1.1,3.2-1.2c0.7-0.1,1.3,0,1.4,0.1L96,3.1c0,0.2,0,0.7-0.3,1.4
+														C95.3,5.4,94.7,6.4,93.6,7.2"/>
+												</g>
+											</g>
+										</g>
+										<g>
+											<g>
+												<g>
+													<defs>
+														
+															<rect id="SVGID_00000048493109526291279590000001773218344195983756_" x="83" y="-4.3" transform="matrix(0.8039 -0.5947 0.5947 0.8039 13.7653 55.3589)" width="15.7" height="22.2"/>
+													</defs>
+													<clipPath id="SVGID_00000019668586411731537830000006987440634505161917_">
+														<use xlink:href="#SVGID_00000048493109526291279590000001773218344195983756_"  style="overflow:visible;"/>
+													</clipPath>
+													<path style="clip-path:url(#SVGID_00000019668586411731537830000006987440634505161917_);fill:#4AA1AF;" d="M89.3,7.9
+														c-0.4-0.6-0.6-1-0.6-1.2c-0.2,0.4-0.4,0.6-0.4,0.6s0.1,0.4,0.5,1c0.4,0.6,0.8,0.8,0.8,0.8s0.2,0,0.7-0.2
+														C90.1,8.8,89.7,8.5,89.3,7.9"/>
+												</g>
+											</g>
+										</g>
+										<g>
+											<g>
+												<g>
+													<defs>
+														
+															<rect id="SVGID_00000114049177887311983440000016487556846474160802_" x="83" y="-4.3" transform="matrix(0.8039 -0.5947 0.5947 0.8039 13.7653 55.3589)" width="15.7" height="22.2"/>
+													</defs>
+													<clipPath id="SVGID_00000097474109334185520910000005372083293226071212_">
+														<use xlink:href="#SVGID_00000114049177887311983440000016487556846474160802_"  style="overflow:visible;"/>
+													</clipPath>
+													<path style="clip-path:url(#SVGID_00000097474109334185520910000005372083293226071212_);fill:#EB464A;" d="M94.1,5.6
+														c-0.4,0.3-1,0.2-1.4-0.2C92.4,5,92.5,4.3,92.9,4c0.4-0.3,1.1-0.2,1.4,0.2C94.7,4.6,94.6,5.3,94.1,5.6"/>
+												</g>
+											</g>
+										</g>
+										<g>
+											<g>
+												<g>
+													<defs>
+														
+															<rect id="SVGID_00000047767815401934251090000013291524470439536802_" x="83" y="-4.3" transform="matrix(0.8039 -0.5947 0.5947 0.8039 13.7653 55.3589)" width="15.7" height="22.2"/>
+													</defs>
+													<clipPath id="SVGID_00000125604371312339043170000012894568330258393272_">
+														<use xlink:href="#SVGID_00000047767815401934251090000013291524470439536802_"  style="overflow:visible;"/>
+													</clipPath>
+													<path style="clip-path:url(#SVGID_00000125604371312339043170000012894568330258393272_);fill:#4AA1AF;" d="M94,5.4
+														c-0.3,0.2-0.8,0.2-1-0.2c-0.2-0.3-0.2-0.8,0.2-1C93.5,4,94,4,94.2,4.4C94.4,4.7,94.3,5.1,94,5.4"/>
+												</g>
+											</g>
+										</g>
+										<g>
+											<g>
+												<g>
+													<defs>
+														
+															<rect id="SVGID_00000156565814599219979600000000703357948407209361_" x="83" y="-4.3" transform="matrix(0.8039 -0.5947 0.5947 0.8039 13.7653 55.3589)" width="15.7" height="22.2"/>
+													</defs>
+													<clipPath id="SVGID_00000023977550783959048330000002218838098346679223_">
+														<use xlink:href="#SVGID_00000156565814599219979600000000703357948407209361_"  style="overflow:visible;"/>
+													</clipPath>
+													<path style="clip-path:url(#SVGID_00000023977550783959048330000002218838098346679223_);fill:#EB464A;" d="M95.6,4.5
+														c-0.3-0.2-0.5-0.4-0.8-0.7c-0.2-0.3-0.4-0.6-0.5-0.9c0.7-0.1,1.3,0,1.4,0.1l0.1,0.1C96,3.3,95.9,3.8,95.6,4.5"/>
+												</g>
+											</g>
+										</g>
+										<g>
+											<g>
+												<g>
+													<defs>
+														
+															<rect id="SVGID_00000018215390396660287670000012273074605423783068_" x="83" y="-4.3" transform="matrix(0.8039 -0.5947 0.5947 0.8039 13.7653 55.3589)" width="15.7" height="22.2"/>
+													</defs>
+													<clipPath id="SVGID_00000098219752070413106690000004212265600329193636_">
+														<use xlink:href="#SVGID_00000018215390396660287670000012273074605423783068_"  style="overflow:visible;"/>
+													</clipPath>
+													<path style="clip-path:url(#SVGID_00000098219752070413106690000004212265600329193636_);fill:#EB464A;" d="M90.5,7.3
+														c-0.7,0.5-1.8,1.2-1.9,1.1c-0.1-0.1,0.9-0.9,1.6-1.5c0.7-0.4,0.9-0.4,0.9-0.3C91.2,6.7,91.2,6.8,90.5,7.3"/>
+												</g>
+											</g>
+										</g>
+									</g>
+								</g>
+							</g>
+						</g>
+					</g>
+				</g>
+			</g>
+		</g>
+	</g>
+</g>
 </svg>
