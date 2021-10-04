@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.xcsoar.testing"
+          package="com.zinuzoid.xcsoar_jet"
           android:installLocation="auto"
           android:versionCode="155"
           android:versionName="7.29">
@@ -11,7 +11,7 @@
       android:appCategory="maps"
       android:icon="@drawable/icon"
       android:label="@string/app_name">
-    <activity android:name=".XCSoar"
+    <activity android:name="org.xcsoar.testing.XCSoar"
               android:exported="true"
               android:label="@string/app_name_testing"
               android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
@@ -43,16 +43,16 @@
                  android:value="2.1"/>
     </activity>
 
-    <service android:name=".MyService" android:foregroundServiceType="location"/>
+    <service android:name="org.xcsoar.testing.MyService" android:foregroundServiceType="location"/>
 
-    <provider android:name="org.xcsoar.FileProvider"
-              android:authorities="org.xcsoar"
+    <provider android:name="org.xcsoar.testing.FileProvider"
+              android:authorities="org.xcsoar.testing"
               android:exported="false"
               android:grantUriPermissions="true"/>
 
     <provider
-        android:name="org.xcsoar.AllFilesDocumentsProvider"
-        android:authorities="org.xcsoar.allfiles"
+        android:name="org.xcsoar.testing.AllFilesDocumentsProvider"
+        android:authorities="org.xcsoar.testing.allfiles"
         android:exported="true"
         android:grantUriPermissions="true"
         android:permission="android.permission.MANAGE_DOCUMENTS">
