@@ -20,7 +20,7 @@
 }
 */
 
-package org.xcsoar;
+package org.xcsoar.testing;
 
 import java.io.File;
 import java.io.FileNotFoundException;
