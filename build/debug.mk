@@ -5,7 +5,7 @@ ifeq ($(DEBUG),y)
   OPTIMIZE := -Og
   OPTIMIZE += -funit-at-a-time
 else
-  OPTIMIZE := -Os
+  OPTIMIZE := -Ofast
   OPTIMIZE += -DNDEBUG
 endif
 
