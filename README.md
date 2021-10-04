@@ -1,8 +1,11 @@
-# <img src="./Data/graphics/logo.svg" width="5%" alt="XCSoar Logo"> XCSoar
+# <img src="./Data/graphics/logo_red.svg" width="5%" alt="XCSoar Logo"> XCSoar JET
 
-[![.github/workflows/build-android.yml](https://github.com/XCSoar/XCSoar/actions/workflows/build-android.yml/badge.svg)](https://github.com/XCSoar/XCSoar/actions/workflows/build-android.yml)
-[![.github/workflows/build-unix.yml](https://github.com/XCSoar/XCSoar/actions/workflows/build-unix.yml/badge.svg)](https://github.com/XCSoar/XCSoar/actions/workflows/build-unix.yml)
-[![.github/workflows/build-docs.yml](https://github.com/XCSoar/XCSoar/actions/workflows/build-docs.yml/badge.svg)](https://github.com/XCSoar/XCSoar/actions/workflows/build-docs.yml)
+![https://circleci.com/gh/zinuzoid/XCSoar](https://circleci.com/gh/zinuzoid/XCSoar/tree/master.svg?style=svg)
+
+XCSoar JET is an extended version of the original XCSoar (https://xcsoar.org) with additional features that gear toward Paragliding.
+I was a glider pilot, then I moved to paragliding recently so most features will come from the idea of how we can do better with XCSoar on paragliding.
+
+------------------
 
 XCSoar is a tactical glide computer for Android, Linux, Mac OS X,
 and Windows.
