@@ -1,8 +1,10 @@
-# <img src="./Data/graphics/logo.svg" width="5%" alt="XCSoar Logo"> XCSoar
+# <img src="./Data/graphics/logo_red.svg" width="5%" alt="XCSoar Logo"> XCSoar JET
+XCSoar JET is an extended version of the original XCSoar (https://xcsoar.org) with additional features that gear toward Paragliding.
+I was a glider pilot, then I moved to paragliding recently so most features will come from the idea of how we can do better with XCSoar on paragliding.
 
-[![.github/workflows/build-native.yml](https://github.com/XCSoar/XCSoar/actions/workflows/build-native.yml/badge.svg)](https://github.com/XCSoar/XCSoar/actions/workflows/build-native.yml)
-[![.github/workflows/build-container.yml](https://github.com/XCSoar/XCSoar/actions/workflows/build-container.yml/badge.svg)](https://github.com/XCSoar/XCSoar/actions/workflows/build-container.yml)
-[![.github/workflows/build-docs.yml](https://github.com/XCSoar/XCSoar/actions/workflows/build-docs.yml/badge.svg)](https://github.com/XCSoar/XCSoar/actions/workflows/build-docs.yml)
+[![.github/workflows/build-native.yml](https://github.com/zinuzoid/XCSoar/actions/workflows/build-native.yml/badge.svg)](https://github.com/zinuzoid/XCSoar/actions/workflows/build-native.yml)
+[![.github/workflows/build-container.yml](https://github.com/zinuzoid/XCSoar/actions/workflows/build-container.yml/badge.svg)](https://github.com/zinuzoid/XCSoar/actions/workflows/build-container.yml)
+[![.github/workflows/build-docs.yml](https://github.com/zinuzoid/XCSoar/actions/workflows/build-docs.yml/badge.svg)](https://github.com/zinuzoid/XCSoar/actions/workflows/build-docs.yml)
 
 XCSoar is a tactical glide computer for Android, Linux, Mac OS X,
 and Windows.
