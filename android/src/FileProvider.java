@@ -18,7 +18,7 @@ import android.webkit.MimeTypeMap;
 /**
  * Provide access to files referred to by the Waypoint details file.
  */
-public final class FileProvider extends ContentProvider {
+public class FileProvider extends ContentProvider {
   private static final String[] COLUMNS = {
     OpenableColumns.DISPLAY_NAME,
     OpenableColumns.SIZE,
