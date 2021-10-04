@@ -8,7 +8,7 @@ ifeq ($(DEBUG),y)
     OPTIMIZE += -funit-at-a-time
   endif
 else
-  OPTIMIZE := -Os
+  OPTIMIZE := -Ofast
   OPTIMIZE += -DNDEBUG
 endif
 
