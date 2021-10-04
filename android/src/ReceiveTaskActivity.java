@@ -11,8 +11,17 @@ import android.util.Log;
 
 public class ReceiveTaskActivity extends Activity {
   private static final String TAG = "XCSoar";
+  
+  /**
+   * Hack: this is set by onCreate(), to support the "testing"
+   * package.
+   */
+  protected static Class<?> mainActivityClass;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
+    if (mainActivityClass == null)
+      mainActivityClass = XCSoar.class;
+
     super.onCreate(savedInstanceState);
 
     String msg = handleIntent(getIntent());
@@ -41,7 +50,7 @@ public class ReceiveTaskActivity extends Activity {
       if (msg == null) {
         /* the data was handled successfully, and the main "XCSoar"
            activity shows the details - switch to it */
-        Intent myIntent = new Intent(this, XCSoar.class);
+        Intent myIntent = new Intent(this, mainActivityClass);
         startActivity(myIntent);
         return null;
       }
