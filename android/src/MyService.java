@@ -85,8 +85,8 @@ public class MyService extends Service {
     Notification.Builder builder = new Notification.Builder(context)
       .setOngoing(true)
       .setContentIntent(intent)
-      .setContentTitle("XCSoar")
-      .setContentText("XCSoar is running")
+      .setContentTitle(context.getResources().getString(R.string.app_name))
+      .setContentText(context.getResources().getString(R.string.app_name) + " is running")
       .setSmallIcon(R.drawable.notification_icon);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
