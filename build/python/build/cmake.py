@@ -27,6 +27,9 @@ set(CMAKE_CXX_COMPILER_TARGET {toolchain.actual_arch})
 
 set(CMAKE_C_FLAGS "{toolchain.cflags} {toolchain.cppflags}")
 set(CMAKE_CXX_FLAGS "{toolchain.cxxflags} {toolchain.cppflags}")
+
+set(CMAKE_AR /home/parallels/opt/androidsdk/ndk/23.0.7599858/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar)
+
 """)
     __write_cmake_compiler(f, 'C', toolchain.cc)
     __write_cmake_compiler(f, 'CXX', toolchain.cxx)
