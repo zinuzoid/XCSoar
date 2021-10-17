@@ -157,8 +157,12 @@ namespace InfoBoxFactory
     e_EngineCHT,  /* Engine Cylinder Head Temperature */
     e_EngineEGT,  /* Engine Exhaust Gas Temperature */
     e_EngineRPM,  /* Engine Revolutions Per Minute */
-
     e_AAT_dT_or_ETA, /* Delta time in AAT task and ETA in racing task */
+    e_HeartRate6, /* dummy item */
+    e_HeartRate7, /* dummy item */
+    e_HeartRate8, /* dummy item */
+    e_HeartRate9, /* dummy item */
+    e_HeartRate10, /* dummy item */
 
     e_NUM_TYPES /* Last item */
   };
