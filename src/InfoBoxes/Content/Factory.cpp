@@ -1120,6 +1120,54 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxContentRPM,
   },
 
+  // e_HeartRate dummy item
+  {
+    N_("DONOTUSE"),
+    N_("DONOTUSE"),
+    N_("DONOTUSE"),
+    UpdateInfoBoxHeartRate,
+  },
+
+  // e_HeartRate dummy item
+  {
+    N_("DONOTUSE"),
+    N_("DONOTUSE"),
+    N_("DONOTUSE"),
+    UpdateInfoBoxHeartRate,
+  },
+
+  // e_HeartRate dummy item
+  {
+    N_("DONOTUSE"),
+    N_("DONOTUSE"),
+    N_("DONOTUSE"),
+    UpdateInfoBoxHeartRate,
+  },
+
+  // e_HeartRate dummy item
+  {
+    N_("DONOTUSE"),
+    N_("DONOTUSE"),
+    N_("DONOTUSE"),
+    UpdateInfoBoxHeartRate,
+  },
+
+  // e_HeartRate dummy item
+  {
+    N_("DONOTUSE"),
+    N_("DONOTUSE"),
+    N_("DONOTUSE"),
+    UpdateInfoBoxHeartRate,
+  },
+
+  // e_HeartRate dummy item
+  {
+    N_("DONOTUSE"),
+    N_("DONOTUSE"),
+    N_("DONOTUSE"),
+    UpdateInfoBoxHeartRate,
+  },
+
 };
 
 static_assert(ARRAY_SIZE(meta_data) == NUM_TYPES,
