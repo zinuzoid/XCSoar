@@ -172,6 +172,17 @@ namespace InfoBoxFactory
 
     e_HeartRate,
 
+    e_HeartRate1, /* dummy item */
+    e_HeartRate2, /* dummy item */
+    e_HeartRate3, /* dummy item */
+    e_HeartRate4, /* dummy item */
+    e_HeartRate5, /* dummy item */
+    e_HeartRate6, /* dummy item */
+    e_HeartRate7, /* dummy item */
+    e_HeartRate8, /* dummy item */
+    e_HeartRate9, /* dummy item */
+    e_HeartRate10, /* dummy item */
+
     e_NUM_TYPES /* Last item */
   };
 
