@@ -292,7 +292,7 @@ Draw(Canvas &canvas, PixelRect rc,
 
   // Draw waypoint name
   OrderedTaskPointLabel(item.tp_type, waypoint.name.c_str(),
-                        item.index, buffer);
+                        waypoint.shortname.c_str(), item.index, buffer);
   row_renderer.DrawFirstRow(canvas, rc, buffer);
 }
 
