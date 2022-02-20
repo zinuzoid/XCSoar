@@ -20,7 +20,7 @@ CylinderZone::GetBoundary() const noexcept
 {
   OZBoundary boundary;
 
-  const unsigned steps = 20;
+  const unsigned steps = std::max(100.0, GetRadius() / 10); // 1000 steps on 10km radius
   const auto delta = Angle::FullCircle() / steps;
 
   GeoVector vector(GetRadius(), Angle::Zero());

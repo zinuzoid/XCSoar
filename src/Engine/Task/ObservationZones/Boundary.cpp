@@ -8,7 +8,7 @@ void
 OZBoundary::GenerateArcExcluding(const GeoPoint &center, double radius,
                                  Angle start_radial, Angle end_radial)
 {
-  const unsigned steps = 20;
+  const unsigned steps = std::max(100.0, radius / 10); // 1000 steps on 10km radius
   const Angle delta = Angle::FullCircle() / steps;
   const Angle start = start_radial.AsBearing();
   Angle end = end_radial.AsBearing();
