@@ -148,23 +148,39 @@ OrderedTaskSummary(const OrderedTask *task, TCHAR *text, bool linebreaks)
 
 void
 OrderedTaskPointLabel(TaskPointType type, const TCHAR *name,
-                      unsigned index, TCHAR* buffer)
+                      const TCHAR *shortname, unsigned index, TCHAR* buffer)
 {
   switch (type) {
   case TaskPointType::START:
-    StringFormatUnsafe(buffer, _T("S: %s"), name);
+    if(strlen(shortname) > 0) {
+      StringFormatUnsafe(buffer, _T("S: [%s] %s"), shortname, name);
+    } else {
+      StringFormatUnsafe(buffer, _T("S: %s"), name);
+    }
     break;
 
   case TaskPointType::AST:
-    StringFormatUnsafe(buffer, _T("T%d: %s"), index, name);
+    if(strlen(shortname) > 0) {
+      StringFormatUnsafe(buffer, _T("T%d: [%s] %s"), index, shortname, name);
+    } else {
+      StringFormatUnsafe(buffer, _T("T%d: %s"), index, name);
+    }
     break;
 
   case TaskPointType::AAT:
-    StringFormatUnsafe(buffer, _T("A%d: %s"), index, name);
+    if(strlen(shortname) > 0) {
+      StringFormatUnsafe(buffer, _T("A%d: [%s] %s"), index, shortname, name);
+    } else {
+      StringFormatUnsafe(buffer, _T("A%d: %s"), index, name);
+    }
     break;
 
   case TaskPointType::FINISH:
-    StringFormatUnsafe(buffer, _T("F: %s"), name);
+    if(strlen(shortname) > 0) {
+      StringFormatUnsafe(buffer, _T("F: [%s] %s"), shortname, name);
+    } else {
+      StringFormatUnsafe(buffer, _T("F: %s"), name);
+    }
     break;
 
   default:

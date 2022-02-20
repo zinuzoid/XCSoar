@@ -41,7 +41,7 @@ OrderedTaskSummary(const OrderedTask *task, TCHAR *text, bool linebreaks);
 
 void
 OrderedTaskPointLabel(TaskPointType type, const TCHAR *name,
-                      unsigned index, TCHAR *buffer);
+                      const TCHAR *shortname, unsigned index, TCHAR *buffer);
 
 void OrderedTaskPointRadiusLabel(const ObservationZonePoint &ozp, TCHAR* radius);
 
