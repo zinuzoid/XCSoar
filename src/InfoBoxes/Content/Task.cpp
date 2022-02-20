@@ -181,7 +181,15 @@ UpdateInfoBoxNextDistance(InfoBoxData &data) noexcept
   if (!way_point)
     data.SetTitle(_("WP Dist"));
   else
-    data.SetTitle(way_point->name.c_str());
+    if(way_point->shortname.length() > 0) {
+      StaticString<100> buffer;
+      buffer.Format(("[%s] %s"),
+                    way_point->shortname.c_str(),
+                    way_point->name.c_str());
+      data.SetTitle(buffer);
+    } else {
+      data.SetTitle(way_point->name.c_str());
+    }
 
   // use proper non-terminal next task stats
 
@@ -902,7 +910,15 @@ InfoBoxContentNextArrow::Update(InfoBoxData &data) noexcept
   if (!way_point)
     data.SetTitle(_("Next arrow"));
   else
-    data.SetTitle(way_point->name.c_str());
+    if(way_point->shortname.length() > 0) {
+      StaticString<100> buffer;
+      buffer.Format("[%s] %s",
+              way_point->shortname.c_str(),
+              way_point->name.c_str());
+      data.SetTitle(buffer);
+    } else {
+      data.SetTitle(way_point->name.c_str());
+    }
 
   // Set value
   if (angle_valid)

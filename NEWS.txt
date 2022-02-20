@@ -15,6 +15,7 @@ Version JET
 - Audio Task Bearing - vario like sound to make sure you're directly on task bearing
 - Add Android Permission Prominent disclosure
 - Skysight.io integration
+- Show shortcode waypoint on task editor and infobox
 
 ------------------------
 Version 7.28 - 2022/10/29
