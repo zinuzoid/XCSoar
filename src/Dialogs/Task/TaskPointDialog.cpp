@@ -358,8 +358,14 @@ TaskPointWidget::RefreshView()
 
   {
     StaticString<100> buffer;
-    buffer.Format(_T("%s %s"), name_prefix_buffer.c_str(),
-                  tp.GetWaypoint().name.c_str());
+    if(tp.GetWaypoint().shortname.length() > 0) {
+      buffer.Format(_T("%s [%s] %s"), name_prefix_buffer.c_str(),
+                    tp.GetWaypoint().shortname.c_str(),
+                    tp.GetWaypoint().name.c_str());
+    } else {
+      buffer.Format(_T("%s %s"), name_prefix_buffer.c_str(),
+                    tp.GetWaypoint().name.c_str());
+    }
     waypoint_name.SetText(buffer);
   }
 }
