@@ -16,6 +16,7 @@ Version JET
 - Skysight.io integration
 - Update Skysight regions config
 - Update Skysight API key
+- Show shortcode waypoint on task editor and infobox
 
 ------------------------
 
