@@ -253,7 +253,7 @@ TaskEditPanel::OnPaintItem(Canvas &canvas, const PixelRect rc,
 
   // Draw turnpoint name
   OrderedTaskPointLabel(tp.GetType(), tp.GetWaypointPtr()->name.c_str(),
-                        DrawListIndex, buffer);
+                        tp.GetWaypointPtr()->shortname.c_str(), DrawListIndex, buffer);
   row_renderer.DrawFirstRow(canvas, text_rc, buffer);
 
   // Draw icon
