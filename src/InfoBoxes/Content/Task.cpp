@@ -926,7 +926,10 @@ InfoBoxContentNextArrow::Update(InfoBoxData &data) noexcept
     data.SetInvalid();
 
   // Set comment
-  if (distance_valid)
+  if (angle_valid) {
+      Angle bd = vector_remaining.bearing - basic.track;
+      data.SetCommentFromBearingDifference(bd);
+  } else if (distance_valid)
     data.SetCommentFromDistance(vector_remaining.distance);
   else
     data.SetCommentInvalid();
