@@ -24,7 +24,7 @@ GetVario1Color(short ramp_h) {
 static RGB8Color
 GetVario2Color(short ramp_h) {
   static constexpr ColorRamp snail_colors_vario2[] = {
-    {  0, { 0x00, 0x00, 0xff }},
+    {  0, { 0x22, 0x22, 0x22 }},
     { 99, { 0x00, 0xff, 0xff }},
     {100, { 0xff, 0xff, 0x00 }},
     {200, { 0xff, 0x00, 0x00 }}
