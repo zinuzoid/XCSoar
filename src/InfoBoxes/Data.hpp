@@ -136,6 +136,7 @@ struct InfoBoxData {
    * Set the InfoBox value to the specified glide ratio.
    */
   void SetValueFromGlideRatio(double gr) noexcept;
+  void SetCommentFromGlideRatio(double gr, const TCHAR *suffix=_T("")) noexcept;
 
   /**
    * Set the InfoBox value to the specified distance.
