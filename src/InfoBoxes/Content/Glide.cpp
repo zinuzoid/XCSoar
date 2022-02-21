@@ -15,11 +15,17 @@ UpdateInfoBoxGRInstant(InfoBoxData &data) noexcept
 
   if (!::GradientValid(gr)) {
     data.SetInvalid();
-    return;
+  } else {
+    data.SetValueFromGlideRatio(gr);
   }
 
-  // Set Value
-  data.SetValueFromGlideRatio(gr);
+  const auto average_gr = CommonInterface::Calculated().average_gr;
+  
+  if (!::GradientValid(average_gr) || average_gr == 0.0) {
+    data.SetCommentInvalid();
+  } else {
+    data.SetCommentFromGlideRatio(average_gr, _T("avg:"));
+  }
 }
 
 void
