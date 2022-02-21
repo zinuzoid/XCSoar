@@ -20,6 +20,7 @@ Version JET
 - Increase cylinder waypoint circle interpolation from 20 to 100 - 400 sections based on radius
 - Update SnailTrail Vario#2 color
 - NextArrowInfoBox show bearing different instead of distance
+- GRInstantInfoBox show average GR on comment label
 
 ------------------------
 Version 7.43 - 2024-08-12
