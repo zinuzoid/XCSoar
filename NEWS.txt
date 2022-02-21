@@ -18,6 +18,7 @@ Version JET
 - Show shortcode waypoint on task editor and infobox
 - Increase cylinder waypoint circle interpolation from 20 to 50 - 1000 sections based on radius
 - Update SnailTrail Vario#2 color
+- NextArrowInfoBox show bearing different instead of distance
 
 ------------------------
 Version 7.29 - 2023/05/03
