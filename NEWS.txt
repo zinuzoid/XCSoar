@@ -17,6 +17,7 @@ Version JET
 - Skysight.io integration
 - Show shortcode waypoint on task editor and infobox
 - Increase cylinder waypoint circle interpolation from 20 to 100 - 400 sections based on radius
+- Update SnailTrail Vario#2 color
 
 ------------------------
 Version 7.34 - 2023/06/06
