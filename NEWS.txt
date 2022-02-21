@@ -19,6 +19,7 @@ Version JET
 - Show shortcode waypoint on task editor and infobox
 - Increase cylinder waypoint circle interpolation from 20 to 100 - 400 sections based on radius
 - NextArrowInfoBox show bearing different instead of distance
+- GRInstantInfoBox show average GR on comment label
 
 ------------------------
 Version 7.43 - 2024-08-12
