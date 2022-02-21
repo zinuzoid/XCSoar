@@ -55,6 +55,12 @@ InfoBoxData::SetValueFromGlideRatio(double gr) noexcept
 }
 
 void
+InfoBoxData::SetCommentFromGlideRatio(double gr, const TCHAR *suffix) noexcept
+{
+  FormatGlideRatio(comment.buffer(), comment.capacity(), gr, suffix);
+}
+
+void
 InfoBoxData::SetComment(Angle _value, const TCHAR *suffix) noexcept
 {
   assert(suffix != NULL);
