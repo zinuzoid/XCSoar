@@ -449,6 +449,9 @@ public:
   double SpeedToFly(const AircraftState &state, const GlideResult &solution,
                    const bool block_stf) const;
 
+  [[gnu::pure]]
+  double SpeedToFlyMaxEfficient(const AircraftState &state, const GlideResult &solution) const;
+
   /**
    * Calculate speed-to-fly according to MacCready dolphin theory
    * with ring setting at current MC value, at specified netto sink rate
