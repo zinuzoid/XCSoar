@@ -341,6 +341,18 @@ GlidePolar::SpeedToFly(const AircraftState &state,
 }
 
 double
+GlidePolar::SpeedToFlyMaxEfficient(const AircraftState &state,
+                                   const GlideResult &solution) const noexcept
+{
+  assert(IsValid());
+
+  const auto head_wind = solution.IsDefined() ? solution.head_wind : 0.;
+  const auto sink_rate = -state.netto_vario;
+
+  return SpeedToFly(sink_rate, head_wind);
+}
+
+double
 GlidePolar::GetTotalMass() const noexcept
 {
   return empty_mass + crew_mass + GetBallastLitres();
