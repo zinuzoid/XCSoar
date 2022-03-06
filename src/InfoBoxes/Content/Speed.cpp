@@ -115,3 +115,16 @@ UpdateInfoBoxSpeedGroundAndTAS(InfoBoxData &data) noexcept
   }
 
 }
+
+void
+UpdateInfoBoxSpeedMaximumEfficiency(InfoBoxData &data) noexcept
+{
+  // Set Value
+  const DerivedInfo &calculated = CommonInterface::Calculated();
+  data.SetValueFromSpeed(calculated.V_max_eff, false);
+
+  if(calculated.head_wind_available)
+    data.SetCommentFromSpeed(calculated.head_wind, false, _T("HW:"));
+  else
+    data.SetCommentInvalid();
+}
