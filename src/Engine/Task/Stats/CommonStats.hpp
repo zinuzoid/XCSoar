@@ -56,6 +56,8 @@ public:
   double V_block;
   /** Dolphin speed to fly */
   double V_dolphin;
+  /** Maximum efficiency speed to fly */
+  double V_max_eff;
 
   /** Risk MC setting (m/s) */
   double current_risk_mc;

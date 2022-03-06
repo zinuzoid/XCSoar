@@ -155,6 +155,7 @@ namespace InfoBoxFactory
     e_HeightAGL_T_O,
     
     e_Fuel_Remain,
+    e_Speed_Maximum_Efficiency,
 
     e_NUM_TYPES /* Last item */
   };

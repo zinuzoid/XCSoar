@@ -26,3 +26,6 @@ UpdateInfoBoxSpeedDolphin(InfoBoxData &data) noexcept;
 
 void
 UpdateInfoBoxSpeedGroundAndTAS(InfoBoxData &data) noexcept;
+
+void
+UpdateInfoBoxSpeedMaximumEfficiency(InfoBoxData &data) noexcept;
