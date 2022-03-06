@@ -26,6 +26,7 @@ CommonStats::Reset()
 
   V_block = 0;
   V_dolphin = 0;
+  V_max_eff = 0;
 
   current_risk_mc = 0;
   height_min_working = 0;

@@ -1221,6 +1221,15 @@ static constexpr MetaData meta_data[] = {
     UpdateInfoBoxFuelRemain,
   },
 
+  // e_Speed_Maximum_Efficiency
+  {
+    N_("Speed maximum efficiency"),
+    N_("V max eff"),
+    N_("Best glide speed based on vario and wind"),
+    UpdateInfoBoxSpeedMaximumEfficiency,
+    maccready_panels,
+  },
+
 };
 
 static_assert(ARRAY_SIZE(meta_data) == NUM_TYPES,

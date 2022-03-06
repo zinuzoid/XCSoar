@@ -25,6 +25,8 @@ Copyright_License {
 
 #include "InfoBoxes/Content/Base.hpp"
 
+extern const InfoBoxPanel maccready_panels[];
+
 class InfoBoxContentMacCready : public InfoBoxContent
 {
 public:

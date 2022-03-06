@@ -120,6 +120,8 @@ TaskComputer::ProcessMoreTask(const MoreData &basic,
   else
     calculated.V_stf = calculated.common_stats.V_dolphin;
 
+  calculated.V_max_eff = calculated.common_stats.V_max_eff;
+
   if (calculated.task_stats.current_leg.vector_remaining.IsValid()) {
     const GeoVector &v = calculated.task_stats.current_leg.vector_remaining;
     calculated.auto_zoom_distance = v.distance;

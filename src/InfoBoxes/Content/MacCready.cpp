@@ -46,7 +46,7 @@ SetVSpeed(InfoBoxData &data, double value) noexcept
  * Subpart callback function pointers
  */
 
-static constexpr InfoBoxPanel panels[] = {
+constexpr InfoBoxPanel maccready_panels[] = {
   { N_("Edit"), LoadMacCreadyEditPanel },
   { N_("Setup"), LoadMacCreadySetupPanel },
   { nullptr, nullptr }
@@ -55,7 +55,7 @@ static constexpr InfoBoxPanel panels[] = {
 const InfoBoxPanel *
 InfoBoxContentMacCready::GetDialogContent() noexcept
 {
-  return panels;
+  return maccready_panels;
 }
 
 /*

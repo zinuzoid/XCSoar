@@ -153,6 +153,9 @@ struct DerivedInfo:
   /** Speed to fly block/dolphin (m/s) */
   double V_stf;
 
+  /** Speed to fly maximum efficiency (m/s) */
+  double V_max_eff;
+
   /** Auto QNH calculation result. */
   AtmosphericPressure pressure;
   Validity pressure_available;

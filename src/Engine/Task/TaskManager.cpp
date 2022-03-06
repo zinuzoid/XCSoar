@@ -248,6 +248,10 @@ TaskManager::UpdateCommonStatsPolar(const AircraftState &state)
     risk_polar.SpeedToFly(state,
                           GetStats().current_leg.solution_remaining,
                           false);
+
+  common_stats.V_max_eff =
+    glide_polar.SpeedToFlyMaxEfficient(state,
+                          GetStats().current_leg.solution_remaining);
 }
 
 void
