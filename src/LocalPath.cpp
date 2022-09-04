@@ -228,12 +228,12 @@ FindDataPaths() noexcept
 #ifdef ANDROID
     const auto env = Java::GetEnv();
 
-    // for (auto &path : context->GetExternalFilesDirs(env)) {
-    //   __android_log_print(ANDROID_LOG_DEBUG, "XCSoar",
-    //                       "Context.getExternalFilesDirs()='%s'",
-    //                       path.c_str());
-    //   result.emplace_back(std::move(path));
-    // }
+    for (auto &path : context->GetExternalFilesDirs(env)) {
+      __android_log_print(ANDROID_LOG_DEBUG, "XCSoar",
+                          "Context.getExternalFilesDirs()='%s'",
+                          path.c_str());
+      result.emplace_back(std::move(path));
+    }
 
     if (auto path = Environment::GetExternalStoragePublicDirectory(env,
                                                                    "XCSoarData");
