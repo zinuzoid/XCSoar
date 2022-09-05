@@ -112,6 +112,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Settings/Panels/TimeConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/WaypointDisplayConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/TrackingConfigPanel.cpp \
+	$(SRC)/Dialogs/Settings/Panels/JETProviderConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/CloudConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/WeatherConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/WeGlideConfigPanel.cpp \
@@ -493,6 +494,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/Profile/MapProfile.cpp \
 	$(SRC)/Profile/PageProfile.cpp \
 	$(SRC)/Profile/UIProfile.cpp \
+	$(SRC)/Profile/JETProviderProfile.cpp \
 	$(SRC)/Profile/Settings.cpp \
 	$(SRC)/Profile/UnitsConfig.cpp \
 	$(SRC)/Profile/DeviceConfig.cpp \
@@ -511,6 +513,7 @@ XCSOAR_SOURCES := \
 	\
 	$(SRC)/Job/Thread.cpp \
 	$(SRC)/Job/Async.cpp \
+	$(SRC)/Job/InlineJobRunner.cpp \
 	\
 	$(SRC)/RateLimiter.cpp \
 	\
@@ -659,6 +662,10 @@ XCSOAR_SOURCES += \
 	$(SRC)/Tracking/SkyLines/Key.cpp \
 	$(SRC)/Tracking/SkyLines/Glue.cpp \
 	$(SRC)/Tracking/TrackingGlue.cpp
+
+XCSOAR_SOURCES += \
+	$(SRC)/Tracking/JETProvider/JETProvider.cpp \
+	$(SRC)/Tracking/JETProvider/RadarParser.cpp
 
 ifeq ($(HAVE_PCM_PLAYER),y)
 XCSOAR_SOURCES += $(SRC)/Audio/VarioGlue.cpp
