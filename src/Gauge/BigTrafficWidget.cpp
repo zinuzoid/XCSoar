@@ -493,6 +493,7 @@ FlarmTrafficControl::PaintTrafficInfo(Canvas &canvas) const
     canvas.SetTextColor(look.alarm_color);
     break;
   case FlarmTraffic::AlarmType::NONE:
+  case FlarmTraffic::AlarmType::OFFLINE:
     canvas.SetTextColor(look.default_color);
     break;
   }

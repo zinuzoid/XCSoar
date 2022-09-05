@@ -18,6 +18,7 @@ TrafficLook::Initialise(const Font &_font)
   warning_brush.Create(warning_color);
   warning_in_altitude_range_brush.Create(warning_in_altitude_range_color);
   alarm_brush.Create(alarm_color);
+  offline_brush.Create(offline_color);
 
   fading_pen.Create(Pen::Style::DASH1, Layout::ScalePenWidth(1), fading_outline_color);
 
@@ -25,7 +26,7 @@ TrafficLook::Initialise(const Font &_font)
   fading_brush.Create(fading_fill_color);
 #endif
 
-  unsigned width = Layout::ScalePenWidth(2);
+  unsigned width = Layout::ScalePenWidth(1);
   team_pen_green.Create(width, team_color_green);
   team_pen_blue.Create(width, team_color_blue);
   team_pen_yellow.Create(width, team_color_yellow);
