@@ -271,6 +271,8 @@ constexpr char EnableThermalInformationMap[] = "EnableThermalInformationMap";
 constexpr char SkysightEmail[] = "SkysightEmail";
 constexpr char SkysightPassword[] = "SkysightPassword";
 constexpr char SkysightRegion[] = "SkysightRegion";
+constexpr char SkysightActiveMetrics[] = "SkysightActiveMetrics";
+constexpr char SkysightDisplayedMetric[] = "SkysightDisplayedMetric";
 
 constexpr char EnableLocationMapItem[] = "EnableLocationMapItem";
 constexpr char EnableArrivalAltitudeMapItem[] = "EnableArrivalAltitudeMapItem";
