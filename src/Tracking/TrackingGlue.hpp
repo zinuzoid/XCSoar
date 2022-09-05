@@ -31,6 +31,11 @@ Copyright_License {
 #include "Tracking/SkyLines/Glue.hpp"
 #include "Tracking/SkyLines/Data.hpp"
 #include "Tracking/LiveTrack24/Glue.hpp"
+#include "Tracking/JETProvider/JETProvider.hpp"
+#include "thread/StandbyThread.hpp"
+#include "time/PeriodClock.hpp"
+#include "Geo/GeoPoint.hpp"
+#include "time/BrokenDateTime.hpp"
 
 struct TrackingSettings;
 struct MoreData;
@@ -38,13 +43,31 @@ struct DerivedInfo;
 class CurlGlobal;
 
 class TrackingGlue final
-  : private SkyLinesTracking::Handler
+  : private SkyLinesTracking::Handler,
+    private JETProvider::Handler
 {
   SkyLinesTracking::Glue skylines;
 
   SkyLinesTracking::Data skylines_data;
 
   LiveTrack24::Glue livetrack24;
+
+  JETProvider::Glue jet_provider;
+  
+  JETProvider::Data jet_provider_data;
+
+  /**
+   * The Unix UTC time stamp that was last submitted to the tracking
+   * server.  This attribute is used to detect time warps.
+   */
+  std::chrono::system_clock::time_point last_timestamp{};
+
+  BrokenDateTime date_time;
+  GeoPoint location;
+  unsigned altitude;
+  unsigned ground_speed;
+  Angle track;
+  bool flying = false, last_flying;
 
 public:
   TrackingGlue(EventLoop &event_loop, CurlGlobal &curl) noexcept;
@@ -64,10 +87,15 @@ private:
                  const AGeoPoint &bottom, const AGeoPoint &top,
                  double lift) override;
   void OnSkyLinesError(std::exception_ptr e) override;
+  void OnJETTraffic(std::vector<JETProvider::Data::Traffic> traffics, bool success) override;
+  void OnJETProviderError(std::exception_ptr e) override;
 
 public:
   const SkyLinesTracking::Data &GetSkyLinesData() const {
     return skylines_data;
+  }
+  const JETProvider::Data &GetJETProviderData() const {
+    return jet_provider_data;
   }
 };
 

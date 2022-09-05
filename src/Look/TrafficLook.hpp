@@ -36,12 +36,14 @@ struct TrafficLook {
   static constexpr Color warning_color{0xfe,0x84,0x38};
   static constexpr Color warning_in_altitude_range_color{0xff,0x00,0xff};
   static constexpr Color alarm_color{0xfb,0x35,0x2f};
+  static constexpr Color offline_color{0x00,0x00,0x00};
 
   Brush safe_above_brush;
   Brush safe_below_brush;
   Brush warning_brush;
   Brush warning_in_altitude_range_brush;
   Brush alarm_brush;
+  Brush offline_brush;
 
   static constexpr Color team_color_green = Color(0x74, 0xff, 0);
   static constexpr Color team_color_magenta = Color(0xff, 0, 0xcb);

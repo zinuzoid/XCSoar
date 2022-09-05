@@ -86,4 +86,5 @@ ComputerSettings::SetDefaults()
   weather.SetDefaults();
   radio.SetDefaults();
   weglide.SetDefaults();
+  jet_provider_setting.SetDefaults();
 }

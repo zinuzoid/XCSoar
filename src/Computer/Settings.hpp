@@ -40,6 +40,7 @@ Copyright_License {
 #include "WaveSettings.hpp"
 #include "RadioFrequency.hpp"
 #include "net/client/WeGlide/Settings.hpp"
+#include "Tracking/JETProvider/Settings.hpp"
 
 #include <cstdint>
 #include <type_traits>
@@ -238,6 +239,8 @@ struct ComputerSettings {
   WeatherSettings weather;
 
   RadioSettings radio;
+
+  JETProviderSettings jet_provider_setting;
 
   void SetDefaults();
 };

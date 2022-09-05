@@ -540,6 +540,9 @@ Startup(UI::Display &display)
   if (map_window != nullptr)
     map_window->SetSkyLinesData(&tracking->GetSkyLinesData());
 #endif
+  if (map_window != nullptr)
+    map_window->SetJETProviderData(&tracking->GetJETProviderData());
+
 #endif
 
 #ifdef HAVE_HTTP

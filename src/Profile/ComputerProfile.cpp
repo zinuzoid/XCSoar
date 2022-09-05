@@ -30,6 +30,7 @@ Copyright_License {
 #include "ContestProfile.hpp"
 #include "Map.hpp"
 #include "Computer/Settings.hpp"
+#include "JETProviderProfile.hpp"
 
 namespace Profile {
   static void Load(const ProfileMap &map, WindSettings &settings);
@@ -193,4 +194,5 @@ Profile::Load(const ProfileMap &map, ComputerSettings &settings)
 #endif
 
   Load(map, settings.weather);
+  Load(map, settings.jet_provider_setting);
 }
