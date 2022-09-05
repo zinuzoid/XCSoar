@@ -6,6 +6,7 @@
 #include "Look/MapLook.hpp"
 #include "Weather/Rasp/RaspRenderer.hpp"
 #include "Weather/Rasp/RaspCache.hpp"
+#include "Weather/Skysight/Skysight.hpp"
 #include "Topography/CachedTopographyRenderer.hpp"
 #include "Renderer/AircraftRenderer.hpp"
 #include "Renderer/WaveRenderer.hpp"
@@ -69,6 +70,15 @@ MapWindow::RenderRasp(Canvas &canvas)
 }
 
 inline void
+MapWindow::RenderSkysight(__attribute__((unused)) Canvas &canvas)
+{
+  if (skysight == nullptr)
+    return;
+
+  skysight->Render();
+}
+
+void
 MapWindow::RenderTopography(Canvas &canvas)
 {
   if (topography_renderer != nullptr && GetMapSettings().topography_enabled)
@@ -191,6 +201,9 @@ MapWindow::Render(Canvas &canvas, const PixelRect &rc)
 
   draw_sw.Mark("RenderRasp");
   RenderRasp(canvas);
+
+  draw_sw.Mark("RenderSkysight");
+  RenderSkysight(canvas); 
 
   draw_sw.Mark("RenderTopography");
   RenderTopography(canvas);
