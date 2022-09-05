@@ -42,6 +42,7 @@ struct FlarmTraffic {
     IMPORTANT = 2,
     URGENT = 3,
     INFO_ALERT = 4,
+    OFFLINE = 5,
   };
 
   /**
