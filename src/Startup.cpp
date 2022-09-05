@@ -413,7 +413,7 @@ Startup(UI::Display &display)
 
   //Initialise Skysight weather forecast
   LogFormat("Skysight load");
-  auto skysight = std::make_shared<Skysight>();
+  auto skysight = std::make_shared<Skysight>(*Net::curl);
 
   // Reads the airspace files
   {
