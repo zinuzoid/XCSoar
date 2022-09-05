@@ -359,6 +359,8 @@ private:
 
   void RenderRasp(Canvas &canvas) noexcept;
 
+  void RenderSkysight(Canvas &canvas) noexcept;
+
   void RenderTerrainAbove(Canvas &canvas, bool working) noexcept;
 
   /**
