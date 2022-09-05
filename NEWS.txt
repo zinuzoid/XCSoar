@@ -9,6 +9,8 @@ Version JET
 - New Infobox H AGL and H T/O in the same Infobox
 - Update Wind Infobox to include wind_estimation data age
 - The initial goto task will always be a takeoff site instead of nearest landable
+- JETProvider :)
+- JETProvider fixes: Offline mode will draw black, fix interval setting saving
 
 ------------------------
 Version 7.29 - 2023/05/03

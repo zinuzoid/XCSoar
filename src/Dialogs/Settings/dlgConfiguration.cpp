@@ -57,6 +57,7 @@
 #include "Panels/TrackingConfigPanel.hpp"
 #endif
 
+#include "Panels/JETProviderConfigPanel.hpp"
 #include "Panels/CloudConfigPanel.hpp"
 
 #if defined(HAVE_PCMET) || defined(HAVE_HTTP)
@@ -136,6 +137,7 @@ static constexpr TabMenuPage setup_pages[] = {
 #ifdef HAVE_VOLUME_CONTROLLER
   { N_("Audio"), CreateAudioConfigPanel },
 #endif
+  { N_("JET Provider"), CreateJETProviderConfigPanel },
   { nullptr, nullptr }
 };
 
