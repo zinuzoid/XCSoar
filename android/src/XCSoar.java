@@ -250,7 +250,9 @@ public class XCSoar extends Activity {
 
   private static final String[] NEEDED_PERMISSIONS = new String[] {
     Manifest.permission.ACCESS_FINE_LOCATION,
-    Manifest.permission.WRITE_EXTERNAL_STORAGE
+    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+    Manifest.permission.BLUETOOTH_CONNECT,
+    Manifest.permission.BLUETOOTH_SCAN
   };
 
   private boolean hasAllPermissions() {
@@ -275,8 +277,8 @@ public class XCSoar extends Activity {
 
     if (!hasAllPermissions()) {
       new AlertDialog.Builder(this)
-        .setTitle("Location Permission")
-        .setMessage("XCSoar JET needs to collect location data to enable live navigation calculation and IGC logger, even when the app is in the background")
+        .setTitle("Permission request")
+        .setMessage("XCSoar JET needs to\n1.Collect location data to enable live navigation calculation and IGC logger, even when the app is in the background\n2.Bluetooth permission to connect external peripheral")
         .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
