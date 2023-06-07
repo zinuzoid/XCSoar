@@ -4,13 +4,14 @@
 #include "AnnularSectorZone.hpp"
 #include "Boundary.hpp"
 #include "Geo/GeoVector.hpp"
+#include <algorithm>
 
 OZBoundary
 AnnularSectorZone::GetBoundary() const noexcept
 {
   OZBoundary boundary;
 
-  const unsigned steps = 20;
+  const unsigned steps = std::clamp(GetRadius() / 25, 100.0, 400.0); // 400 steps on 10km radius
   const Angle delta = Angle::FullCircle() / steps;
   const Angle start = GetStartRadial().AsBearing();
   Angle end = GetEndRadial().AsBearing();
