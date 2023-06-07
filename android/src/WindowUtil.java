@@ -27,6 +27,9 @@ class WindowUtil {
    * Screen Mode.
    */
   static void enableImmersiveMode(Window window) {
+    if (XCSoar.IS_GOOGLE_PHONE) {
+      return;
+    }
     View decorView = window.getDecorView();
     decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN|
                                     View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|
@@ -37,16 +40,25 @@ class WindowUtil {
   }
 
   static void disableImmersiveMode(Window window) {
+    if (XCSoar.IS_GOOGLE_PHONE) {
+      return;
+    }
     View decorView = window.getDecorView();
     decorView.setSystemUiVisibility(0);
   }
 
   static void enterFullScreenMode(Window window) {
+    if (XCSoar.IS_GOOGLE_PHONE) {
+      return;
+    }
     window.addFlags(FULL_SCREEN_WINDOW_FLAGS);
     enableImmersiveMode(window);
   }
 
   static void leaveFullScreenMode(Window window, int preserveFlags) {
+    if (XCSoar.IS_GOOGLE_PHONE) {
+      return;
+    }
     disableImmersiveMode(window);
     window.clearFlags(FULL_SCREEN_WINDOW_FLAGS & ~preserveFlags);
   }

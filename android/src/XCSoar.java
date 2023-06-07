@@ -61,6 +61,8 @@ public class XCSoar extends Activity implements PermissionManager {
 
   boolean fullScreen = false;
 
+  public static final boolean IS_GOOGLE_PHONE = "Google".equals(Build.MANUFACTURER);
+
   @Override protected void onCreate(Bundle savedInstanceState) {
     if (serviceClass == null)
       serviceClass = MyService.class;
