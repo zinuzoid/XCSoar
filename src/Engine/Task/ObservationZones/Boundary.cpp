@@ -3,12 +3,13 @@
 
 #include "Boundary.hpp"
 #include "Geo/GeoVector.hpp"
+#include <algorithm>
 
 void
 OZBoundary::GenerateArcExcluding(const GeoPoint &center, double radius,
                                  Angle start_radial, Angle end_radial) noexcept
 {
-  const unsigned steps = 20;
+  const unsigned steps = std::clamp(radius / 25, 100.0, 400.0); // 400 steps on 10km radius
   const Angle delta = Angle::FullCircle() / steps;
   const Angle start = start_radial.AsBearing();
   Angle end = end_radial.AsBearing();

@@ -16,6 +16,7 @@ Version JET
 - Add Android Permission Prominent disclosure
 - Skysight.io integration
 - Show shortcode waypoint on task editor and infobox
+- Increase cylinder waypoint circle interpolation from 20 to 100 - 400 sections based on radius
 
 ------------------------
 Version 7.39 - 2023/07/28
