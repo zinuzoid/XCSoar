@@ -6,7 +6,7 @@
 #include "util/Macros.hpp"
 #include "Math/Angle.hpp"
 
-static constexpr unsigned CIRCLE_SEGS = 64;
+static constexpr unsigned CIRCLE_SEGS = 256;
 
 [[gnu::const]]
 static PixelPoint
