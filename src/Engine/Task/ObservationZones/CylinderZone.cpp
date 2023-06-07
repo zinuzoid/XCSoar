@@ -4,6 +4,7 @@
 #include "CylinderZone.hpp"
 #include "Boundary.hpp"
 #include "Geo/GeoVector.hpp"
+#include <algorithm>
 
 #include <algorithm>
 
@@ -20,7 +21,7 @@ CylinderZone::GetBoundary() const noexcept
 {
   OZBoundary boundary;
 
-  const unsigned steps = 20;
+  const unsigned steps = std::clamp(GetRadius() / 25, 100.0, 400.0); // 400 steps on 10km radius
   const auto delta = Angle::FullCircle() / steps;
 
   GeoVector vector(GetRadius(), Angle::Zero());
