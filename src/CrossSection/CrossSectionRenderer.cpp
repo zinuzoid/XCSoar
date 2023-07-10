@@ -42,7 +42,7 @@ CrossSectionRenderer::ReadBlackboard(const MoreData &_gps_info,
 void
 CrossSectionRenderer::Paint(Canvas &canvas, const PixelRect rc) const
 {
-  ChartRenderer chart(chart_look, canvas, rc);
+  ChartRenderer chart(chart_look, canvas, rc, false);
 
   chart.SetXLabel(_T("D"), Units::GetDistanceName());
   chart.SetYLabel(_T("h"), Units::GetAltitudeName());
@@ -62,8 +62,10 @@ CrossSectionRenderer::Paint(Canvas &canvas, const PixelRect rc) const
   const auto nav_altitude = gps_info.NavAltitudeAvailable()
     ? gps_info.nav_altitude
     : 0.;
-  auto hmin = fdim(nav_altitude, 3300);
-  auto hmax = std::max(3300., nav_altitude + 1000.);
+  auto hmin = fdim(nav_altitude, Units::ToSysUnit(2000., Unit::FEET));
+  auto hmax = std::max(
+    Units::ToSysUnit(2000., Unit::FEET),
+    nav_altitude + Units::ToSysUnit(2000., Unit::FEET));
 
   chart.ScaleXFromValue(0);
   chart.ScaleXFromValue(vec.distance);
@@ -131,7 +133,7 @@ CrossSectionRenderer::PaintGlide(ChartRenderer &chart) const
   if (result.GetArrivalAltitude()> 0.) {
     chart.DrawLine({0, altitude},
                    {result.vector.distance, result.GetArrivalAltitude()},
-                   ChartLook::STYLE_BLUE);
+                   ChartLook::STYLE_GREEN);
   } else {
     // draw glide line to zero
     const auto dh = altitude - result.GetArrivalAltitude();
@@ -141,7 +143,7 @@ CrossSectionRenderer::PaintGlide(ChartRenderer &chart) const
 
       chart.DrawLine({0, altitude},
                      {result.vector.distance * p, 0},
-                     ChartLook::STYLE_BLUE);
+                     ChartLook::STYLE_GREEN);
     }
   }
 }
@@ -171,10 +173,10 @@ CrossSectionRenderer::PaintAircraft(Canvas &canvas, const ChartRenderer &chart,
 
   BulkPixelPoint line[4];
   line[0] = chart.ToScreen({0, gps_info.nav_altitude});
-  line[1].x = rc.left;
+  line[1].x = rc.left + 0.05 * (rc.right - rc.left);
   line[1].y = line[0].y;
-  line[2].x = line[1].x;
-  line[2].y = line[0].y - (line[0].x - line[1].x) / 2;
+  line[2].x = line[0].x;
+  line[2].y = line[0].y + (line[0].x - line[1].x) / 2;
   line[3].x = (line[1].x + line[0].x) / 2;
   line[3].y = line[0].y;
   canvas.DrawTriangleFan(line, 4);
