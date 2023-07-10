@@ -3,6 +3,7 @@ Version JET
 - Fix XCTracer GPS from return null island position
 - Reduce Trail length from 60min/5min to 10min/2min
 - Google phone: show status bar while in full screen
+- CrossSection view: fix scaling for feets unit, remove unit text padding
 
 ------------------------
 Version 7.36 - 2023/07/02
