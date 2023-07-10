@@ -63,7 +63,6 @@ ChartRenderer::Begin() noexcept
     /* make room for X axis labels below the chart */
     const auto size = look.axis_label_font.TextSize(x_label.c_str());
 
-    rc_chart.bottom -= size.height + Layout::GetTextPadding() * 2;
     x_label_left = rc.right - size.width - Layout::GetTextPadding() * 2;
   }
 
@@ -71,8 +70,6 @@ ChartRenderer::Begin() noexcept
     /* make room for Y axis labels left of the chart */
     const auto size = look.axis_label_font.TextSize(y_label.c_str());
 
-    rc_chart.left += std::max(size.width + Layout::GetTextPadding() * 2,
-                              Layout::VptScale(30));
     y_label_bottom = rc.top + size.height + Layout::GetTextPadding() * 2;
   }
 
@@ -483,7 +480,7 @@ ChartRenderer::DrawXGrid(double tic_step, double unit_step,
   line[2].y += minor_tick_size;
   line[3].y -= minor_tick_size;
 
-  const int y = line[1].y + Layout::GetTextPadding();
+  const int y = line[1].y - Layout::GetTextPadding();
 
   auto start = (int)(x.min / tic_step) * tic_step;
 
@@ -507,11 +504,12 @@ ChartRenderer::DrawXGrid(double tic_step, double unit_step,
     if (unit_format != UnitFormat::NONE) {
       const auto unit_text = FormatTicText(xval * unit_step / tic_step,
                                            unit_step, unit_format);
-      const auto w = canvas.CalcTextWidth(unit_text.c_str());
+      const auto text_size = canvas.CalcTextSize(unit_text.c_str());
+      const auto w = text_size.width;
       const int label_x = xmin - w / 2;
       if (label_x >= next_text &&
           int(label_x + Layout::VptScale(30)) < x_label_left) {
-        canvas.DrawText({label_x, y}, unit_text.c_str());
+        canvas.DrawText({label_x, y - (int)text_size.height}, unit_text.c_str());
         next_text = label_x + w + Layout::GetTextPadding();
       }
     }
