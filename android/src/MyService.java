@@ -34,9 +34,18 @@ public class MyService extends Service {
 
   private static final String NOTIFICATION_CHANNEL_ID = "xcsoar";
 
+  /**
+   * Hack: this is set by onCreate(), to support the "testing"
+   * package.
+   */
+  protected static Class<?> mainActivityClass;
+
   private NotificationManager notificationManager;
 
   @Override public void onCreate() {
+    if (mainActivityClass == null)
+      mainActivityClass = XCSoar.class;
+
     super.onCreate();
 
     notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
@@ -73,7 +82,7 @@ public class MyService extends Service {
   @Override public int onStartCommand(Intent intent, int flags, int startId) {
     /* add an icon to the notification area while XCSoar runs, to
        remind the user that we're sucking his battery empty */
-    Intent intent2 = new Intent(this, XCSoar.class);
+    Intent intent2 = new Intent(this, mainActivityClass);
     PendingIntent contentIntent =
       PendingIntent.getActivity(this, 0, intent2, PendingIntent.FLAG_IMMUTABLE);
     Notification notification = createNotification(this, contentIntent);
