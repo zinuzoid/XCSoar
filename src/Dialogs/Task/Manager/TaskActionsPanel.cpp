@@ -120,6 +120,14 @@ try {
   ShowError(std::current_exception(), _("Download"));
 }
 
+inline void
+TaskActionsPanel::OnImportQrCodeClicked() noexcept
+{
+  ShowMessageBox(_("You can use an Android camera app to scan QR then select XCSoar JET to import it here. Only .xctsk task is supported."),
+    _("Import task from QR code"),
+    MB_OK | MB_ICONINFORMATION);
+}
+
 void
 TaskActionsPanel::ReClick() noexcept
 {
@@ -147,6 +155,10 @@ TaskActionsPanel::Prepare([[maybe_unused]] ContainerWindow &_parent,
 
   AddButton(_("Public WeGlide tasks"), [this](){
     parent.SetCurrent(parent.PAGE_WEGLIDE_PUBLIC_DECLARED);
+  });
+
+  AddButton(_("Import task from QR code"), [this](){
+    OnImportQrCodeClicked();
   });
 
   if (is_simulator())
