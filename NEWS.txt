@@ -14,6 +14,7 @@ Version JET
 - Fuel Burn calculation for PPG (Fuel burn time widget and task range estimation)
 - Audio Task Bearing - vario like sound to make sure you're directly on task bearing
 - Skysight.io integration
+- Update Skysight regions config
 
 ------------------------
 Version 7.43-rc0 - 2024-06-02
