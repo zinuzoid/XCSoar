@@ -11,7 +11,7 @@ sections_to_install=()
 
 # Parse arguments
 if [ "$#" -eq 0 ]; then
-  sections_to_install=("UPDATE" "BASE" "MANUAL" "LINUX" "WAYLAND" "DEBIAN" "LLVM" "LIBINPUT_GBM" "ARM" "WIN" "KOBO" "ANDROID")
+  sections_to_install=("UPDATE" "BASE" "MANUAL" "LINUX" "WAYLAND" "DEBIAN" "LLVM" "LIBINPUT_GBM" "ARM" "WIN" "KOBO" "ANDROID" "JET")
 else
   for arg in "$@"
   do
@@ -134,6 +134,16 @@ install_android() {
   echo
 }
 
+install_jet() {
+  echo Installing dependencies XCSoarJET
+  apt-get install ${APTOPTS[*]} \
+      libnetcdf-c++4-dev \
+      libnetcdf-dev \
+      libglm-dev \
+      libnetcdf-dev
+  echo
+}
+
 for section in "${sections_to_install[@]}"; do
   case $section in
     BASE)
@@ -168,6 +178,9 @@ for section in "${sections_to_install[@]}"; do
       ;;
     ANDROID)
       install_android
+      ;;
+    JET)
+      install_jet
       ;;
     UPDATE)
       update_pkg

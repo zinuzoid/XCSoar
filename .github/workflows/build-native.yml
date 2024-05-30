@@ -192,6 +192,7 @@ jobs:
               ./ide/provisioning/install-debian-packages.sh LINUX
               ./ide/provisioning/install-debian-packages.sh LIBINPUT_GBM
               ./ide/provisioning/install-debian-packages.sh DEBIAN
+              ./ide/provisioning/install-debian-packages.sh JET
             fi
             if [ ${{ matrix.target }} = 'KOBO' ]; then
               ./ide/provisioning/install-debian-packages.sh LINUX
@@ -213,6 +214,7 @@ jobs:
               ./ide/provisioning/install-debian-packages.sh ANDROID
               ./ide/provisioning/install-android-tools.sh NDK
               ./ide/provisioning/install-android-tools.sh SDK
+              ./ide/provisioning/install-android-tools.sh JET
             fi
             ./ide/provisioning/install-debian-packages.sh CLEAN
           elif [ ${{ matrix.os }} = 'macos-12' ]; then
