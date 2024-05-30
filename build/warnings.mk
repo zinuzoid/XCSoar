@@ -7,6 +7,7 @@ WARNINGS += -Wredundant-decls
 CXX_WARNINGS = $(WARNINGS)
 CXX_WARNINGS += -Wmissing-noreturn
 CXX_WARNINGS += -Wvla
+CXX_WARNINGS += -Wno-psabi
 
 # these warnings are not helpful
 ifeq ($(CLANG),n)
