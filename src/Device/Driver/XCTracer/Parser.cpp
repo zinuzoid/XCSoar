@@ -68,6 +68,30 @@ ReadCheckedRange(NMEAInputLine &line,double &value_r, double min, double max)
   return true;
 }
 
+static int
+ReadCheckedLatitudeLongitude(NMEAInputLine &line, double &value_latitude, double &value_longitude)
+{
+  int valid_fields = 0;
+  double latitude, longitude;
+  double epsilon = std::numeric_limits<double>::epsilon();
+
+  valid_fields += ReadCheckedRange(line, latitude, -90.0, 90.0);
+  valid_fields += ReadCheckedRange(line, longitude, -180.0, 180.0);
+
+  if(valid_fields == 2 && !(fabs(latitude) < epsilon && fabs(longitude) < epsilon)) {
+    value_latitude = latitude;
+    value_longitude = longitude;
+  } else {
+    /**
+     * While inactive on the ground XCTracer send the 0.0/0.0 location.
+     * We mark as invalid here, so map is not jumping to the 0.0/0.0
+     */
+    valid_fields = 0;
+  }
+
+  return valid_fields;
+}
+
 /**
  * the parser for the LXWP0 subset sentence that the XC-Tracer can produce
  */
@@ -149,8 +173,7 @@ XCTracerDevice::XCTRC(NMEAInputLine &line, NMEAInfo &info)
    * parse and check both  values, even if one or more is empty, e.g. ",3.1234,"
    */
   double latitude, longitude;
-  valid_fields += ReadCheckedRange(line,latitude,-90.0,90.0);
-  valid_fields += ReadCheckedRange(line,longitude,-180.0,180.0);
+  valid_fields += ReadCheckedLatitudeLongitude(line, latitude, longitude);
 
   /**
    * we only want to accept GPS fixes with completely sane values
