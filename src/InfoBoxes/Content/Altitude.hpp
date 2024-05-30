@@ -29,6 +29,9 @@ void
 UpdateInfoBoxAltitudeBaro(InfoBoxData &data) noexcept;
 
 void
+UpdateInfoBoxAltitudeBaroGPS(InfoBoxData &data) noexcept;
+
+void
 UpdateInfoBoxAltitudeQFE(InfoBoxData &data) noexcept;
 
 void

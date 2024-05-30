@@ -39,7 +39,8 @@ FormatUserMass(double value, TCHAR *buffer,
  */
 void
 FormatUserAltitude(double value, TCHAR *buffer,
-                   bool include_unit = true) noexcept;
+                   bool include_unit = true,
+                   const TCHAR *prefix = nullptr) noexcept;
 
 [[gnu::const]]
 static inline auto
@@ -144,7 +145,7 @@ FormatUserMapScale(double value, TCHAR *buffer,
 void
 FormatUserSpeed(double value, TCHAR *buffer,
                 bool include_unit = true, bool Precision = true,
-                const TCHAR *affix = NULL) noexcept;
+                const TCHAR *affix = nullptr) noexcept;
 
 [[gnu::const]]
 static inline auto

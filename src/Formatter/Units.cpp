@@ -46,9 +46,15 @@ FormatWingLoading(TCHAR *buffer, double value, Unit unit,
 
 void
 FormatAltitude(TCHAR *buffer, double value, Unit unit,
-               bool include_unit)
+               bool include_unit, const TCHAR *prefix)
 {
-  FormatInteger(buffer, value, unit, include_unit, false);
+  if (!prefix) {
+    FormatInteger(buffer, value, unit, include_unit, false);
+  } else {
+    TCHAR value_buffer[16];
+    FormatInteger(value_buffer, value, unit, include_unit, false);
+    StringFormatUnsafe(buffer, "%s%s", prefix, value_buffer);
+  }
 }
 
 void
