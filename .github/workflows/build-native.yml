@@ -94,7 +94,8 @@ jobs:
             liblua5.4-dev \
             libxml-parser-perl \
             libasound2-dev \
-            libgles2-mesa-dev libegl1-mesa-dev
+            libgles2-mesa-dev libegl1-mesa-dev \
+            libnetcdf-dev libnetcdf-c++4-dev
 
       - name: Compile XCSoar
         run: |
@@ -173,7 +174,8 @@ jobs:
             libc-ares-dev \
             liblua5.4-dev \
             libxml-parser-perl \
-            libasound2-dev
+            libasound2-dev \
+            libnetcdf-dev libnetcdf-c++4-dev
 
       - name: workaround random bits value in github actions
         run: sudo sysctl --write vm.mmap_rnd_bits=28
@@ -242,7 +244,8 @@ jobs:
             librsvg2-bin xsltproc \
             imagemagick gettext sox \
             cmake meson ninja-build \
-            ttf-bitstream-vera
+            ttf-bitstream-vera \
+            libnetcdf-dev libnetcdf-c++4-dev
 
       - name: Compile XCSoar
         run: |
@@ -537,7 +540,9 @@ jobs:
             libtiff libgeotiff proj \
             c-ares \
             curl \
-            lua
+            lua \
+            netcdf-cxx \
+            libgeotiff
 
       - name: Compile XCSoar
         # We use "-O0" instead of the default "-Og" to work around a

@@ -50,6 +50,8 @@ apt-get install ${APTOPTS[*]} make g++ \
   imagemagick gettext \
   mesa-common-dev libgl1-mesa-dev libegl1-mesa-dev \
   fonts-dejavu \
+  libnetcdf-c++4-dev \
+  libnetcdf-dev \
   xz-utils
 echo
 
@@ -96,6 +98,9 @@ echo Installing dependencies for the Android target, not including SDK / NDK...
 apt-get install ${APTOPTS[*]} default-jdk-headless vorbis-tools adb libtool \
     unzip
 echo
+
+echo Installing dependencies for Skysight
+apt-get install ${APTOPTS[*]} libglm-dev libnetcdf-dev
 
 echo Clean up downloaded resources in order to free space
 apt-get clean
