@@ -67,4 +67,5 @@ ComputerSettings::SetDefaults()
   radio.SetDefaults();
   transponder.SetDefaults();
   weglide.SetDefaults();
+  jet_provider_setting.SetDefaults();
 }
