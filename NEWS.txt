@@ -23,6 +23,7 @@ Version JET
 - GRInstantInfoBox show average GR on comment label
 - Add scan QR task guidence
 - Add experimental new NetworkWidget
+- Add new Barogram infobox with meter height
 
 ------------------------
 Version 7.43-rc0 - 2024-06-02
