@@ -113,6 +113,7 @@ DIALOG_SOURCES = \
 	$(SRC)/Dialogs/Settings/Panels/WaypointDisplayConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/TrackingConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/JETProviderConfigPanel.cpp \
+	$(SRC)/Dialogs/Settings/Panels/NetworkWidgetConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/CloudConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/WeatherConfigPanel.cpp \
 	$(SRC)/Dialogs/Settings/Panels/WeGlideConfigPanel.cpp \
@@ -479,6 +480,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/Profile/PageProfile.cpp \
 	$(SRC)/Profile/UIProfile.cpp \
 	$(SRC)/Profile/JETProviderProfile.cpp \
+	$(SRC)/Profile/NetworkWidgetProfile.cpp \
 	$(SRC)/Profile/Settings.cpp \
 	$(SRC)/Profile/UnitsConfig.cpp \
 	$(SRC)/Profile/DeviceConfig.cpp \
@@ -641,7 +643,8 @@ XCSOAR_SOURCES += \
 XCSOAR_SOURCES += \
 	$(SRC)/Tracking/LiveTrack24/SessionID.cpp \
 	$(SRC)/Tracking/LiveTrack24/Glue.cpp \
-	$(SRC)/Tracking/LiveTrack24/Client.cpp
+	$(SRC)/Tracking/LiveTrack24/Client.cpp \
+	$(SRC)/net/client/NetworkWidget/Glue.cpp
 endif
 
 XCSOAR_SOURCES += \

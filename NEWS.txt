@@ -22,6 +22,7 @@ Version JET
 - NextArrowInfoBox show bearing different instead of distance
 - GRInstantInfoBox show average GR on comment label
 - Add scan QR task guidence
+- Add experimental new NetworkWidget
 
 ------------------------
 Version 7.43 - 2024-08-12

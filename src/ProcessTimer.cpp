@@ -19,6 +19,7 @@
 #include "Operation/Operation.hpp"
 #include "Tracking/TrackingGlue.hpp"
 #include "net/client/tim/Glue.hpp"
+#include "net/client/NetworkWidget/Glue.hpp"
 #include "ui/event/Idle.hpp"
 #include "Dialogs/Tracking/CloudEnableDialog.hpp"
 #include "Components.hpp"
@@ -286,6 +287,8 @@ ProcessTimer() noexcept
     if (net_components->tim != nullptr &&
         CommonInterface::GetComputerSettings().weather.enable_tim)
       net_components->tim->OnTimer(CommonInterface::Basic());
+    if (net_components->networkWidget != nullptr)
+      net_components->networkWidget->OnTimer(CommonInterface::Basic());
 #endif
   }
 }
