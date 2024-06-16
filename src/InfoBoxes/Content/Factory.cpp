@@ -23,6 +23,7 @@
 #include "InfoBoxes/Content/Airspace.hpp"
 #include "InfoBoxes/Content/Radio.hpp"
 #include "InfoBoxes/Content/Engine.hpp"
+#include "InfoBoxes/Content/Network.hpp"
 
 #include "util/Macros.hpp"
 #include "Language/Language.hpp"
@@ -1209,6 +1210,14 @@ static constexpr MetaData meta_data[] = {
     N_("Best glide speed based on vario and wind"),
     UpdateInfoBoxSpeedMaximumEfficiency,
     maccready_panels,
+  },
+
+  // e_NetworkWidget
+  {
+    N_("Network Widget"),
+    N_("Network Widget"),
+    N_("Network Widget"),
+    IBFHelper<InfoBoxContentNetwork>::Create,
   },
 
 };

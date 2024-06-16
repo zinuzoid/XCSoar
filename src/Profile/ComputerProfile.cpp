@@ -11,6 +11,7 @@
 #include "Map.hpp"
 #include "Computer/Settings.hpp"
 #include "JETProviderProfile.hpp"
+#include "NetworkWidgetProfile.hpp"
 
 namespace Profile {
   static void Load(const ProfileMap &map, WindSettings &settings);
@@ -175,4 +176,5 @@ Profile::Load(const ProfileMap &map, ComputerSettings &settings)
 
   Load(map, settings.weather);
   Load(map, settings.jet_provider_setting);
+  Load(map, settings.network_widget);
 }

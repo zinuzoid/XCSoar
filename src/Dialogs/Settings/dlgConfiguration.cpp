@@ -58,6 +58,7 @@
 #endif
 
 #include "Panels/JETProviderConfigPanel.hpp"
+#include "Panels/NetworkWidgetConfigPanel.hpp"
 #include "Panels/CloudConfigPanel.hpp"
 
 #if defined(HAVE_PCMET) || defined(HAVE_HTTP)
@@ -139,6 +140,7 @@ static constexpr TabMenuPage setup_pages[] = {
   { N_("Audio"), CreateAudioConfigPanel },
 #endif
   { N_("JET Provider"), CreateJETProviderConfigPanel },
+  { N_("Network Widget"), CreateNetworkWidgetConfigPanel },
   { nullptr, nullptr }
 };
 
