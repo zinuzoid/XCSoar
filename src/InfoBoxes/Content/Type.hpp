@@ -157,6 +157,7 @@ namespace InfoBoxFactory
     e_Fuel_Remain,
     e_Speed_Maximum_Efficiency,
     e_NetworkWidget,
+    e_Barogram_with_meter,
 
     e_NUM_TYPES /* Last item */
   };

@@ -21,6 +21,7 @@
 #include "Components.hpp"
 #include "BackendComponents.hpp"
 #include "DataComponents.hpp"
+#include "Formatter/Units.hpp"
 
 [[gnu::const]]
 static PixelRect
@@ -119,6 +120,30 @@ InfoBoxContentBarogram::Update(InfoBoxData &data) noexcept
   if (basic.NavAltitudeAvailable()) {
     FormatUserAltitude(basic.nav_altitude, sTmp);
     data.SetComment(sTmp);
+  } else
+    data.SetCommentInvalid();
+
+  // TODO: use an appropriate digest
+  data.SetCustom(basic.location_available.ToInteger() +
+                 basic.gps_altitude_available.ToInteger() +
+                 basic.baro_altitude_available.ToInteger() +
+                 basic.pressure_altitude_available.ToInteger() +
+                 basic.static_pressure_available.ToInteger());
+}
+
+void
+InfoBoxContentBarogramWithMeter::Update(InfoBoxData &data) noexcept
+{
+  const MoreData &basic = CommonInterface::Basic();
+  TCHAR sTmp[32];
+
+  if (basic.NavAltitudeAvailable()) {
+    FormatUserAltitude(basic.nav_altitude, sTmp, false);
+    TCHAR meterTmp[32];
+    FormatAltitude(meterTmp, basic.nav_altitude, Unit::METER, false);
+    TCHAR combinedTmp[32];
+    StringFormat(combinedTmp, 32, "%sf %sm", sTmp, meterTmp);
+    data.SetComment(combinedTmp);
   } else
     data.SetCommentInvalid();
 

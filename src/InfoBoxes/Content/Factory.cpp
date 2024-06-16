@@ -1220,6 +1220,14 @@ static constexpr MetaData meta_data[] = {
     IBFHelper<InfoBoxContentNetwork>::Create,
   },
 
+    // e_Barogram_with_meter
+  {
+    N_("Barogram with meter"),
+    N_("Barogram w/meter"),
+    N_("Trace of altitude during flight, including hardcoded height in meter"),
+    IBFHelper<InfoBoxContentBarogramWithMeter>::Create,
+  },
+
 };
 
 static_assert(ARRAY_SIZE(meta_data) == NUM_TYPES,
