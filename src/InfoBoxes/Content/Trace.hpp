@@ -49,6 +49,12 @@ public:
   const InfoBoxPanel *GetDialogContent() noexcept override;
 };
 
+class InfoBoxContentBarogramWithMeter : public InfoBoxContentBarogram
+{
+public:
+  void Update(InfoBoxData &data) noexcept override;
+};
+
 class InfoBoxContentThermalBand : public InfoBoxContent
 {
 public:
