@@ -6,7 +6,7 @@
 #include "Base.hpp"
 #include "util/StaticString.hxx"
 
-static constexpr unsigned EDITSTRINGSIZE = 32;
+static constexpr unsigned EDITSTRINGSIZE = 256;
 
 class DataFieldString: public DataField
 {
