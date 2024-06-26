@@ -21,7 +21,7 @@ static KeyboardWidget *kb = NULL;
 
 static AllowedCharacters AllowedCharactersCallback;
 
-static constexpr size_t MAX_TEXTENTRY = 40;
+static constexpr size_t MAX_TEXTENTRY = 256;
 static unsigned int cursor = 0;
 static size_t max_width;
 static TCHAR edittext[MAX_TEXTENTRY];
