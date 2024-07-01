@@ -275,6 +275,8 @@ MapWindow::Render(Canvas &canvas, const PixelRect &rc) noexcept
 
   DrawFLARMTraffic(canvas, aircraft_pos);
 
+  DrawJETProviderTraffic(canvas, aircraft_pos);
+
   //////////////////////////////////////////////// own aircraft
   // Finally, draw you!
   if (basic.location_available)

@@ -5,11 +5,14 @@
 #include "Tracking/TrackingSettings.hpp"
 #include "NMEA/MoreData.hpp"
 #include "LogFile.hpp"
+#include "util/Macros.hpp"
+#include "Interface.hpp"
 
 TrackingGlue::TrackingGlue(EventLoop &event_loop,
                            CurlGlobal &curl) noexcept
   :skylines(event_loop, this),
-   livetrack24(curl)
+   livetrack24(curl),
+   jet_provider(curl, this)
 {
 }
 
@@ -28,6 +31,9 @@ TrackingGlue::OnTimer(const MoreData &basic, const DerivedInfo &calculated)
   } catch (...) {
     LogError(std::current_exception(), "SkyLines error");
   }
+
+  jet_provider.OnTimer(basic, calculated);
+  jet_provider_data.validity.Expire(basic.clock, std::chrono::seconds(JET_PROVIDER_TRAFFIC_OFFLINE_THRESHOLD_SECS));
 
   livetrack24.OnTimer(basic, calculated);
 }
@@ -51,6 +57,29 @@ TrackingGlue::OnTraffic(uint32_t pilot_id, unsigned time_of_day_ms,
     /* we don't know this user's name yet - try to find it out by
        asking the server */
     skylines.RequestUserName(pilot_id);
+}
+
+void TrackingGlue::OnJETTraffic(std::vector<JETProvider::Traffic> traffics, Validity validity, bool success)
+{
+  const std::lock_guard<Mutex> lock(jet_provider_data.mutex);
+
+  jet_provider_data.validity = validity;
+  jet_provider_data.success = success;
+  if (success) {
+    jet_provider_data.traffics.clear();
+    for (JETProvider::Traffic traffic : traffics) {
+      jet_provider_data.traffics[traffic.traffic_id] = traffic;
+    }
+  }
+
+  LogFormat("OnJETTraffic size:%d success:%d",
+    (int) jet_provider_data.traffics.size(), success);
+}
+
+void TrackingGlue::OnJETProviderReset() {
+  if (jet_provider_data.traffics.size() > 0) {
+    OnJETTraffic(std::vector<JETProvider::Traffic>(), Validity(), true);
+  }
 }
 
 void
@@ -96,4 +125,10 @@ void
 TrackingGlue::OnSkyLinesError(std::exception_ptr e)
 {
   LogError(e, "SkyLines error");
+}
+
+void
+TrackingGlue::OnJETProviderError(std::exception_ptr e)
+{
+  LogError(e, "JETProvider error");
 }

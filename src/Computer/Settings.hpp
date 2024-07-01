@@ -21,6 +21,7 @@
 #include "RadioFrequency.hpp"
 #include "TransponderCode.hpp"
 #include "net/client/WeGlide/Settings.hpp"
+#include "Tracking/JETProvider/Settings.hpp"
 
 #include <cstdint>
 #include <type_traits>
@@ -232,6 +233,8 @@ struct ComputerSettings {
   RadioSettings radio;
 
   TransponderSettings transponder;
+
+  JETProviderSettings jet_provider_setting;
 
   void SetDefaults();
 };
