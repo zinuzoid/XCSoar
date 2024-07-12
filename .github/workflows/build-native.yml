@@ -1,97 +1,14 @@
 ---
 on:
   workflow_dispatch:
-  push:
-    paths-ignore:
-      - 'cloud/**'
-      - 'doc/**'
-      - 'fuzzer/**'
-      - 'ide/**'
-      - 'kobo/**'
-      - 'python/**'
-      - '.github/workflows/build-container.yml'
-      - '.github/workflows/build-unix.yml'
-      - '.readthedocs.yaml'
-    branches:
-      - master
-    tags:
-      - 'v*'
-
-  pull_request:
-    paths-ignore:
-      - 'cloud/**'
-      - 'doc/**'
-      - 'fuzzer/**'
-      - 'ide/**'
-      - 'kobo/**'
-      - 'python/**'
-      - '.github/workflows/build-container.yml'
-      - '.github/workflows/build-unix.yml'
-      - '.readthedocs.yaml'
-    branches:
-      - master
 
 env:
   DEBUG: y
   BOOST: boost_1_85_0
 
 jobs:
-  release:
-    name: "Create Release"
-    runs-on: ubuntu-22.04
-    permissions:
-      contents: write
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-      version: ${{ steps.get_version.outputs.VERSION }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-
-      - name: Parse changelog
-        if: startsWith(github.ref, 'refs/tags/v')
-        run: |
-          TAG=$(echo "${{ github.ref }}" | cut -f3 -d '/')
-          echo "TAG=$TAG" >> $GITHUB_ENV
-          echo "::set-output name=TAG::$TAG"
-          echo 'CHANGELOGENTRY<<EOF' >> $GITHUB_ENV
-          ./tools/changelog.sh "$TAG" >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
-          case "$TAG" in
-            *-rc*)
-              echo "PRERELEASE=true" >> $GITHUB_ENV
-              ;;
-            *)
-              echo "PRERELEASE=false" >> $GITHUB_ENV
-              ;;
-          esac
-        id: changelogentry
-
-      - name: get XCSoar Version
-        id: get_version
-        run: |
-          VERSION=$(cat VERSION.txt)
-          echo "$VERSION"
-          echo "VERSION=${VERSION}" >> $GITHUB_ENV
-          echo "::set-output name=VERSION::${VERSION}"
-
-      - name: Create release
-        id: create_release
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: ncipollo/release-action@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          allowUpdates: true
-          name: Version ${{ github.ref_name }}
-          body: ${{ env.CHANGELOGENTRY }}
-          prerelease: ${{ env.PRERELEASE }}
-
   build:
     runs-on: ${{ matrix.os }}
-    needs: release
     container: ${{ matrix.target_container }}
     strategy:
       fail-fast: false
@@ -106,14 +23,6 @@ jobs:
             target_upload: true
             target_container: debian:bookworm-slim
           - os: ubuntu-22.04
-            target: KOBO
-            target_bin: KoboRoot
-            target_bin_path: ''
-            target_final: KoboRoot
-            target_ext: .tgz
-            target_upload: true
-            target_container: debian:bookworm-slim
-          - os: ubuntu-22.04
             target: ANDROID
             target_bin: XCSoar
             target_bin_path: bin
@@ -122,30 +31,6 @@ jobs:
             target_upload: true
             ndk: r26d
             target_container: debian:bookworm-slim
-          - os: ubuntu-22.04
-            target: WIN64
-            target_bin: XCSoar
-            target_bin_path: bin
-            target_final: XCSoar
-            target_ext: .exe
-            target_upload: true
-            target_container: debian:bookworm-slim
-          - os: ubuntu-22.04
-            target: PC
-            target_bin: XCSoar
-            target_bin_path: bin
-            target_final: XCSoar
-            target_ext: .exe
-            target_upload: true
-            target_container: debian:bookworm-slim
-          - os: macos-12
-            target: OSX64
-            target_bin: XCSoar
-            target_bin_path: bin
-            target_final: XCSoar
-            target_ext: ''
-            target_upload: false
-            target_container: ''
 
     steps:
       - name: Install checkout dependencies
