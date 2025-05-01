@@ -130,7 +130,7 @@ install_kobo() {
 install_android() {
   echo Installing dependencies for the Android target, not including SDK / NDK...
   apt-get install ${APTOPTS[*]} default-jdk-headless vorbis-tools adb libtool \
-      unzip
+      unzip openjdk-17-jdk
   echo
 }
 
