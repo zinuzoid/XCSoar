@@ -120,6 +120,14 @@ public class XCSoar extends Activity implements PermissionManager {
       requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, null);
   }
 
+  @Override public Intent registerReceiver (BroadcastReceiver receiver, 
+                IntentFilter filter) {
+    if(android.os.Build.VERSION.SDK_INT >= 26) {
+      return registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED);
+    }
+    return super.registerReceiver(receiver, filter);
+  }
+
   private void quit() {
     nativeView = null;
 

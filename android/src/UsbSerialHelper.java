@@ -358,7 +358,7 @@ public final class UsbSerialHelper extends BroadcastReceiver {
     IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
     filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
     filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
-    context.registerReceiver(this, filter);
+    context.registerReceiver(this, filter, Context.RECEIVER_EXPORTED);
   }
 
   private void unregisterReceiver() {
