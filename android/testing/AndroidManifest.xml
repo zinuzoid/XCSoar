@@ -76,7 +76,7 @@
     </provider>
   </application>
 
-  <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="33"/>
+  <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="34"/>
 
   <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
                    android:usesPermissionFlags="neverForLocation"/>
@@ -100,6 +100,9 @@
 
   <!-- required since Android 10 / targetSdkVersion 29 -->
   <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+
+  <!-- required since Android 14 / targetSdkVersion 34 -->
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
 
   <!-- XCSoar renders maps and the UI with GLES 2.0 -->
   <uses-feature android:glEsVersion="0x00020000" android:required="true"/>

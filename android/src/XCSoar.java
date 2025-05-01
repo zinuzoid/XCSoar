@@ -111,13 +111,19 @@ public class XCSoar extends Activity implements PermissionManager {
 
     batteryReceiver = new BatteryReceiver();
     registerReceiver(batteryReceiver,
-                     new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+                     new IntentFilter(Intent.ACTION_BATTERY_CHANGED),
+                     Context.RECEIVER_EXPORTED);
 
     /* WRITE_EXTERNAL_STORAGE has no effect on Build.VERSION_CODES.R
        (Android 11 or newer); we request it on older versions so users
        can keep using /sdcard/XCSoarData */
     if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
       requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, null);
+  }
+
+  @Override public Intent registerReceiver (BroadcastReceiver receiver, 
+                IntentFilter filter) {
+    return registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED);
   }
 
   private void quit() {

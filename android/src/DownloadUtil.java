@@ -39,7 +39,8 @@ final class DownloadUtil extends BroadcastReceiver implements Closeable {
       throw new IllegalStateException("No DownloadManager");
 
     context.registerReceiver(this,
-                             new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+                             new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
+                             Context.RECEIVER_EXPORTED);
 
     /* let the DownloadManager save to the app-specific directory,
        which requires no special permissions; later, we can use

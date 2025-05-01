@@ -30,7 +30,7 @@ class GliderLinkReceiver
     this.context = context;
     this.listener = listener;
 
-    context.registerReceiver(this, new IntentFilter(ACTION));
+    context.registerReceiver(this, new IntentFilter(ACTION), Context.RECEIVER_NOT_EXPORTED);
   }
 
   @Override
