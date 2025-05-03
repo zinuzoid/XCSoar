@@ -88,6 +88,12 @@ SkysightRequest::BufferHandler::GetReceived() const
   return received;
 }
 
+unsigned
+SkysightRequest::BufferHandler::GetHeaderStatus() const
+{
+  return header_status;
+}
+
 void
 SkysightRequest::BufferHandler::OnData(std::span<const std::byte> data)
 {
@@ -179,7 +185,7 @@ SkysightAsyncRequest::TriggerNullCallback(tstring &&ErrText)
 bool
 SkysightRequest::Process()
 {
-  return RequestToFile();
+  return RequestToFile() == Status::Complete;
 }
 
 tstring
@@ -188,12 +194,6 @@ SkysightAsyncRequest::GetMessage()
   std::lock_guard<Mutex> lock(mutex);
   tstring msg = tstring (_T("Downloading ")) + args.layer;
   return msg;
-}
-
-bool
-SkysightRequest::ProcessToString(tstring &response)
-{
-  return RequestToBuffer(response);
 }
 
 void
@@ -211,25 +211,27 @@ SkysightAsyncRequest::Tick() noexcept
 
   mutex.unlock();
 
-  bool result;
   tstring resultStr;
 
   if (args.to_file) {
-    result = RequestToFile();
+    status = RequestToFile();
     resultStr = args.path.c_str();
   } else {
-    result = RequestToBuffer(resultStr);
+    status = RequestToBuffer(resultStr);
   }
 
-  if (result) {
-    SkysightAPI::ParseResponse(resultStr.c_str(), result, args);
+  if (status == Status::Complete) {
+    SkysightAPI::ParseResponse(resultStr.c_str(), true, args);
+  } else if(status == Status::EmergencyStop) {
+    LogFormat("Emergency stop response: %s", resultStr.c_str());
+    SkysightAPI::ParseResponse(_T("Received 429 EmergencyStop signal from Skysight."),
+    false, args);
   } else {
     SkysightAPI::ParseResponse(_T("Could not fetch data from Skysight server."),
-			       result, args);
+			       false, args);
   }
 
   mutex.lock();
-  status = (!result) ? Status::Error : Status::Complete;
 }
 
 void
@@ -238,7 +240,7 @@ SkysightAsyncRequest::Done()
   StandbyThread::LockStop();
 }
 
-bool
+SkysightRequest::Status
 SkysightRequest::RequestToFile()
 {
   LogFormat("Connecting to %s for %s with key:%s user-agent:%s", args.url.c_str(), args.path.c_str(), key.c_str(), XCSoar_ProductToken);
@@ -247,11 +249,11 @@ SkysightRequest::RequestToFile()
   AllocatedPath temp_path = final_path.WithSuffix(".dltemp");
 
   if (!File::Delete(temp_path) && File::ExistsAny(temp_path))
-    return  false;
+    return Status::Error;
 
   FILE *file = _tfopen(temp_path.c_str(), _T("wb"));
   if (file == nullptr)
-    return false;
+    return Status::Error;
 
   bool success = true;
   FileHandler handler(file);
@@ -296,15 +298,14 @@ SkysightRequest::RequestToFile()
   if (success) {
     if (!File::Delete(final_path) && File::ExistsAny(final_path)) {
       File::Delete(temp_path);
-      return false;
+      return Status::Error;
     }
     std::rename(temp_path.c_str(), args.path.c_str());
   }
-
-  return success;
+  return success ? Status::Complete : Status::Error;
 }
 
-bool
+SkysightRequest::Status
 SkysightRequest::RequestToBuffer(tstring &response)
 {
   LogFormat("Connecting to %s for %s with key:%s user-agent:%s", args.url.c_str(), args.path.c_str(), key.c_str(), XCSoar_ProductToken);
@@ -347,5 +348,11 @@ SkysightRequest::RequestToBuffer(tstring &response)
 
   response = tstring(buffer,
 		     buffer + handler.GetReceived() / sizeof(buffer[0]));
-  return success;
+
+  if(handler.GetHeaderStatus() == 429) {
+    // Skysight asked us to stop the session if 429 was returned
+    LogFormat("SkysightRequest::RequestToBuffer Received 429 EmergencyStop signal from Skysight.");
+    return Status::EmergencyStop;
+  }
+  return success ? Status::Complete : Status::Error;
 }
