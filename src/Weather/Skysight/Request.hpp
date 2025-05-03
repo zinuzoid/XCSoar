@@ -42,11 +42,10 @@ class SkysightRequestError {};
 
 struct SkysightRequest {
 public:
-  enum class Status {Idle, Busy, Complete, Error};
+  enum class Status {Idle, Busy, Complete, Error, EmergencyStop};
 
   SkysightRequest(const SkysightRequestArgs _args): args(_args) {};
   bool Process();
-  bool ProcessToString(tstring &response);
 
   SkysightCallType GetType();
   void SetCredentials(const TCHAR *_key, const TCHAR *_username = nullptr,
@@ -77,6 +76,7 @@ public:
     uint8_t *buffer;
     const size_t max_size;
     size_t received = 0;
+    unsigned header_status = 0;
     Mutex mutex;
     Cond cond;
 
@@ -90,6 +90,7 @@ public:
         (void)max_size; // UNUSED
       }
     size_t GetReceived() const;
+    unsigned GetHeaderStatus() const;
     // void ResponseReceived(int64_t content_length) override;
     // void DataReceived(const void *data, size_t length) override;
     void OnData(std::span<const std::byte> data) override;
@@ -102,8 +103,8 @@ public:
 protected:
   const SkysightRequestArgs args;
   tstring key, username, password;
-  bool RequestToFile();
-  bool RequestToBuffer(tstring &response);
+  Status RequestToFile();
+  Status RequestToBuffer(tstring &response);
 };
 
 struct SkysightAsyncRequest final:
