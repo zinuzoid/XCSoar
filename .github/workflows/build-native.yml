@@ -20,7 +20,7 @@ jobs:
             target_bin_path: ''
             target_final: xcsoar_
             target_ext: .deb
-            target_upload: true
+            target_upload: false
             target_container: debian:bookworm-slim
           - os: ubuntu-22.04
             target: ANDROID
@@ -28,7 +28,7 @@ jobs:
             target_bin_path: bin
             target_final: XCSoar
             target_ext: .apk
-            target_upload: true
+            target_upload: false
             ndk: r27c
             target_container: debian:bookworm-slim
 
@@ -97,9 +97,9 @@ jobs:
               ./ide/provisioning/install-debian-packages.sh ARM
               ./ide/provisioning/install-debian-packages.sh LLVM
               ./ide/provisioning/install-debian-packages.sh ANDROID
+              ./ide/provisioning/install-debian-packages.sh JET
               ./ide/provisioning/install-android-tools.sh NDK
               ./ide/provisioning/install-android-tools.sh SDK
-              ./ide/provisioning/install-android-tools.sh JET
             fi
             ./ide/provisioning/install-debian-packages.sh CLEAN
           elif [ ${{ matrix.os }} = 'macos-12' ]; then
@@ -118,11 +118,14 @@ jobs:
               curl \
               lua
           fi
+
+          git config --global --add safe.directory $PWD
+
           echo "git_hash=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_ENV
 
       - name: Prepare signing key
         shell: bash
-        if: ${{ matrix.target == 'ANDROID' && startsWith(github.ref, 'refs/tags/v') }}
+        if: ${{ matrix.target == 'ANDROID' }}
         run: |
           if [ -n "${{ secrets.XCSOAR_UPLOAD_KEY_JKS_BASE64 }}" ]; then
             mkdir -p ~/.android/
@@ -131,7 +134,7 @@ jobs:
           fi
 
       - name: Compile XCSoar - PR
-        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        if: false
         run: |
           if [ ${{ matrix.target }} = 'ANDROID' ]; then
             make -j$(nproc) TARGET=ANDROID DEBUG=${{ env.DEBUG }} USE_CCACHE=y V=2 \
@@ -145,14 +148,13 @@ jobs:
           fi
 
       - name: Compile XCSoar - Sanitizer Check
-        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        if: false
         run: |
           if [ ${{ matrix.target }} = "UNIX" ]; then
             make -j$(nproc) TARGET=${{ matrix.target }} DEBUG=${{ env.DEBUG }} USE_CCACHE=y V=2 everything check VFB=y SANITIZE=y DEBUG_GLIBCXX=y
           fi
 
       - name: Compile XCSoar - Release
-        if: startsWith(github.ref, 'refs/tags/v')
         run: |
           if [ ${{ matrix.target }} = 'ANDROID' ]; then
             if [ -n "${{ secrets.XCSOAR_UPLOAD_KEY_JKS_PASSWORD }}" ] && [ -n "${{ secrets.XCSOAR_UPLOAD_KEY_JKS_KEY_ALIAS }}" ]; then
@@ -172,6 +174,8 @@ jobs:
             make -j$(nproc) TARGET=${{ matrix.target }} DEBUG=${{ env.DEBUG }} USE_CCACHE=y V=2 output/${{ matrix.target }}/${{ matrix.target_bin }}${{ matrix.target_ext }}
           elif [ ${{ matrix.target }} = "OSX64" ]; then
             gmake -j$(nproc) TARGET=${{ matrix.target }} DEBUG=${{ env.DEBUG }} USE_CCACHE=y V=2 OPTIMIZE="-O0"
+          elif [ ${{ matrix.target }} = "UNIX" ]; then
+            make -j$(nproc) TARGET=${{ matrix.target }} DEBUG=${{ env.DEBUG }} USE_CCACHE=y V=2
           fi
 
       - name: Create UNIX dpkg
