@@ -41,6 +41,7 @@ class SkysightAPIQueue final {
   tstring email;
   tstring password;
   bool is_emergency_stop = false;
+  unsigned total_login_requests = 0;
 
   void Process();
   UI::PeriodicTimer timer{[this]{ Process(); }};
