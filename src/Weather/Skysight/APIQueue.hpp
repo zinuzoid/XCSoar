@@ -30,6 +30,7 @@ Copyright_License {
 #include <vector>
 
 class SkysightAPIQueue final {
+  std::mutex request_queue_mutex;
   std::vector<std::unique_ptr<SkysightAsyncRequest>> request_queue;
   std::vector<std::unique_ptr<CDFDecoder>> decode_queue;
   bool is_busy = false;
@@ -38,6 +39,7 @@ class SkysightAPIQueue final {
   uint64_t key_expiry_time = 0;
   tstring email;
   tstring password;
+  bool is_emergency_stop = false;
 
   void Process();
   UI::PeriodicTimer timer{[this]{ Process(); }};

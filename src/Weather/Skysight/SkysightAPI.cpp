@@ -472,7 +472,7 @@ SkysightAPI::ParseLogin(const SkysightRequestArgs &args, const tstring &result)
 		 static_cast<uint64_t>
 		 (std::strtoull(valid_until->second.data().c_str(), NULL, 0)));
     success = true;
-    LogFormat("SkysightAPI::ParseLogin success with key %s", key->second.data().c_str());
+    LogFormat("SkysightAPI::ParseLogin success with key %s valid_until %s", key->second.data().c_str(), valid_until->second.data().c_str());
 
     //TODO: trim available regions from allowed_regions
   } else {
