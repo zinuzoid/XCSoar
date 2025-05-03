@@ -60,6 +60,12 @@ void SkysightAPIQueue::AddDecodeJob(std::unique_ptr<CDFDecoder> &&job) {
 
 void SkysightAPIQueue::Process()
 {
+  if(is_emergency_stop) {
+    LogFormat("SkysightAPIQueue::Process() is_emergency_stop=true, disable Skysight requests for this session!");
+    DoClearingQueue();
+    return;
+  }
+
   is_busy = true;
 
   if(is_clearing) {
@@ -91,6 +97,13 @@ void SkysightAPIQueue::Process()
       request_queue.erase(job);
       break;
     case SkysightRequest::Status::Busy:
+      break;
+    case SkysightRequest::Status::EmergencyStop:
+      LogFormat("SkysightAPIQueue::Process() SkysightRequest::Status::EmergencyStop");
+      (*job)->Done();
+      request_queue.erase(job);
+      Clear("Emergency stop");
+      is_emergency_stop = true;
       break;
     }
   }
@@ -155,8 +168,13 @@ SkysightAPIQueue::IsLoggedIn()
 void
 SkysightAPIQueue::DoClearingQueue()
 {
+  LogFormat("SkysightAPIQueue::DoClearingQueue() request_queue: %ld", (long)request_queue.size());
   for (auto &&i = request_queue.begin(); i<request_queue.end(); ++i) {
-    if ((*i)->GetStatus() != SkysightRequest::Status::Busy) {
+    auto status = (*i)->GetStatus();
+    if (status == SkysightRequest::Status::EmergencyStop) {
+      is_emergency_stop = true;
+      LogFormat("SkysightAPIQueue::DoClearingQueue() is_emergency_stop: %d", is_emergency_stop);
+    } else if (status != SkysightRequest::Status::Busy) {
       (*i)->Done();
       request_queue.erase(i);
     }
