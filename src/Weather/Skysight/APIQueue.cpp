@@ -40,20 +40,22 @@ void
 SkysightAPIQueue::AddRequest(std::unique_ptr<SkysightAsyncRequest> request,
 			     bool append_end)
 {
+  LogFormat("SkysightAPIQueue::AddRequest %d", (unsigned) request->GetType());
+
   if (!append_end) {
     //Login requests jump to the front of the queue
     request_queue.insert(request_queue.begin(), std::move(request));
   } else {
     request_queue.emplace_back(std::move(request));
   }
-  if (!is_busy)
-    Process();
+  if (!is_busy && !timer.IsActive())
+      timer.Schedule(std::chrono::milliseconds(100));
 }
 
 void SkysightAPIQueue::AddDecodeJob(std::unique_ptr<CDFDecoder> &&job) {
   decode_queue.emplace_back(std::move(job));
-  if(!is_busy)
-    Process();
+  if (!is_busy && !timer.IsActive())
+      timer.Schedule(std::chrono::milliseconds(100));
 }
 
 void SkysightAPIQueue::Process()
