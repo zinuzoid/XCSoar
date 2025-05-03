@@ -41,6 +41,12 @@ SkysightAPIQueue::AddRequest(std::unique_ptr<SkysightAsyncRequest> request,
 			     bool append_end)
 {
   LogFormat("SkysightAPIQueue::AddRequest %d", (unsigned) request->GetType());
+  if(request->GetType() == SkysightCallType::Login) {
+    if(total_login_requests++ > 1000) {
+      LogFormat("SkysightAPIQueue::AddRequest We're doing more than 1000 login requests for the session.");
+      is_emergency_stop = true;
+    }
+  }
 
   if (!append_end) {
     //Login requests jump to the front of the queue
