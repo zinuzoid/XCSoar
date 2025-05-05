@@ -44,7 +44,6 @@ CoGet(CurlGlobal &curl, const char *url)
 {
   CurlEasy easy{url};
   Curl::Setup(easy);
-  easy.SetFailOnError();
 
   co_return co_await Curl::CoRequest(curl, std::move(easy));
 }
@@ -59,7 +58,9 @@ JETProvider::Glue::OnTimer(const NMEAInfo &basic, [[maybe_unused]] const Derived
   const JETProviderSettings &settings =
     CommonInterface::GetComputerSettings().jet_provider_setting;
   access_token = settings.radar.access_token;
-  if (!settings.radar.enabled || strlen(access_token) <= 2) {
+  if (!settings.radar.enabled || strlen(access_token) <= 2 ||
+      strcmp(access_token, unauthorized_access_token) == 0)
+  {
     return;
   }
 
@@ -94,6 +95,14 @@ JETProvider::Glue::CoTick(const NMEAInfo &basic) noexcept
     );
 
   auto response = co_await CoGet(curl, url);
+
+  if(response.status == 401) {
+    // Unauthorized
+    strcpy(unauthorized_access_token, access_token);
+    LogFormat("Found unauthorized_access_token: %s, stop all JETProvider "
+      "future request!",
+      access_token);
+  }
 
   RadarParser::Radar radar;
   if (RadarParser::ParseRadarBuffer(basic, response.body.c_str(), radar)) {
