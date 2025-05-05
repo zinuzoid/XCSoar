@@ -175,11 +175,11 @@ SkysightAPIQueue::SetKey(const tstring _key,
 bool
 SkysightAPIQueue::IsLoggedIn()
 {
-  uint64_t now = (uint64_t) std::chrono::system_clock::to_time_t(
-    BrokenDateTime::NowUTC().ToTimePoint());
+  auto now = std::chrono::system_clock::to_time_t(BrokenDateTime::NowUTC().ToTimePoint());
+  auto diff = (time_t)key_expiry_time - now;
+  LogFormat("SkysightAPIQueue::IsLoggedIn() now: %ld key_expiry_time: %ld diff: %ld", (long)now, (long)key_expiry_time, (long)diff);
 
-  //Add a 2-minute padding so that token doesn't expire mid-way thru a request
-  return (((int64_t)(key_expiry_time - now)) > (60*2));
+  return diff > 0;
 }
 
 void
