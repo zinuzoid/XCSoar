@@ -86,6 +86,7 @@ Co::InjectTask inject_task;
 PeriodClock clock;
 
 const char *access_token;
+char unauthorized_access_token[64] = "";
 
 public:
   Glue(CurlGlobal &curl, Handler *_handler);
