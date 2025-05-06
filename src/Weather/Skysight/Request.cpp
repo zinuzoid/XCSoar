@@ -97,6 +97,12 @@ SkysightRequest::BufferHandler::GetHeaderStatus() const
 void
 SkysightRequest::BufferHandler::OnData(std::span<const std::byte> data)
 {
+  if(received + data.size() >= max_size) {
+    LogFormat("BufferHandler::OnData received + data.size(): %zu is bigger "
+              "than max_size: %zu, skipping the received data.",
+              received + data.size(), max_size);
+    return;
+  }
   memcpy(buffer + received, data.data(), data.size());
   received += data.size();
 }
@@ -312,7 +318,7 @@ SkysightRequest::RequestToBuffer(tstring &response)
 
   bool success = true;
 
-  char buffer[10240];
+  char buffer[1024 * 100];
   BufferHandler handler(buffer, sizeof(buffer));
   CurlRequest request(*Net::curl, args.url.c_str(), handler);
   CurlSlist request_headers;
