@@ -65,6 +65,7 @@ public:
     FileHandler(FILE *_file): file(_file) {};
     // void DataReceived(const void *data, size_t length) override;
     // void ResponseReceived(int64_t content_length) override;
+    size_t GetReceived() const;
     void OnData(std::span<const std::byte> data) override;
     void OnHeaders(unsigned status, Curl::Headers &&headers) override;
     void OnEnd() override;
