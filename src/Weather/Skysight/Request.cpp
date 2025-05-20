@@ -39,11 +39,11 @@ Copyright_License {
 void
 SkysightRequest::FileHandler::OnData(std::span<const std::byte> data)
 {
-  size_t written = fwrite(data.data(), 1, data.size(), file);
+  size_t written = fwrite(data.data(), sizeof(std::byte), data.size(), file);
   if (written != (size_t)data.size())
     throw SkysightRequestError();
 
-  received += data.size();
+  received += written;
 }
 
 void
@@ -80,6 +80,12 @@ SkysightRequest::FileHandler::Wait() {
 
   if (error)
     std::rethrow_exception(error);
+}
+
+size_t
+SkysightRequest::FileHandler::GetReceived() const
+{
+  return received;
 }
 
 size_t
@@ -311,6 +317,8 @@ SkysightRequest::RequestToFile()
       return Status::Error;
     }
     std::rename(temp_path.c_str(), args.path.c_str());
+    LogFormat("SkysightRequest::RequestToFile received: %zu", handler.GetReceived());
+    
   }
   return success ? Status::Complete : Status::Error;
 }
