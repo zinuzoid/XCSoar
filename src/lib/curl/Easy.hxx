@@ -189,6 +189,10 @@ public:
 		SetOption(CURLOPT_MIMEPOST, mime);
 	}
 
+	void SetAcceptEncoding(const std::string& s) {
+		SetOption(CURLOPT_ACCEPT_ENCODING, s.c_str());
+	}
+
 	template<typename T>
 	bool GetInfo(CURLINFO info, T value_r) const noexcept {
 		return ::curl_easy_getinfo(handle, info, value_r) == CURLE_OK;
