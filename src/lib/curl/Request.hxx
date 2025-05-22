@@ -120,6 +120,10 @@ public:
 		easy.SetRequestBody(data, size);
 	}
 
+	void SetAcceptEncoding(const std::string& s) {
+		easy.SetAcceptEncoding(s);
+	}
+
 	void Resume() noexcept;
 
 	/**
