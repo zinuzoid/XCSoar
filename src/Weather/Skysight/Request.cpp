@@ -49,7 +49,11 @@ SkysightRequest::FileHandler::OnData(std::span<const std::byte> data)
 void
 SkysightRequest::FileHandler::OnHeaders(unsigned status,
     __attribute__((unused)) Curl::Headers &&headers) {
-  LogFormat("FileHandler::OnHeaders %d", status);
+  std::string content_encoding;
+  if(auto it = headers.find("content-encoding"); it != headers.end()) {
+    content_encoding = it->second.data();
+  }
+  LogFormat("FileHandler::OnHeaders status:%d content-encoding:%s", status, content_encoding.data());
 }
 
 void
@@ -94,7 +98,7 @@ SkysightRequest::BufferHandler::OnData(std::span<const std::byte> data)
 void
 SkysightRequest::BufferHandler::OnHeaders(unsigned status,
     __attribute__((unused)) Curl::Headers &&headers) {
-  LogFormat("BufferHandler::OnHeaders %d", status);
+  LogFormat("BufferHandler::OnHeaders status:%d", status);
 }
 
 void
@@ -273,6 +277,7 @@ SkysightRequest::RequestToFile()
   }
 
   request.SetRequestHeaders(request_headers.Get());
+  request.SetAcceptEncoding("gzip");
   request.SetVerifyPeer(false);
 
   try {
