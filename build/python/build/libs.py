@@ -237,6 +237,7 @@ curl = CmakeProject(
         "-DCURL_DISABLE_GOPHER=ON",
         "-DCURL_DISABLE_COOKIES=ON",
         "-DCURL_DISABLE_CRYPTO_AUTH=ON",
+        "-DCURL_ZLIB=ON",
         "-DCMAKE_USE_LIBSSH2=OFF",
         "-DBUILD_TESTING=OFF",
         "-DHAVE_FSEEKO=0",

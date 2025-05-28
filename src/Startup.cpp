@@ -237,6 +237,8 @@ Startup(UI::Display &display)
   VerboseOperationEnvironment operation;
   operation.SetProgressRange(1024);
 
+  LogFormat("curl_version: %s", curl_version());
+
 #ifdef HAVE_DOWNLOAD_MANAGER
   Net::DownloadManager::Initialise();
 #endif
