@@ -76,6 +76,7 @@ elif toolchain.is_android:
         libsodium,
         openssl,
         cares,
+        zlib,
         curl,
         lua,
         sqlite3,
