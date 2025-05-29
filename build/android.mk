@@ -318,7 +318,7 @@ $$(TARGET_OUTPUT_DIR)/$(2)/$$(XCSOAR_ABI)/bin/lib$(1).so: $(NATIVE_HEADERS) gene
 # extract symbolication files for Google Play
 ANDROID_SYMBOLICATION_BUILD += $$(ANDROID_BUILD)/symbols/$(2)/lib$(1).so
 $$(ANDROID_BUILD)/symbols/$(2)/lib$(1).so: $$(TARGET_OUTPUT_DIR)/$(2)/$$(XCSOAR_ABI)/bin/lib$(1)-ns.so | $$(ANDROID_BUILD)/symbols/$(2)/dirstamp
-	$$(Q)$$(TCPREFIX)objcopy$$(EXE) --strip-debug $$< $$@
+	$$(Q)$$(TCPREFIX)objcopy$$(EXE) $$< $$@
 
 endef
 
