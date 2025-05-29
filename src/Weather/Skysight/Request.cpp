@@ -201,12 +201,15 @@ SkysightAsyncRequest::Process()
 {
   std::lock_guard<Mutex> lock(mutex);
   if (IsBusy()) return;
+  if (done) return;
   Trigger();
 }
 
 void
 SkysightAsyncRequest::Tick() noexcept
 {
+  if (done) return;
+
   status = Status::Busy;
 
   mutex.unlock();
@@ -238,6 +241,7 @@ void
 SkysightAsyncRequest::Done()
 {
   StandbyThread::LockStop();
+  done = true;
 }
 
 SkysightRequest::Status

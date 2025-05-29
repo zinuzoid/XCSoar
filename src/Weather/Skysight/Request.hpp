@@ -130,6 +130,8 @@ public:
 protected:
   Status status;
   void Tick() noexcept override;
+private:
+  bool done = false;
 };
 
 #endif

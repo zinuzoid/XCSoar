@@ -63,6 +63,7 @@ void SkysightAPIQueue::AddDecodeJob(std::unique_ptr<CDFDecoder> &&job) {
 
 void SkysightAPIQueue::Process()
 {
+  std::lock_guard lock(process_mutex);
   if(is_emergency_stop) {
     LogFormat("SkysightAPIQueue::Process() is_emergency_stop=true, disable Skysight requests for this session!");
     DoClearingQueue();
@@ -74,7 +75,8 @@ void SkysightAPIQueue::Process()
   if(is_clearing) {
     DoClearingQueue();
   } else if (!request_queue.empty()) {
-    auto job = request_queue.begin();
+    std::vector<std::unique_ptr<SkysightAsyncRequest>>::iterator job = request_queue.begin();
+
     switch ((*job)->GetStatus()) {
     case SkysightRequest::Status::Idle:
       //Provide the job with the very latest API key just prior to execution
