@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.zinuzoid.xcsoar_jet"
           android:installLocation="auto"
-          android:versionCode="169"
-          android:versionName="7.43">
+          android:versionCode="154"
+          android:versionName="7.43_JET_1.28">
   <application
       android:requestLegacyExternalStorage="true"
       android:preserveLegacyExternalStorage="true"
