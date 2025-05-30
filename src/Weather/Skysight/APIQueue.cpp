@@ -107,7 +107,13 @@ void SkysightAPIQueue::Process()
       (*job)->Done();
       {
         std::lock_guard lock(request_queue_mutex);
-        request_queue.erase(job);
+        std::vector<std::unique_ptr<SkysightAsyncRequest>>::iterator job_begin = request_queue.begin();
+        if((*job).get() != (*job_begin).get()) {
+          LogFormat("SkysightAPIQueue::Process() Try to delete wrong job!");
+          assert(false);
+        } else {
+          request_queue.erase(request_queue.begin());
+        }
       }
       break;
     case SkysightRequest::Status::Busy:
@@ -117,7 +123,13 @@ void SkysightAPIQueue::Process()
       (*job)->Done();
       {
         std::lock_guard lock(request_queue_mutex);
-        request_queue.erase(job);
+        std::vector<std::unique_ptr<SkysightAsyncRequest>>::iterator job_begin = request_queue.begin();
+        if((*job).get() != (*job_begin).get()) {
+          LogFormat("SkysightAPIQueue::Process() Try to delete wrong job!");
+          assert(false);
+        } else {
+          request_queue.erase(request_queue.begin());
+        }
       }
       Clear("Emergency stop");
       is_emergency_stop = true;
