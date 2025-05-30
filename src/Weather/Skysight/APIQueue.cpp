@@ -40,7 +40,7 @@ void
 SkysightAPIQueue::AddRequest(std::unique_ptr<SkysightAsyncRequest> request,
 			     bool append_end)
 {
-  LogFormat("SkysightAPIQueue::AddRequest %d", (unsigned) request->GetType());
+  LogFormat("SkysightAPIQueue::AddRequest type: %d", (unsigned) request->GetType());
   if(request->GetType() == SkysightCallType::Login) {
     if(total_login_requests++ > 1000) {
       LogFormat("SkysightAPIQueue::AddRequest We're doing more than 1000 login requests for the session.");
@@ -56,6 +56,7 @@ SkysightAPIQueue::AddRequest(std::unique_ptr<SkysightAsyncRequest> request,
     } else {
       request_queue.emplace_back(std::move(request));
     }
+    LogFormat("SkysightAPIQueue::AddRequest request_queue.size(): %zu", request_queue.size());
   }
   if (!is_busy && !timer.IsActive())
       timer.Schedule(std::chrono::milliseconds(100));
@@ -82,6 +83,7 @@ void SkysightAPIQueue::Process()
     DoClearingQueue();
   } else if (!request_queue.empty()) {
     std::vector<std::unique_ptr<SkysightAsyncRequest>>::iterator job = request_queue.begin();
+    SkysightAsyncRequest* job_ptr = (*job).get();
 
     switch ((*job)->GetStatus()) {
     case SkysightRequest::Status::Idle:
@@ -106,16 +108,20 @@ void SkysightAPIQueue::Process()
     case SkysightRequest::Status::Error:
       (*job)->Done();
       {
+        LogFormat("SkysightAPIQueue::Process() X request_queue.size(): %zu", request_queue.size());
+        for(auto &it : request_queue) {
+          LogFormat("SkysightAPIQueue::Process() queue %p", it.get());
+        }
         std::lock_guard lock(request_queue_mutex);
-        SkysightAsyncRequest* job_ptr = (*job).get();
         auto find = std::find_if(request_queue.begin(), request_queue.end(), [job_ptr](std::unique_ptr<SkysightAsyncRequest>& it) {
           return it.get() == job_ptr;
         });
         if(find == request_queue.end()) {
-          LogFormat("SkysightAPIQueue::Process() Cannot find job to delete!");
+          LogFormat("SkysightAPIQueue::Process() X Cannot find job to delete! %p", job_ptr);
           assert(false);
         } else {
           request_queue.erase(find);
+          LogFormat("SkysightAPIQueue::Process() X Delete %p size: ", job_ptr);
         }
       }
       break;
@@ -126,15 +132,15 @@ void SkysightAPIQueue::Process()
       (*job)->Done();
       {
         std::lock_guard lock(request_queue_mutex);
-        SkysightAsyncRequest* job_ptr = (*job).get();
         auto find = std::find_if(request_queue.begin(), request_queue.end(), [job_ptr](std::unique_ptr<SkysightAsyncRequest>& it) {
           return it.get() == job_ptr;
         });
         if(find == request_queue.end()) {
-          LogFormat("SkysightAPIQueue::Process() Cannot find job to delete!");
+          LogFormat("SkysightAPIQueue::Process() Y Cannot find job to delete!");
           assert(false);
         } else {
           request_queue.erase(find);
+          LogFormat("SkysightAPIQueue::Process() Y Delete %p", job_ptr);
         }
       }
       Clear("Emergency stop");
