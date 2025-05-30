@@ -107,12 +107,15 @@ void SkysightAPIQueue::Process()
       (*job)->Done();
       {
         std::lock_guard lock(request_queue_mutex);
-        std::vector<std::unique_ptr<SkysightAsyncRequest>>::iterator job_begin = request_queue.begin();
-        if((*job).get() != (*job_begin).get()) {
-          LogFormat("SkysightAPIQueue::Process() Try to delete wrong job!");
+        SkysightAsyncRequest* job_ptr = (*job).get();
+        auto find = std::find_if(request_queue.begin(), request_queue.end(), [job_ptr](std::unique_ptr<SkysightAsyncRequest>& it) {
+          return it.get() == job_ptr;
+        });
+        if(find == request_queue.end()) {
+          LogFormat("SkysightAPIQueue::Process() Cannot find job to delete!");
           assert(false);
         } else {
-          request_queue.erase(request_queue.begin());
+          request_queue.erase(find);
         }
       }
       break;
@@ -123,12 +126,15 @@ void SkysightAPIQueue::Process()
       (*job)->Done();
       {
         std::lock_guard lock(request_queue_mutex);
-        std::vector<std::unique_ptr<SkysightAsyncRequest>>::iterator job_begin = request_queue.begin();
-        if((*job).get() != (*job_begin).get()) {
-          LogFormat("SkysightAPIQueue::Process() Try to delete wrong job!");
+        SkysightAsyncRequest* job_ptr = (*job).get();
+        auto find = std::find_if(request_queue.begin(), request_queue.end(), [job_ptr](std::unique_ptr<SkysightAsyncRequest>& it) {
+          return it.get() == job_ptr;
+        });
+        if(find == request_queue.end()) {
+          LogFormat("SkysightAPIQueue::Process() Cannot find job to delete!");
           assert(false);
         } else {
-          request_queue.erase(request_queue.begin());
+          request_queue.erase(find);
         }
       }
       Clear("Emergency stop");
