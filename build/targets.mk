@@ -544,6 +544,10 @@ endif
 
 ifeq ($(TARGET),ANDROID)
   TARGET_LDFLAGS += -Wl,--no-undefined
+  # Mitigate empty/missing DT_HASH in older Android
+  TARGET_LDFLAGS += -Wl,--hash-style=both
+  # Support 16 KB page sizes
+  TARGET_LDFLAGS += -Wl,-z,max-page-size=16384
 
   ifeq ($(ARMV7),y)
     TARGET_LDFLAGS += -Wl,--fix-cortex-a8
