@@ -8,6 +8,11 @@
 
 MOFile::MOFile(std::span<const std::byte> _raw)
   :raw(_raw), count(0) {
+  if (raw.size() < sizeof(mo_header)) {
+    // wrong mem alignment
+    return;
+  }
+
   const struct mo_header *header = (const struct mo_header *)(const void *)raw.data();
   if (raw.size() < sizeof(*header))
     return;
@@ -60,6 +65,11 @@ MOFile::lookup(const char *p) const
 const char *
 MOFile::get_string(const struct mo_table_entry *entry) const
 {
+  if (raw.size() > 100*1024*1024) {
+    assert(false);
+    return NULL;
+  }
+
   unsigned length = import_uint32(entry->length);
   unsigned offset = import_uint32(entry->offset);
 
