@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.zinuzoid.xcsoar_jet"
           android:installLocation="auto"
-          android:versionCode="169"
-          android:versionName="7.43">
+          android:versionCode="159"
+          android:versionName="7.43_JET_1.33">
   <application
       android:requestLegacyExternalStorage="true"
       android:preserveLegacyExternalStorage="true"
@@ -76,7 +76,7 @@
     </provider>
   </application>
 
-  <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="34"/>
+  <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="35"/>
 
   <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
                    android:usesPermissionFlags="neverForLocation"/>
