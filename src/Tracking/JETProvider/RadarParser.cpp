@@ -75,12 +75,12 @@ bool ParseHeader(std::string line, Radar &radar) {
 bool ParseTraffic(std::string line, Radar &radar) {
     std::vector<std::string> items;
     boost::split(items, line, boost::is_any_of(","));
-    if (items.size() != 11) {
+    if (items.size() < 12) {
         LogFormat("RadarParser received invalid items.size()=%d", (int) items.size());
         return false;
     }
-    // a1,deadbeef,50.869501,0.010864,42,1500,300,2,1615771825,744
-    // uid,name,lat,long,track,alt,spd,vspd,epoch,type
+    // a1,deadbeef,50.869501,0.010864,42,1500,300,2,1615771825,744,1
+    // uid,name,lat,long,track,alt,spd,vspd,epoch,type,icon_type
 
     JETProvider::Traffic traffic;
     traffic.traffic_id = to_c_str(items[0]);
@@ -95,6 +95,7 @@ bool ParseTraffic(std::string line, Radar &radar) {
     traffic.vspeed = atof(items[8].c_str());
     traffic.epoch = atoi(items[9].c_str());
     traffic.type = to_c_str(items[10]);
+    traffic.icon_type = atoi(items[11].c_str());
 
     traffic.altitude = round(Units::ToSysUnit(traffic.altitude, Unit::FEET));
     traffic.speed = Units::ToSysUnit(traffic.speed, Unit::KNOTS);
