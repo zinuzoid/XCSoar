@@ -34,8 +34,8 @@ Copyright_License {
 #include "Interface.hpp"
 #include "LogFile.hpp"
 
-// #define API_ENTPOINT_URL "http://192.168.42.113:3000/api/1/radar"
-#define API_ENTPOINT_URL "http://xcsoar.imjim.im/api/1/radar"
+// #define API_ENTPOINT_URL "http://192.168.42.113:3000/api/2/radar"
+#define API_ENTPOINT_URL "http://xcsoar.imjim.im/api/2/radar"
 
 class EventLoop;
 

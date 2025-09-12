@@ -263,6 +263,8 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
     return;
   }
 
+  const MoreData &basic = Basic();
+
   const std::lock_guard lock{jet_provider_data->mutex};
 
   const WindowProjection &projection = render_projection;
@@ -289,13 +291,13 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
 
     // Draw the name 16 points below the icon
     sc_name = sc;
-    sc_name.y -= Layout::Scale(20);
-    sc_name.x -= Layout::Scale(6);
+    sc_name.y -= Layout::Scale(18);
+    sc_name.x -= Layout::Scale(10);
 
     // Draw the average climb value above the icon
     sc_bottom = sc;
-    sc_bottom.y += Layout::Scale(10);
-    sc_bottom.x -= Layout::Scale(6);
+    sc_bottom.y += Layout::Scale(8);
+    sc_bottom.x -= Layout::Scale(10);
 
     TextInBoxMode mode;
     mode.shape = LabelShape::OUTLINED;
@@ -317,16 +319,42 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
     }
     TextInBox(canvas, second_text, sc_bottom, mode, GetClientRect());
 
-    auto color = FlarmColor::YELLOW;
+    auto circle = FlarmColor::NONE;
     FlarmTraffic t;
-    if (jet_provider_data->validity.IsValid() && jet_provider_data->success) {
-      t.alarm_level = FlarmTraffic::AlarmType::NONE;
-    } else {
+    t.alarm_level = FlarmTraffic::AlarmType::NONE;
+    t.relative_altitude = (RoughAltitude) 100;
+    if (!jet_provider_data->validity.IsValid() || !jet_provider_data->success) {
       t.alarm_level = FlarmTraffic::AlarmType::OFFLINE;
+    } else {
+      if(basic.gps_altitude_available) {
+        t.relative_altitude = (RoughAltitude) (traffic.altitude - basic.gps_altitude);
+      }
+
+      int icon_color = traffic.icon_type & 0xf;
+      if(icon_color == 1) {
+        t.alarm_level = FlarmTraffic::AlarmType::NONE;
+      } else if(icon_color == 2) {
+        t.alarm_level = FlarmTraffic::AlarmType::LOW;
+      } else if(icon_color == 3) {
+        t.alarm_level = FlarmTraffic::AlarmType::URGENT;
+      }
+
+      int circle_color = traffic.icon_type >> 8 & 0xf;
+      if(circle_color == 1) {
+        circle = FlarmColor::NONE;
+      } else if(circle_color == 2) {
+        circle = FlarmColor::GREEN;
+      } else if(circle_color == 3) {
+        circle = FlarmColor::BLUE;
+      } else if(circle_color == 4) {
+        circle = FlarmColor::YELLOW;
+      } else if(circle_color == 5) {
+        circle = FlarmColor::MAGENTA;
+      }
     }
     TrafficRenderer::Draw(canvas, traffic_look, false, t,
                           Angle::Degrees(traffic.track) - projection.GetScreenAngle(),
-                          color, sc);
+                          circle, sc);
   }
 
 }
