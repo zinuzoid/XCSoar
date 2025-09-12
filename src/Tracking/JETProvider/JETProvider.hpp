@@ -54,6 +54,7 @@ struct Traffic {
   double speed = -1;
   double vspeed = -1;
   const char *type = nullptr;
+  int icon_type = -1;
 };
 
 struct Data {
