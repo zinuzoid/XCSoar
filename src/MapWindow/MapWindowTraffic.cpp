@@ -263,6 +263,8 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
     return;
   }
 
+  const std::lock_guard lock{jet_provider_data->mutex};
+
   const WindowProjection &projection = render_projection;
 
   canvas.Select(*traffic_look.font);
