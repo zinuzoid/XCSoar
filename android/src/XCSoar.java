@@ -97,6 +97,7 @@ public class XCSoar extends Activity implements PermissionManager {
 
     final Window window = getWindow();
     window.requestFeature(Window.FEATURE_NO_TITLE);
+    window.setDecorFitsSystemWindows(false);
 
     TextView tv = new TextView(this);
     tv.setText("Loading XCSoar...");
