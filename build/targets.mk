@@ -315,7 +315,7 @@ endif
 ifeq ($(TARGET),ANDROID)
   ANDROID_NDK ?= $(HOME)/opt/android-ndk-r27c
 
-  ANDROID_SDK_PLATFORM = android-34
+  ANDROID_SDK_PLATFORM = android-35
   ANDROID_NDK_API = 27
 
   # The naming of CPU ABIs, architectures, and various NDK directory names is an unholy mess.
