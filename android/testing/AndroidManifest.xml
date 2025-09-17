@@ -10,12 +10,14 @@
       android:hasFragileUserData="true"
       android:appCategory="maps"
       android:icon="@drawable/icon"
-      android:label="@string/app_name">
+      android:label="@string/app_name"
+      android:theme="@style/AppTheme">
     <activity android:name="org.xcsoar.testing.XCSoar"
               android:exported="true"
               android:label="@string/app_name_testing"
               android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-              android:launchMode="singleInstance">
+              android:launchMode="singleInstance"
+              android:resizeableActivity="true">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
@@ -40,7 +42,7 @@
       <meta-data android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                  android:resource="@xml/usb_device_filter" />
       <meta-data android:name="android.max_aspect"
-                 android:value="2.1"/>
+                 android:value="5"/>
     </activity>
 
     <service android:name="org.xcsoar.testing.MyService" android:foregroundServiceType="location"/>

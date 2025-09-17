@@ -35,6 +35,11 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.util.Log;
 import android.provider.Settings;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
+import android.view.WindowInsets;
 
 public class XCSoar extends Activity implements PermissionManager {
   private static final String TAG = "XCSoar";
@@ -97,7 +102,26 @@ public class XCSoar extends Activity implements PermissionManager {
 
     final Window window = getWindow();
     window.requestFeature(Window.FEATURE_NO_TITLE);
-    window.setDecorFitsSystemWindows(false);
+
+    // Edge-to-edge enforcement for API 35
+    if(android.os.Build.VERSION.SDK_INT >= 35) {
+      window.setDecorFitsSystemWindows(false);
+    } else if(android.os.Build.VERSION.SDK_INT >= 30) {
+      final int stableFlag = View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+
+      final View decorView = window.getDecorView();
+      final int sysUiVis = decorView.getSystemUiVisibility();
+      decorView.setSystemUiVisibility(sysUiVis | stableFlag);
+      window.setDecorFitsSystemWindows(false);
+    } else {
+            final int decorFitsFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+              | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+              | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+
+      final View decorView = window.getDecorView();
+      final int sysUiVis = decorView.getSystemUiVisibility();
+      decorView.setSystemUiVisibility(sysUiVis | decorFitsFlags);
+    }
 
     TextView tv = new TextView(this);
     tv.setText("Loading XCSoar...");
@@ -224,7 +248,42 @@ public class XCSoar extends Activity implements PermissionManager {
                                 wakeLockHandler, fullScreenHandler,
                                 errorHandler,
                                 this);
-    setContentView(nativeView);
+    LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, 0);
+    lp.weight = 1.f;
+    nativeView.setLayoutParams(lp);
+
+    View top = new View(this);
+    top.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+    top.setTag("TopInset");
+
+    View bottom = new View(this);
+    bottom.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 0));
+    bottom.setTag("BottomInset");
+
+    LinearLayout parent = new LinearLayout(this);
+    parent.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+    parent.setOrientation(LinearLayout.VERTICAL);
+
+    parent.addView(top);
+    parent.addView(nativeView);
+    parent.addView(bottom);
+
+    parent.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+      @Override
+      public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+          View top = ((ViewGroup) v).findViewWithTag("TopInset");
+          top.setLayoutParams(
+            new LayoutParams(LayoutParams.MATCH_PARENT,
+            insets.getSystemWindowInsetTop()));
+          View bottom = ((ViewGroup) v).findViewWithTag("BottomInset");
+          bottom.setLayoutParams(
+            new LayoutParams(LayoutParams.MATCH_PARENT,
+            insets.getSystemWindowInsetBottom()));
+          return insets;
+      }
+    });
+
+    setContentView(parent);
     // Receive keyboard events
     nativeView.setFocusableInTouchMode(true);
     nativeView.setFocusable(true);
