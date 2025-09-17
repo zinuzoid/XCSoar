@@ -1,0 +1,10 @@
+<resources>
+
+<style name="AppTheme">
+  <item name="android:navigationBarColor">@android:color/transparent</item>
+
+  <!-- Optional: set for a light status bar with dark content. -->
+  <item name="android:windowLightStatusBar">true</item>
+</style>
+
+</resources>
