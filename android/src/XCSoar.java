@@ -35,6 +35,11 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.util.Log;
 import android.provider.Settings;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
+import android.view.WindowInsets;
 
 public class XCSoar extends Activity implements PermissionManager {
   private static final String TAG = "XCSoar";
@@ -97,7 +102,10 @@ public class XCSoar extends Activity implements PermissionManager {
 
     final Window window = getWindow();
     window.requestFeature(Window.FEATURE_NO_TITLE);
-    window.setDecorFitsSystemWindows(false);
+    if (android.os.Build.VERSION.SDK_INT >= 35) {
+      // Edge-to-edge enforcement
+      window.setDecorFitsSystemWindows(false);
+    }
 
     TextView tv = new TextView(this);
     tv.setText("Loading XCSoar...");
@@ -222,7 +230,31 @@ public class XCSoar extends Activity implements PermissionManager {
                                 wakeLockHandler, fullScreenHandler,
                                 errorHandler,
                                 this);
-    setContentView(nativeView);
+    nativeView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+
+    View view = new View(this);
+    view.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+    view.setTag("TopInset");
+
+    LinearLayout parent = new LinearLayout(this);
+    parent.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+    parent.setOrientation(LinearLayout.VERTICAL);
+
+    parent.addView(view);
+    parent.addView(nativeView);
+
+    parent.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+      @Override
+      public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+          View top = ((ViewGroup) v).findViewWithTag("TopInset");
+          top.setLayoutParams(
+            new LayoutParams(LayoutParams.MATCH_PARENT,
+            insets.getSystemWindowInsetTop()));
+          return insets;
+      }
+    });
+
+    setContentView(parent);
     // Receive keyboard events
     nativeView.setFocusableInTouchMode(true);
     nativeView.setFocusable(true);
