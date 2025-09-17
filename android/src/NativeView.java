@@ -154,6 +154,7 @@ class NativeView extends SurfaceView
            in the foreground in a state when services are allowed)",
            but we're about to be resumed, which means we're in
            foreground... */
+        Log.e(TAG, "Start MyService error!", e);
       }
 
       try {
