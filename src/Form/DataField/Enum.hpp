@@ -5,6 +5,7 @@
 
 #include "Base.hpp"
 #include "util/StaticArray.hxx"
+#include "InfoBoxes/Content/Type.hpp"
 
 #include <type_traits>
 #include <utility>
@@ -87,7 +88,7 @@ public:
   };
 
 private:
-  StaticArray<Entry, 128> entries;
+  StaticArray<Entry, InfoBoxFactory::MAX_TYPE_VAL> entries;
   std::size_t value = 0;
 
 public:
