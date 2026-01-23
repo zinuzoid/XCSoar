@@ -128,7 +128,8 @@ DRIVER_SOURCES = \
 	$(DRIVER_SRC_DIR)/AirControlDisplay.cpp \
 	$(DRIVER_SRC_DIR)/Larus.cpp \
 	$(DRIVER_SRC_DIR)/ATR833/Device.cpp \
-	$(DRIVER_SRC_DIR)/ATR833/Register.cpp
+	$(DRIVER_SRC_DIR)/ATR833/Register.cpp \
+	$(DRIVER_SRC_DIR)/VectorVario.cpp
 
 DRIVER_DEPENDS = TIME LIBNMEA GEO OPERATION UNITS
 
