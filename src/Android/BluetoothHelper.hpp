@@ -62,5 +62,8 @@ public:
 
   PortBridge *connectHM10(JNIEnv *env, const char *address);
 
+  PortBridge *connectVectorVario(JNIEnv *env, const char *address,
+                                 SensorListener &listener);
+
   PortBridge *createServer(JNIEnv *env);
 };

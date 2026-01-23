@@ -380,6 +380,8 @@ private:
 
   bool OpenBluetoothSensor();
 
+  bool OpenVectorVarioPort(OperationEnvironment &env);
+
 public:
   /**
    * To be used by OpenDeviceJob, don't call directly.

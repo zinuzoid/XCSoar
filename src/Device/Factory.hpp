@@ -75,5 +75,10 @@ public:
   Java::LocalCloseable OpenVoltage(SensorListener &listener);
   Java::LocalCloseable OpenGliderLink(SensorListener &listener);
   Java::LocalCloseable OpenBluetoothSensor(const DeviceConfig &config, SensorListener &listener);
+
+  std::unique_ptr<Port> OpenVectorVarioPort(const DeviceConfig &config,
+                                            PortListener *listener,
+                                            DataHandler &handler,
+                                            SensorListener &sensor_listener);
 #endif
 };
