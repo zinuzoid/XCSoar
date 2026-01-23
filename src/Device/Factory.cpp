@@ -14,6 +14,7 @@
 #include "Android/IOIOHelper.hpp"
 #include "Android/NunchuckDevice.hpp"
 #include "Android/VoltageDevice.hpp"
+#include "Device/Port/AndroidBluetoothPort.hpp"
 #include "java/Closeable.hxx"
 #endif
 
@@ -142,6 +143,24 @@ DeviceFactory::OpenBluetoothSensor(const DeviceConfig &config,
   return bluetooth_helper->connectSensor(Java::GetEnv(),
                                          config.bluetooth_mac,
                                          listener);
+}
+
+std::unique_ptr<Port>
+DeviceFactory::OpenVectorVarioPort(const DeviceConfig &config,
+                                   PortListener *listener,
+                                   DataHandler &handler,
+                                   SensorListener &sensor_listener)
+{
+  if (bluetooth_helper == nullptr)
+    throw std::runtime_error{"Bluetooth not available"};
+
+  if (config.bluetooth_mac.empty())
+    throw std::runtime_error{"No Bluetooth MAC configured"};
+
+  return OpenAndroidBleVectorVarioPort(*bluetooth_helper,
+                                       config.bluetooth_mac,
+                                       listener, handler,
+                                       sensor_listener);
 }
 
 #endif // ANDROID

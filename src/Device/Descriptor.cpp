@@ -347,6 +347,60 @@ DeviceDescriptor::OpenBluetoothSensor()
 }
 
 bool
+DeviceDescriptor::OpenVectorVarioPort([[maybe_unused]] OperationEnvironment &env)
+{
+#ifdef ANDROID
+  if (is_simulator())
+    return true;
+
+  reopen_clock.Update();
+
+  std::unique_ptr<Port> port;
+  try {
+    port = factory.OpenVectorVarioPort(config, this, *this, *this);
+  } catch (OperationCancelled) {
+    return false;
+  } catch (...) {
+    const auto e = std::current_exception();
+    LogError(e, "VectorVario");
+
+    const auto _msg = GetFullMessage(e);
+    if (const UTF8ToWideConverter what{_msg.c_str()}; what.IsValid()) {
+      LockSetErrorMessage(what);
+      StaticString<256> msg;
+      msg.Format(_T("%s: VectorVario (%s)"), _("Unable to open port"),
+                 (const TCHAR *)what);
+      env.SetErrorMessage(msg);
+    }
+    return false;
+  }
+
+  if (port == nullptr) {
+    env.SetErrorMessage(_T("Unable to open VectorVario port"));
+    return false;
+  }
+
+  if (!port->WaitConnected(env)) {
+    ++n_failures;
+    return false;
+  }
+
+  auto dump_port = std::make_unique<DumpPort>(std::move(port));
+  dump_port->Disable();
+
+  if (!OpenOnPort(std::move(dump_port), env)) {
+    ++n_failures;
+    return false;
+  }
+
+  ResetFailureCounter();
+  return true;
+#else
+  return false;
+#endif
+}
+
+bool
 DeviceDescriptor::DoOpen(OperationEnvironment &env) noexcept
 try {
   assert(config.IsAvailable());
@@ -376,6 +430,11 @@ try {
 
   if (config.port_type == DeviceConfig::PortType::BLE_SENSOR)
     return OpenBluetoothSensor();
+
+  // VectorVario with combined BLE HM10 port and sensors needs special handling
+  if (config.port_type == DeviceConfig::PortType::BLE_HM10 &&
+      config.driver_name == _T("VectorVario"))
+    return OpenVectorVarioPort(env);
 
   reopen_clock.Update();
 

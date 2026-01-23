@@ -21,6 +21,7 @@ static jmethodID isEnabled_method;
 static jmethodID getNameFromAddress_method;
 static jmethodID connect_method, createServer_method;
 static jmethodID hm10connect_method;
+static jmethodID vectorVarioConnect_method;
 static jmethodID connectSensor_method;
 static jmethodID addDetectDeviceListener_method;
 static jmethodID removeDetectDeviceListener_method;
@@ -64,6 +65,9 @@ BluetoothHelper::Initialise(JNIEnv *env) noexcept
   hm10connect_method = env->GetMethodID(cls, "connectHM10",
                                         "(Ljava/lang/String;)"
                                         "Lorg/xcsoar/AndroidPort;");
+  vectorVarioConnect_method = env->GetMethodID(cls, "connectVectorVario",
+                                               "(Ljava/lang/String;Lorg/xcsoar/SensorListener;)"
+                                               "Lorg/xcsoar/AndroidPort;");
   addDetectDeviceListener_method =
     env->GetMethodID(cls, "addDetectDeviceListener",
                      "(Lorg/xcsoar/DetectDeviceListener;)V");
@@ -179,6 +183,19 @@ BluetoothHelper::connectHM10(JNIEnv *env, const char *address)
   const Java::String address2(env, address);
   auto obj = Java::CallObjectMethodRethrow(env, Get(), hm10connect_method,
                                            address2.Get());
+  assert(obj);
+
+  return new PortBridge(env, obj);
+}
+
+PortBridge *
+BluetoothHelper::connectVectorVario(JNIEnv *env, const char *_address,
+                                    SensorListener &_listener)
+{
+  const Java::String address{env, _address};
+  auto listener = NativeSensorListener::Create(env, _listener);
+  auto obj = Java::CallObjectMethodRethrow(env, Get(), vectorVarioConnect_method,
+                                           address.Get(), listener.Get());
   assert(obj);
 
   return new PortBridge(env, obj);

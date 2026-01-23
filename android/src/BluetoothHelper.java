@@ -252,6 +252,22 @@ final class BluetoothHelper
     return new HM10Port(context, device);
   }
 
+  public AndroidPort connectVectorVario(String address, SensorListener listener)
+    throws IOException {
+    if (!hasLe)
+      throw new IOException("No Bluetooth LE support");
+
+    BluetoothDevice device = adapter.getRemoteDevice(address);
+    if (device == null)
+      throw new IOException("Bluetooth device not found");
+
+    requestConnectPermission(null);
+
+    Log.d(TAG, String.format("Connecting to Vector Vario \"%s\" via GATT...",
+                             getDisplayString(device)));
+    return new VectorVarioPort(context, device, listener);
+  }
+
   public AndroidPort connect(String address)
     throws IOException {
     BluetoothDevice device = adapter.getRemoteDevice(address);
