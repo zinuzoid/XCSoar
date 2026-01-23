@@ -12,6 +12,7 @@ class BluetoothHelper;
 class Port;
 class PortListener;
 class DataHandler;
+class SensorListener;
 
 std::unique_ptr<Port>
 OpenAndroidBluetoothPort(BluetoothHelper &bluetooth_helper,
@@ -26,3 +27,9 @@ std::unique_ptr<Port>
 OpenAndroidBleHm10Port(BluetoothHelper &bluetooth_helper,
                        const TCHAR *address, PortListener *_listener,
                        DataHandler &_handler);
+
+std::unique_ptr<Port>
+OpenAndroidBleVectorVarioPort(BluetoothHelper &bluetooth_helper,
+                              const TCHAR *address, PortListener *_listener,
+                              DataHandler &_handler,
+                              SensorListener &_sensor_listener);

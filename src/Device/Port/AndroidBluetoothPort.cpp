@@ -40,3 +40,17 @@ OpenAndroidBleHm10Port(BluetoothHelper &bluetooth_helper,
   assert(bridge != nullptr);
   return std::make_unique<AndroidPort>(listener, handler, bridge);
 }
+
+std::unique_ptr<Port>
+OpenAndroidBleVectorVarioPort(BluetoothHelper &bluetooth_helper,
+                              const TCHAR *address, PortListener *listener,
+                              DataHandler &handler,
+                              SensorListener &sensor_listener)
+{
+  assert(address != nullptr);
+
+  PortBridge *bridge = bluetooth_helper.connectVectorVario(
+    Java::GetEnv(), address, sensor_listener);
+  assert(bridge != nullptr);
+  return std::make_unique<AndroidPort>(listener, handler, bridge);
+}

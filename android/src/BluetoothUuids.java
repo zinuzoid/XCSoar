@@ -58,4 +58,13 @@ public interface BluetoothUuids {
     UUID.fromString("aba27100-143b-4b81-a444-edcd0000f024");
   UUID FLYTEC_SENSBOX_SYSTEM_CHARACTERISTIC =
     UUID.fromString("aba27100-143b-4b81-a444-edcd0000f025");
+
+  /**
+   * Vector Vario
+   * @see https://vectorvario.com/en/developers/
+   */
+  UUID VECTOR_VARIO_SERVICE =
+    UUID.fromString("2fce4890-0197-47e0-a825-d4777b9a5d67");
+  UUID VECTOR_VARIO_VARIO_CHARACTERISTIC =
+    UUID.fromString("2fce4891-0197-47e0-a825-d4777b9a5d67");
 }
