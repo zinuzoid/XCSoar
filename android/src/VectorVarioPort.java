@@ -51,6 +51,7 @@ public class VectorVarioPort
   private BluetoothGattCharacteristic windDirectionCharacteristic;
   private BluetoothGattCharacteristic tasCharacteristic;
   private BluetoothGattCharacteristic iasCharacteristic;
+  private BluetoothGattCharacteristic staticPressureCharacteristic;
   private volatile boolean shutdown = false;
 
   private final HM10WriteBuffer writeBuffer = new HM10WriteBuffer();
@@ -120,6 +121,7 @@ public class VectorVarioPort
     if (service != null) {
       windSpeedCharacteristic = service.getCharacteristic(BluetoothUuids.WIND_SPEED_CHARACTERISTIC);
       windDirectionCharacteristic = service.getCharacteristic(BluetoothUuids.WIND_DIRECTION_CHARACTERISTIC);
+      staticPressureCharacteristic = service.getCharacteristic(BluetoothUuids.STATIC_PRESSURE_CHARACTERISTIC);
     }
 
     if (dataCharacteristic == null)
@@ -185,6 +187,11 @@ public class VectorVarioPort
       enableNotification(windDirectionCharacteristic);
     }
 
+    /* Enable notifications for static pressure if available */
+    if (staticPressureCharacteristic != null) {
+      enableNotification(staticPressureCharacteristic);
+    }
+
     portState = STATE_READY;
     stateChanged();
   }
@@ -205,6 +212,7 @@ public class VectorVarioPort
         windDirectionCharacteristic = null;
         tasCharacteristic = null;
         iasCharacteristic = null;
+        staticPressureCharacteristic = null;
         lastWindSpeedCmps = 0;
         lastWindDirCentideg = 0;
         lastTasMps = 0;
@@ -343,6 +351,18 @@ public class VectorVarioPort
         lastWindDirCentideg = characteristic.getIntValue(
             BluetoothGattCharacteristic.FORMAT_UINT16, 0);
         reportWind();
+      }
+
+      /* Handle Static Pressure from Environmental Sensing service */
+      if ((staticPressureCharacteristic != null) &&
+          (staticPressureCharacteristic.getUuid().equals(characteristic.getUuid()))) {
+        if (sensorListener != null) {
+          /* Value is uint32 in 0.1 Pa, convert to hPa (1 hPa = 100 Pa) */
+          long pressureTenthPa = characteristic.getIntValue(
+              BluetoothGattCharacteristic.FORMAT_UINT32, 0) & 0xFFFFFFFFL;
+          float pressureHpa = pressureTenthPa / 1000.0f;
+          sensorListener.onBarometricPressureSensor(pressureHpa, 0.5f);
+        }
       }
     } catch (NullPointerException e) {
       /* probably caused by a malformed value - ignore */
