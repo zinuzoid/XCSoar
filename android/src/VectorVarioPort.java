@@ -53,6 +53,7 @@ public class VectorVarioPort
   private BluetoothGattCharacteristic iasCharacteristic;
   private BluetoothGattCharacteristic staticPressureCharacteristic;
   private BluetoothGattCharacteristic airTemperatureCharacteristic;
+  private BluetoothGattCharacteristic batteryLevelCharacteristic;
   private volatile boolean shutdown = false;
 
   private final HM10WriteBuffer writeBuffer = new HM10WriteBuffer();
@@ -124,6 +125,11 @@ public class VectorVarioPort
       windDirectionCharacteristic = service.getCharacteristic(BluetoothUuids.WIND_DIRECTION_CHARACTERISTIC);
       staticPressureCharacteristic = service.getCharacteristic(BluetoothUuids.STATIC_PRESSURE_CHARACTERISTIC);
       airTemperatureCharacteristic = service.getCharacteristic(BluetoothUuids.AIR_TEMPERATURE_CHARACTERISTIC);
+    }
+
+    service = gatt.getService(BluetoothUuids.BATTERY_SERVICE);
+    if (service != null) {
+      batteryLevelCharacteristic = service.getCharacteristic(BluetoothUuids.BATTERY_LEVEL_CHARACTERISTIC);
     }
 
     if (dataCharacteristic == null)
@@ -199,6 +205,11 @@ public class VectorVarioPort
       enableNotification(airTemperatureCharacteristic);
     }
 
+    /* Enable notifications for battery level if available */
+    if (batteryLevelCharacteristic != null) {
+      enableNotification(batteryLevelCharacteristic);
+    }
+
     portState = STATE_READY;
     stateChanged();
   }
@@ -221,6 +232,7 @@ public class VectorVarioPort
         iasCharacteristic = null;
         staticPressureCharacteristic = null;
         airTemperatureCharacteristic = null;
+        batteryLevelCharacteristic = null;
         lastWindSpeedCmps = 0;
         lastWindDirCentideg = 0;
         lastTasMps = 0;
@@ -382,6 +394,17 @@ public class VectorVarioPort
               BluetoothGattCharacteristic.FORMAT_SINT16, 0);
           double tempKelvin = (tempHundredthsCelsius / 100.0) + 273.15;
           sensorListener.onTemperature(tempKelvin);
+        }
+      }
+
+      /* Handle Battery Level from Battery Service */
+      if ((batteryLevelCharacteristic != null) &&
+          (batteryLevelCharacteristic.getUuid().equals(characteristic.getUuid()))) {
+        if (sensorListener != null) {
+          /* Value is uint8 percentage (0-100) */
+          int batteryPercent = characteristic.getIntValue(
+              BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+          sensorListener.onBatteryPercent((double) batteryPercent);
         }
       }
     } catch (NullPointerException e) {
