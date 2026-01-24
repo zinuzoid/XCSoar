@@ -645,6 +645,7 @@ private:
   void OnBatteryPercent(double battery_percent) noexcept override;
   void OnSensorStateChanged() noexcept override;
   void OnSensorError(const char *msg) noexcept override;
+  void OnExternalWind(float speed_mps, float direction_degrees) noexcept override;
 #endif // ANDROID
 #endif // HAVE_INTERNAL_GPS
 };
