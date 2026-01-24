@@ -107,7 +107,8 @@ class DeviceListWidget final
         basic.static_pressure_available;
       pitot = basic.pitot_pressure_available;
       airspeed = basic.airspeed_available;
-      vario = basic.total_energy_vario_available;
+      vario = basic.total_energy_vario_available ||
+        basic.noncomp_vario_available;
       traffic = basic.flarm.IsDetected();
       temperature = basic.temperature_available;
       humidity = basic.humidity_available;
