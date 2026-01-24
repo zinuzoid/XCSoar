@@ -646,6 +646,9 @@ private:
   void OnSensorStateChanged() noexcept override;
   void OnSensorError(const char *msg) noexcept override;
   void OnExternalWind(float speed_mps, float direction_degrees) noexcept override;
+  void OnTrueAirspeed(float tas_mps) noexcept override;
+  void OnIndicatedAirspeed(float ias_mps) noexcept override;
+  void OnBothAirspeeds(float ias_mps, float tas_mps) noexcept override;
 #endif // ANDROID
 #endif // HAVE_INTERNAL_GPS
 };

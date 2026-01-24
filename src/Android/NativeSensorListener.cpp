@@ -356,3 +356,46 @@ Java_org_xcsoar_NativeSensorListener_onExternalWind(JNIEnv *env,
   auto &listener = *(SensorListener *)ptr;
   listener.OnExternalWind(speed, direction);
 }
+
+gcc_visibility_default
+JNIEXPORT void JNICALL
+Java_org_xcsoar_NativeSensorListener_onTrueAirspeed(JNIEnv *env,
+                                                     jobject obj,
+                                                     jfloat tas_mps)
+{
+  jlong ptr = env->GetLongField(obj, NativeSensorListener::ptr_field);
+  if (ptr == 0)
+    return;
+
+  auto &listener = *(SensorListener *)ptr;
+  listener.OnTrueAirspeed(tas_mps);
+}
+
+gcc_visibility_default
+JNIEXPORT void JNICALL
+Java_org_xcsoar_NativeSensorListener_onIndicatedAirspeed(JNIEnv *env,
+                                                          jobject obj,
+                                                          jfloat ias_mps)
+{
+  jlong ptr = env->GetLongField(obj, NativeSensorListener::ptr_field);
+  if (ptr == 0)
+    return;
+
+  auto &listener = *(SensorListener *)ptr;
+  listener.OnIndicatedAirspeed(ias_mps);
+}
+
+gcc_visibility_default
+JNIEXPORT void JNICALL
+Java_org_xcsoar_NativeSensorListener_onBothAirspeeds(JNIEnv *env,
+                                                      jobject obj,
+                                                      jfloat ias_mps,
+                                                      jfloat tas_mps)
+{
+  jlong ptr = env->GetLongField(obj, NativeSensorListener::ptr_field);
+  if (ptr == 0)
+    return;
+
+  auto &listener = *(SensorListener *)ptr;
+  listener.OnBothAirspeeds(ias_mps, tas_mps);
+}
