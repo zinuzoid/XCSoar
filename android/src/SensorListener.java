@@ -83,4 +83,23 @@ public interface SensorListener {
    * @param direction wind origin direction in degrees (0-360)
    */
   void onExternalWind(float speed, float direction);
+
+  /**
+   * True airspeed from external device.
+   * @param tas_mps true airspeed in m/s
+   */
+  void onTrueAirspeed(float tas_mps);
+
+  /**
+   * Indicated airspeed from external device.
+   * @param ias_mps indicated airspeed in m/s
+   */
+  void onIndicatedAirspeed(float ias_mps);
+
+  /**
+   * Both airspeeds from external device.
+   * @param ias_mps indicated airspeed in m/s
+   * @param tas_mps true airspeed in m/s
+   */
+  void onBothAirspeeds(float ias_mps, float tas_mps);
 }
