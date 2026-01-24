@@ -49,6 +49,8 @@ public class VectorVarioPort
   private BluetoothGattCharacteristic varioCharacteristic;
   private BluetoothGattCharacteristic windSpeedCharacteristic;
   private BluetoothGattCharacteristic windDirectionCharacteristic;
+  private BluetoothGattCharacteristic tasCharacteristic;
+  private BluetoothGattCharacteristic iasCharacteristic;
   private volatile boolean shutdown = false;
 
   private final HM10WriteBuffer writeBuffer = new HM10WriteBuffer();
@@ -68,6 +70,12 @@ public class VectorVarioPort
   /* Cached wind values (both characteristics report independently) */
   private int lastWindSpeedCmps = 0;
   private int lastWindDirCentideg = 0;
+
+  /* Cached airspeed values (both characteristics report independently) */
+  private float lastTasMps = 0;
+  private float lastIasMps = 0;
+  private boolean hasTas = false;
+  private boolean hasIas = false;
 
   public VectorVarioPort(Context context, BluetoothDevice device,
                          SensorListener sensorListener)
@@ -104,6 +112,8 @@ public class VectorVarioPort
     service = gatt.getService(BluetoothUuids.VECTOR_VARIO_SERVICE);
     if (service != null) {
       varioCharacteristic = service.getCharacteristic(BluetoothUuids.VECTOR_VARIO_VARIO_CHARACTERISTIC);
+      tasCharacteristic = service.getCharacteristic(BluetoothUuids.VECTOR_VARIO_TAS_CHARACTERISTIC);
+      iasCharacteristic = service.getCharacteristic(BluetoothUuids.VECTOR_VARIO_IAS_CHARACTERISTIC);
     }
 
     service = gatt.getService(BluetoothUuids.ENVIRONMENTAL_SENSING_SERVICE);
@@ -159,6 +169,14 @@ public class VectorVarioPort
       enableNotification(varioCharacteristic);
     }
 
+    /* Enable notifications for TAS/IAS characteristics if available */
+    if (tasCharacteristic != null) {
+      enableNotification(tasCharacteristic);
+    }
+    if (iasCharacteristic != null) {
+      enableNotification(iasCharacteristic);
+    }
+
     /* Enable notifications for wind characteristics if available */
     if (windSpeedCharacteristic != null) {
       enableNotification(windSpeedCharacteristic);
@@ -185,8 +203,14 @@ public class VectorVarioPort
         varioCharacteristic = null;
         windSpeedCharacteristic = null;
         windDirectionCharacteristic = null;
+        tasCharacteristic = null;
+        iasCharacteristic = null;
         lastWindSpeedCmps = 0;
         lastWindDirCentideg = 0;
+        lastTasMps = 0;
+        lastIasMps = 0;
+        hasTas = false;
+        hasIas = false;
 
         if ((BluetoothProfile.STATE_DISCONNECTED == newState) && !shutdown &&
             !gatt.connect())
@@ -281,6 +305,28 @@ public class VectorVarioPort
         }
       }
 
+      /* Handle TAS (True Airspeed) from Vector Vario characteristic */
+      if ((tasCharacteristic != null) &&
+          (tasCharacteristic.getUuid().equals(characteristic.getUuid()))) {
+        /* Value is signed 32-bit int in dm/s, convert to m/s */
+        int tasDmps = characteristic.getIntValue(
+            BluetoothGattCharacteristic.FORMAT_SINT32, 0);
+        lastTasMps = tasDmps / 10.0f;
+        hasTas = true;
+        reportAirspeeds();
+      }
+
+      /* Handle IAS (Indicated Airspeed) from Vector Vario characteristic */
+      if ((iasCharacteristic != null) &&
+          (iasCharacteristic.getUuid().equals(characteristic.getUuid()))) {
+        /* Value is signed 32-bit int in dm/s, convert to m/s */
+        int iasDmps = characteristic.getIntValue(
+            BluetoothGattCharacteristic.FORMAT_SINT32, 0);
+        lastIasMps = iasDmps / 10.0f;
+        hasIas = true;
+        reportAirspeeds();
+      }
+
       /* Handle Wind Speed from Environmental Sensing service */
       if ((windSpeedCharacteristic != null) &&
           (windSpeedCharacteristic.getUuid().equals(characteristic.getUuid()))) {
@@ -310,6 +356,21 @@ public class VectorVarioPort
       float speedMps = lastWindSpeedCmps / 100.0f;
       float dirDeg = lastWindDirCentideg / 100.0f;
       sensorListener.onExternalWind(speedMps, dirDeg);
+    }
+  }
+
+  private void reportAirspeeds() {
+    if (sensorListener != null) {
+      if (hasTas && hasIas) {
+        /* Both available - send together */
+        sensorListener.onBothAirspeeds(lastIasMps, lastTasMps);
+      } else if (hasTas) {
+        /* Only TAS - send just TAS (IAS will be calculated) */
+        sensorListener.onTrueAirspeed(lastTasMps);
+      } else if (hasIas) {
+        /* Only IAS - send just IAS (TAS will be calculated) */
+        sensorListener.onIndicatedAirspeed(lastIasMps);
+      }
     }
   }
 

@@ -67,6 +67,10 @@ public interface BluetoothUuids {
     UUID.fromString("2fce4890-0197-47e0-a825-d4777b9a5d67");
   UUID VECTOR_VARIO_VARIO_CHARACTERISTIC =
     UUID.fromString("2fce4891-0197-47e0-a825-d4777b9a5d67");
+  UUID VECTOR_VARIO_TAS_CHARACTERISTIC =
+    UUID.fromString("2fce4892-0197-47e0-a825-d4777b9a5d67");
+  UUID VECTOR_VARIO_IAS_CHARACTERISTIC =
+    UUID.fromString("2fce4893-0197-47e0-a825-d4777b9a5d67");
 
   /* Environmental Sensing (Wind) - Bluetooth SIG standard */
   UUID ENVIRONMENTAL_SENSING_SERVICE =

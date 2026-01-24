@@ -526,4 +526,37 @@ DeviceDescriptor::OnExternalWind(float speed_mps,
   e.Commit();
 }
 
+void
+DeviceDescriptor::OnTrueAirspeed(float tas_mps) noexcept
+{
+  const auto e = BeginEdit();
+  NMEAInfo &basic = *e;
+  basic.UpdateClock();
+  basic.alive.Update(basic.clock);
+  basic.ProvideTrueAirspeed(tas_mps);
+  e.Commit();
+}
+
+void
+DeviceDescriptor::OnIndicatedAirspeed(float ias_mps) noexcept
+{
+  const auto e = BeginEdit();
+  NMEAInfo &basic = *e;
+  basic.UpdateClock();
+  basic.alive.Update(basic.clock);
+  basic.ProvideIndicatedAirspeed(ias_mps);
+  e.Commit();
+}
+
+void
+DeviceDescriptor::OnBothAirspeeds(float ias_mps, float tas_mps) noexcept
+{
+  const auto e = BeginEdit();
+  NMEAInfo &basic = *e;
+  basic.UpdateClock();
+  basic.alive.Update(basic.clock);
+  basic.ProvideBothAirspeeds(ias_mps, tas_mps);
+  e.Commit();
+}
+
 #endif
