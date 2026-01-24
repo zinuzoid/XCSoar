@@ -47,6 +47,8 @@ public class VectorVarioPort
   private BluetoothGattCharacteristic dataCharacteristic;
   private BluetoothGattCharacteristic deviceNameCharacteristic;
   private BluetoothGattCharacteristic varioCharacteristic;
+  private BluetoothGattCharacteristic windSpeedCharacteristic;
+  private BluetoothGattCharacteristic windDirectionCharacteristic;
   private volatile boolean shutdown = false;
 
   private final HM10WriteBuffer writeBuffer = new HM10WriteBuffer();
@@ -62,6 +64,10 @@ public class VectorVarioPort
   private BluetoothGattCharacteristic currentEnableNotification;
   private final Queue<BluetoothGattCharacteristic> enableNotificationQueue =
     new LinkedList<BluetoothGattCharacteristic>();
+
+  /* Cached wind values (both characteristics report independently) */
+  private int lastWindSpeedCmps = 0;
+  private int lastWindDirCentideg = 0;
 
   public VectorVarioPort(Context context, BluetoothDevice device,
                          SensorListener sensorListener)
@@ -82,6 +88,8 @@ public class VectorVarioPort
     dataCharacteristic = null;
     deviceNameCharacteristic = null;
     varioCharacteristic = null;
+    windSpeedCharacteristic = null;
+    windDirectionCharacteristic = null;
 
     BluetoothGattService service = gatt.getService(BluetoothUuids.HM10_SERVICE);
     if (service != null) {
@@ -98,6 +106,12 @@ public class VectorVarioPort
       varioCharacteristic = service.getCharacteristic(BluetoothUuids.VECTOR_VARIO_VARIO_CHARACTERISTIC);
     }
 
+    service = gatt.getService(BluetoothUuids.ENVIRONMENTAL_SENSING_SERVICE);
+    if (service != null) {
+      windSpeedCharacteristic = service.getCharacteristic(BluetoothUuids.WIND_SPEED_CHARACTERISTIC);
+      windDirectionCharacteristic = service.getCharacteristic(BluetoothUuids.WIND_DIRECTION_CHARACTERISTIC);
+    }
+
     if (dataCharacteristic == null)
       throw new Error("HM10 data characteristic not found");
 
@@ -107,6 +121,10 @@ public class VectorVarioPort
     /* varioCharacteristic is optional - log if missing but don't fail */
     if (varioCharacteristic == null)
       Log.w(TAG, "Vector Vario characteristic not found - vario data unavailable");
+
+    /* wind characteristics are optional - log if missing */
+    if (windSpeedCharacteristic == null || windDirectionCharacteristic == null)
+      Log.w(TAG, "Wind characteristics not found - wind data unavailable");
   }
 
   private boolean doEnableNotification(BluetoothGattCharacteristic c) {
@@ -141,6 +159,14 @@ public class VectorVarioPort
       enableNotification(varioCharacteristic);
     }
 
+    /* Enable notifications for wind characteristics if available */
+    if (windSpeedCharacteristic != null) {
+      enableNotification(windSpeedCharacteristic);
+    }
+    if (windDirectionCharacteristic != null) {
+      enableNotification(windDirectionCharacteristic);
+    }
+
     portState = STATE_READY;
     stateChanged();
   }
@@ -157,6 +183,10 @@ public class VectorVarioPort
         dataCharacteristic = null;
         deviceNameCharacteristic = null;
         varioCharacteristic = null;
+        windSpeedCharacteristic = null;
+        windDirectionCharacteristic = null;
+        lastWindSpeedCmps = 0;
+        lastWindDirCentideg = 0;
 
         if ((BluetoothProfile.STATE_DISCONNECTED == newState) && !shutdown &&
             !gatt.connect())
@@ -250,10 +280,36 @@ public class VectorVarioPort
           sensorListener.onVarioSensor(varioDmPerSec / 10.0f);
         }
       }
+
+      /* Handle Wind Speed from Environmental Sensing service */
+      if ((windSpeedCharacteristic != null) &&
+          (windSpeedCharacteristic.getUuid().equals(characteristic.getUuid()))) {
+        /* Value is uint16 in cm/s */
+        lastWindSpeedCmps = characteristic.getIntValue(
+            BluetoothGattCharacteristic.FORMAT_UINT16, 0);
+        reportWind();
+      }
+
+      /* Handle Wind Direction from Environmental Sensing service */
+      if ((windDirectionCharacteristic != null) &&
+          (windDirectionCharacteristic.getUuid().equals(characteristic.getUuid()))) {
+        /* Value is uint16 in 0.01 degrees */
+        lastWindDirCentideg = characteristic.getIntValue(
+            BluetoothGattCharacteristic.FORMAT_UINT16, 0);
+        reportWind();
+      }
     } catch (NullPointerException e) {
       /* probably caused by a malformed value - ignore */
     } finally {
       safeDestruct.decrement();
+    }
+  }
+
+  private void reportWind() {
+    if (sensorListener != null && lastWindSpeedCmps > 0) {
+      float speedMps = lastWindSpeedCmps / 100.0f;
+      float dirDeg = lastWindDirCentideg / 100.0f;
+      sensorListener.onExternalWind(speedMps, dirDeg);
     }
   }
 
