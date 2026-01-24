@@ -97,4 +97,13 @@ final class NativeSensorListener implements SensorListener {
 
   @Override
   public native void onExternalWind(float speed, float direction);
+
+  @Override
+  public native void onTrueAirspeed(float tas_mps);
+
+  @Override
+  public native void onIndicatedAirspeed(float ias_mps);
+
+  @Override
+  public native void onBothAirspeeds(float ias_mps, float tas_mps);
 }

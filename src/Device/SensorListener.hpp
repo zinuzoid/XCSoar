@@ -84,5 +84,24 @@ public:
    * @param direction_degrees wind origin direction in degrees (0-360)
    */
   virtual void OnExternalWind(float speed_mps, float direction_degrees) noexcept = 0;
+
+  /**
+   * True airspeed from external device.
+   * @param tas_mps true airspeed in m/s
+   */
+  virtual void OnTrueAirspeed(float tas_mps) noexcept = 0;
+
+  /**
+   * Indicated airspeed from external device.
+   * @param ias_mps indicated airspeed in m/s
+   */
+  virtual void OnIndicatedAirspeed(float ias_mps) noexcept = 0;
+
+  /**
+   * Both airspeeds from external device.
+   * @param ias_mps indicated airspeed in m/s
+   * @param tas_mps true airspeed in m/s
+   */
+  virtual void OnBothAirspeeds(float ias_mps, float tas_mps) noexcept = 0;
 #endif // ANDROID
 };
