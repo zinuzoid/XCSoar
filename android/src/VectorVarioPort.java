@@ -52,6 +52,7 @@ public class VectorVarioPort
   private BluetoothGattCharacteristic tasCharacteristic;
   private BluetoothGattCharacteristic iasCharacteristic;
   private BluetoothGattCharacteristic staticPressureCharacteristic;
+  private BluetoothGattCharacteristic airTemperatureCharacteristic;
   private volatile boolean shutdown = false;
 
   private final HM10WriteBuffer writeBuffer = new HM10WriteBuffer();
@@ -122,6 +123,7 @@ public class VectorVarioPort
       windSpeedCharacteristic = service.getCharacteristic(BluetoothUuids.WIND_SPEED_CHARACTERISTIC);
       windDirectionCharacteristic = service.getCharacteristic(BluetoothUuids.WIND_DIRECTION_CHARACTERISTIC);
       staticPressureCharacteristic = service.getCharacteristic(BluetoothUuids.STATIC_PRESSURE_CHARACTERISTIC);
+      airTemperatureCharacteristic = service.getCharacteristic(BluetoothUuids.AIR_TEMPERATURE_CHARACTERISTIC);
     }
 
     if (dataCharacteristic == null)
@@ -192,6 +194,11 @@ public class VectorVarioPort
       enableNotification(staticPressureCharacteristic);
     }
 
+    /* Enable notifications for air temperature if available */
+    if (airTemperatureCharacteristic != null) {
+      enableNotification(airTemperatureCharacteristic);
+    }
+
     portState = STATE_READY;
     stateChanged();
   }
@@ -213,6 +220,7 @@ public class VectorVarioPort
         tasCharacteristic = null;
         iasCharacteristic = null;
         staticPressureCharacteristic = null;
+        airTemperatureCharacteristic = null;
         lastWindSpeedCmps = 0;
         lastWindDirCentideg = 0;
         lastTasMps = 0;
@@ -362,6 +370,18 @@ public class VectorVarioPort
               BluetoothGattCharacteristic.FORMAT_UINT32, 0) & 0xFFFFFFFFL;
           float pressureHpa = pressureTenthPa / 1000.0f;
           sensorListener.onBarometricPressureSensor(pressureHpa, 0.5f);
+        }
+      }
+
+      /* Handle Air Temperature from Environmental Sensing service */
+      if ((airTemperatureCharacteristic != null) &&
+          (airTemperatureCharacteristic.getUuid().equals(characteristic.getUuid()))) {
+        if (sensorListener != null) {
+          /* Value is int16 in 0.01 deg C, convert to Kelvin */
+          int tempHundredthsCelsius = characteristic.getIntValue(
+              BluetoothGattCharacteristic.FORMAT_SINT16, 0);
+          double tempKelvin = (tempHundredthsCelsius / 100.0) + 273.15;
+          sensorListener.onTemperature(tempKelvin);
         }
       }
     } catch (NullPointerException e) {
