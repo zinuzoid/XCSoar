@@ -94,4 +94,7 @@ final class NativeSensorListener implements SensorListener {
 
   @Override
   public native void onSensorError(String msg);
+
+  @Override
+  public native void onExternalWind(float speed, float direction);
 }

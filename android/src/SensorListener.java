@@ -76,4 +76,11 @@ public interface SensorListener {
    * @param msg a human-readable error message
    */
   void onSensorError(String msg);
+
+  /**
+   * External wind data from device.
+   * @param speed wind speed in m/s
+   * @param direction wind origin direction in degrees (0-360)
+   */
+  void onExternalWind(float speed, float direction);
 }

@@ -77,5 +77,12 @@ public:
 
   virtual void OnSensorStateChanged() noexcept = 0;
   virtual void OnSensorError(const char *msg) noexcept = 0;
+
+  /**
+   * External wind data from device.
+   * @param speed_mps wind speed in m/s
+   * @param direction_degrees wind origin direction in degrees (0-360)
+   */
+  virtual void OnExternalWind(float speed_mps, float direction_degrees) noexcept = 0;
 #endif // ANDROID
 };

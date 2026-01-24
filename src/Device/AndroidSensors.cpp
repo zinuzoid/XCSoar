@@ -5,6 +5,7 @@
 #include "DataEditor.hpp"
 #include "NMEA/Info.hpp"
 #include "Geo/Geoid.hpp"
+#include "Geo/SpeedVector.hpp"
 #include "time/FloatDuration.hxx"
 
 using namespace std::chrono;
@@ -508,6 +509,21 @@ void
 DeviceDescriptor::OnSensorError(const char *msg) noexcept
 {
   PortError(msg);
+}
+
+void
+DeviceDescriptor::OnExternalWind(float speed_mps,
+                                 float direction_degrees) noexcept
+{
+  const auto e = BeginEdit();
+  NMEAInfo &basic = *e;
+  basic.UpdateClock();
+  basic.alive.Update(basic.clock);
+
+  SpeedVector wind{Angle::Degrees(direction_degrees), speed_mps};
+  basic.ProvideExternalWind(wind);
+
+  e.Commit();
 }
 
 #endif
