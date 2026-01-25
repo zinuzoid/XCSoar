@@ -132,6 +132,12 @@ OpenGL::SetupContext()
 #endif
 
 #ifdef HAVE_DYNAMIC_MULTI_DRAW_ARRAYS
+#ifdef ANDROID
+  // Disable glMultiDrawElements on Android - crashes on PowerVR & MediaTek
+  // drivers when using client-side index arrays (not bound to GL_ELEMENT_ARRAY_BUFFER)
+  GLExt::multi_draw_arrays = nullptr;
+  GLExt::multi_draw_elements = nullptr;
+#else
   if (IsExtensionSupported("GL_EXT_multi_draw_arrays")) {
     GLExt::multi_draw_arrays = (PFNGLMULTIDRAWARRAYSEXTPROC)
       GetProcAddress("glMultiDrawArraysEXT");
@@ -141,6 +147,7 @@ OpenGL::SetupContext()
     GLExt::multi_draw_arrays = nullptr;
     GLExt::multi_draw_elements = nullptr;
   }
+#endif
 #endif
 
 #ifdef GL_EXT_discard_framebuffer
