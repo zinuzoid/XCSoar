@@ -54,6 +54,7 @@ public class VectorVarioPort
   private BluetoothGattCharacteristic staticPressureCharacteristic;
   private BluetoothGattCharacteristic airTemperatureCharacteristic;
   private BluetoothGattCharacteristic batteryLevelCharacteristic;
+  private BluetoothGattCharacteristic headingCharacteristic;
   private volatile boolean shutdown = false;
 
   private final HM10WriteBuffer writeBuffer = new HM10WriteBuffer();
@@ -117,6 +118,7 @@ public class VectorVarioPort
       varioCharacteristic = service.getCharacteristic(BluetoothUuids.VECTOR_VARIO_VARIO_CHARACTERISTIC);
       tasCharacteristic = service.getCharacteristic(BluetoothUuids.VECTOR_VARIO_TAS_CHARACTERISTIC);
       iasCharacteristic = service.getCharacteristic(BluetoothUuids.VECTOR_VARIO_IAS_CHARACTERISTIC);
+      headingCharacteristic = service.getCharacteristic(BluetoothUuids.VECTOR_VARIO_HEADING_CHARACTERISTIC);
     }
 
     service = gatt.getService(BluetoothUuids.ENVIRONMENTAL_SENSING_SERVICE);
@@ -187,6 +189,11 @@ public class VectorVarioPort
       enableNotification(iasCharacteristic);
     }
 
+    /* Enable notifications for heading characteristic if available */
+    if (headingCharacteristic != null) {
+      enableNotification(headingCharacteristic);
+    }
+
     /* Enable notifications for wind characteristics if available */
     if (windSpeedCharacteristic != null) {
       enableNotification(windSpeedCharacteristic);
@@ -233,6 +240,7 @@ public class VectorVarioPort
         staticPressureCharacteristic = null;
         airTemperatureCharacteristic = null;
         batteryLevelCharacteristic = null;
+        headingCharacteristic = null;
         lastWindSpeedCmps = 0;
         lastWindDirCentideg = 0;
         lastTasMps = 0;
@@ -405,6 +413,17 @@ public class VectorVarioPort
           int batteryPercent = characteristic.getIntValue(
               BluetoothGattCharacteristic.FORMAT_UINT8, 0);
           sensorListener.onBatteryPercent((double) batteryPercent);
+        }
+      }
+
+      /* Handle Heading from Vector Vario characteristic */
+      if ((headingCharacteristic != null) &&
+          (headingCharacteristic.getUuid().equals(characteristic.getUuid()))) {
+        if (sensorListener != null) {
+          /* Value is int16 in degrees (0-359) */
+          int headingDeg = characteristic.getIntValue(
+              BluetoothGattCharacteristic.FORMAT_SINT16, 0);
+          sensorListener.onHeading((float) headingDeg);
         }
       }
     } catch (NullPointerException e) {
