@@ -649,6 +649,7 @@ private:
   void OnTrueAirspeed(float tas_mps) noexcept override;
   void OnIndicatedAirspeed(float ias_mps) noexcept override;
   void OnBothAirspeeds(float ias_mps, float tas_mps) noexcept override;
+  void OnHeading(float heading_degrees) noexcept override;
 #endif // ANDROID
 #endif // HAVE_INTERNAL_GPS
 };
