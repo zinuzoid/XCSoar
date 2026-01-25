@@ -102,4 +102,10 @@ public interface SensorListener {
    * @param tas_mps true airspeed in m/s
    */
   void onBothAirspeeds(float ias_mps, float tas_mps);
+
+  /**
+   * Heading from external device.
+   * @param heading_degrees heading in degrees relative to true north (0-359)
+   */
+  void onHeading(float heading_degrees);
 }

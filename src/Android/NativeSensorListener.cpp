@@ -399,3 +399,17 @@ Java_org_xcsoar_NativeSensorListener_onBothAirspeeds(JNIEnv *env,
   auto &listener = *(SensorListener *)ptr;
   listener.OnBothAirspeeds(ias_mps, tas_mps);
 }
+
+gcc_visibility_default
+JNIEXPORT void JNICALL
+Java_org_xcsoar_NativeSensorListener_onHeading(JNIEnv *env,
+                                                jobject obj,
+                                                jfloat heading_degrees)
+{
+  jlong ptr = env->GetLongField(obj, NativeSensorListener::ptr_field);
+  if (ptr == 0)
+    return;
+
+  auto &listener = *(SensorListener *)ptr;
+  listener.OnHeading(heading_degrees);
+}

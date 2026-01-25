@@ -559,4 +559,16 @@ DeviceDescriptor::OnBothAirspeeds(float ias_mps, float tas_mps) noexcept
   e.Commit();
 }
 
+void
+DeviceDescriptor::OnHeading(float heading_degrees) noexcept
+{
+  const auto e = BeginEdit();
+  NMEAInfo &basic = *e;
+  basic.UpdateClock();
+  basic.alive.Update(basic.clock);
+  basic.attitude.heading = Angle::Degrees(heading_degrees);
+  basic.attitude.heading_available.Update(basic.clock);
+  e.Commit();
+}
+
 #endif
