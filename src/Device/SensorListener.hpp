@@ -103,5 +103,11 @@ public:
    * @param tas_mps true airspeed in m/s
    */
   virtual void OnBothAirspeeds(float ias_mps, float tas_mps) noexcept = 0;
+
+  /**
+   * Heading from external device.
+   * @param heading_degrees heading in degrees relative to true north (0-359)
+   */
+  virtual void OnHeading(float heading_degrees) noexcept = 0;
 #endif // ANDROID
 };

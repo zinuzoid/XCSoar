@@ -106,4 +106,7 @@ final class NativeSensorListener implements SensorListener {
 
   @Override
   public native void onBothAirspeeds(float ias_mps, float tas_mps);
+
+  @Override
+  public native void onHeading(float heading_degrees);
 }
