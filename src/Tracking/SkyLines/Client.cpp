@@ -263,6 +263,11 @@ SkyLinesTracking::Client::OnDatagramReceived(void *data, size_t length)
 void
 SkyLinesTracking::Client::OnSocketReady(unsigned) noexcept
 {
+  const std::lock_guard lock{mutex};
+
+  if (!socket_event.IsDefined())
+    return;
+
   std::byte buffer[4096];
   ssize_t nbytes;
   StaticSocketAddress source_address;
