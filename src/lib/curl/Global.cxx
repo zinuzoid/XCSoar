@@ -3,6 +3,7 @@
 
 #include "Global.hxx"
 #include "Request.hxx"
+#include "event/DeferEvent.hxx"
 #include "event/Loop.hxx"
 #include "event/SocketEvent.hxx"
 #include "util/Compiler.h"
@@ -17,10 +18,23 @@ class CurlSocket final {
 
 	SocketEvent socket_event;
 
+	/**
+	 * Defer destruction to avoid deleting this object while
+	 * curl's internal cleanup is still running.
+	 */
+	DeferEvent defer_destroy;
+
+	/**
+	 * Set to true when ScheduleDestroy() has been called.
+	 * Prevents further socket callbacks from being processed.
+	 */
+	bool pending_destroy = false;
+
 public:
 	CurlSocket(CurlGlobal &_global, EventLoop &_loop, SocketDescriptor _fd)
 		:global(_global),
-		 socket_event(_loop, BIND_THIS_METHOD(OnSocketReady), _fd) {}
+		 socket_event(_loop, BIND_THIS_METHOD(OnSocketReady), _fd),
+		 defer_destroy(_loop, BIND_THIS_METHOD(DeferredDestroy)) {}
 
 	~CurlSocket() noexcept {
 		/* TODO: sometimes, CURL uses CURL_POLL_REMOVE after
@@ -52,6 +66,21 @@ private:
 	}
 
 	void OnSocketReady(unsigned events) noexcept;
+
+	/**
+	 * Schedule deferred destruction of this socket.
+	 * This prevents deleting the object while curl's internal
+	 * cleanup is still in progress.
+	 */
+	void ScheduleDestroy() noexcept {
+		pending_destroy = true;
+		socket_event.Cancel();
+		defer_destroy.Schedule();
+	}
+
+	void DeferredDestroy() noexcept {
+		delete this;
+	}
 
 	static constexpr int FlagsToCurlCSelect(unsigned flags) noexcept {
 		return (flags & (SocketEvent::READ | SocketEvent::HANGUP) ? CURL_CSELECT_IN : 0) |
@@ -102,7 +131,7 @@ CurlSocket::SocketFunction([[maybe_unused]] CURL *easy,
 	assert(global.GetEventLoop().IsInside());
 
 	if (action == CURL_POLL_REMOVE) {
-		delete cs;
+		cs->ScheduleDestroy();
 		return 0;
 	}
 
@@ -121,6 +150,10 @@ CurlSocket::SocketFunction([[maybe_unused]] CURL *easy,
 void
 CurlSocket::OnSocketReady(unsigned flags) noexcept
 {
+	if (pending_destroy)
+		/* already scheduled for destruction, ignore events */
+		return;
+
 	assert(GetEventLoop().IsInside());
 
 	global.SocketAction(GetSocket().Get(), FlagsToCurlCSelect(flags));
