@@ -30,9 +30,16 @@ class Client final : Cares::SimpleHandler {
   Handler *const handler;
 
   /**
-   * Protects #resolving, #resolver, #socket.
+   * Protects #resolving, #resolver, #socket, #pending_close.
    */
   mutable Mutex mutex;
+
+  /**
+   * Set to true when closing to prevent callbacks from racing with
+   * destruction.  This fixes a use-after-free where socket events
+   * could be processed after InternalClose() started cleanup.
+   */
+  bool pending_close = false;
 
   uint64_t key = 0;
 

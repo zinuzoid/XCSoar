@@ -24,6 +24,7 @@ SkyLinesTracking::Client::Open(Cares::Channel &cares, const char *server)
 {
   BlockingCall(GetEventLoop(), [this, &cares, server](){
     InternalClose();
+    pending_close = false;  // Reset after close, before new open
 
     Cares::SimpleHandler &resolver_handler = *this;
     resolver.emplace(resolver_handler, GetDefaultPort());
@@ -37,6 +38,12 @@ SkyLinesTracking::Client::Open(SocketAddress _address)
   assert(_address.IsDefined());
 
   Close();
+
+  // Reset flag since we're opening fresh
+  {
+    const std::lock_guard lock{mutex};
+    pending_close = false;
+  }
 
   address = _address;
 
@@ -62,6 +69,7 @@ void
 SkyLinesTracking::Client::InternalClose() noexcept
 {
   const std::lock_guard lock{mutex};
+  pending_close = true;  // Mark as closing to prevent racing callbacks
   socket_event.Close();
   resolver.reset();
 }
@@ -263,6 +271,11 @@ SkyLinesTracking::Client::OnDatagramReceived(void *data, size_t length)
 void
 SkyLinesTracking::Client::OnSocketReady(unsigned) noexcept
 {
+  const std::lock_guard lock{mutex};
+
+  if (pending_close || !socket_event.IsDefined())
+    return;
+
   std::byte buffer[4096];
   ssize_t nbytes;
   StaticSocketAddress source_address;
@@ -279,6 +292,8 @@ SkyLinesTracking::Client::OnResolverSuccess(std::forward_list<AllocatedSocketAdd
 {
   {
     const std::lock_guard lock{mutex};
+    if (pending_close)  // Check if we're shutting down
+      return;
     resolver.reset();
   }
 
@@ -296,6 +311,8 @@ SkyLinesTracking::Client::OnResolverError(std::exception_ptr error) noexcept
 {
   {
     const std::lock_guard lock{mutex};
+    if (pending_close)  // Check if we're shutting down
+      return;
     resolver.reset();
   }
 
