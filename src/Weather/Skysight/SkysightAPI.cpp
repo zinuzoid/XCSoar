@@ -192,8 +192,7 @@ SkysightAPI::FromUnixTime(uint64_t t)
 #endif
 }
 
-SkysightAPI::SkysightAPI(tstring email, tstring password, tstring _region,
-			 SkysightCallback cb)
+SkysightAPI::SkysightAPI(tstring _region)
        :
   cache_path(MakeLocalPath(_T("skysight")))
 {
@@ -208,7 +207,12 @@ SkysightAPI::SkysightAPI(tstring email, tstring password, tstring _region,
 
   inited_layers = false;
   inited_lastupdates = false;
+}
 
+void
+SkysightAPI::FetchInitialData(tstring email, tstring password,
+			      SkysightCallback cb)
+{
   if (email.empty() || password.empty())
     return;
 
