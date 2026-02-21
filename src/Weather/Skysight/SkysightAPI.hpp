@@ -54,9 +54,10 @@ public:
   std::map<tstring, tstring> regions;
   std::vector<SkysightMetric> metrics;
 
-  SkysightAPI(tstring email, tstring password, tstring _region,
-	      SkysightCallback cb);
+  SkysightAPI(tstring _region);
   ~SkysightAPI();
+
+  void FetchInitialData(tstring email, tstring password, SkysightCallback cb);
   
   bool IsInited();
   SkysightMetric GetMetric(int index);

@@ -326,7 +326,8 @@ Skysight::Init()
   email = settings.email.c_str();
   password = settings.password.c_str();
 
-  api = new SkysightAPI(email, password, region, APIInited);
+  api = new SkysightAPI(region);
+  api->FetchInitialData(email, password, APIInited);
   CleanupFiles();
 }
 
@@ -334,7 +335,7 @@ void
 Skysight::APIInited(__attribute__((unused)) const tstring details, __attribute__((unused)) const bool success,
             __attribute__((unused)) const tstring layer_id, __attribute__((unused)) const uint64_t time_index)
 {
-  if (!self)
+  if (!self || !self->api)
     return;
 
   if (self->api->metrics.size()) {
