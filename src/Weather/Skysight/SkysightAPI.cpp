@@ -361,16 +361,21 @@ SkysightAPI::ParseLayers(const SkysightRequestArgs &args,
       if (colours != legend->second.not_found()) {
         success = true;
         for (auto &j: colours->second) {
-          auto c = j.second.get_child("color").begin();
-          m.legend.insert(
-	    std::pair<float, LegendColor>(
-	      std::stof(j.second.find("value")->second.data()),
-	      {
-		static_cast<unsigned char>(std::stoi(c->second.data())),
-		  static_cast<unsigned char>(std::stoi(std::next(c, 1)->second.data())),
-		  static_cast<unsigned char>(std::stoi(std::next(c, 2)->second.data()))
-		  }
-	      ));
+          try {
+            auto c = j.second.get_child("color").begin();
+            m.legend.insert(
+	      std::pair<float, LegendColor>(
+	        std::stof(j.second.find("value")->second.data()),
+	        {
+		  static_cast<unsigned char>(std::stoi(c->second.data())),
+		    static_cast<unsigned char>(std::stoi(std::next(c, 1)->second.data())),
+		    static_cast<unsigned char>(std::stoi(std::next(c, 2)->second.data()))
+		    }
+	        ));
+          } catch (const std::exception &e) {
+            LogFormat("Skysight: failed to parse legend entry: %s", e.what());
+            continue;
+          }
         }
         metrics.push_back(m);
       }
