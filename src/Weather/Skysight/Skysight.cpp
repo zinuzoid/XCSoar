@@ -110,11 +110,17 @@ SkysightImageFile::SkysightImageFile(Path _filename, Path _path) {
   tstring met = rem.substr(0, p);
 
   tstring dt = rem.substr(p+1);
-  unsigned yy = stoi(dt.substr(0, 4));
-  unsigned mm = stoi(dt.substr(4, 2));
-  unsigned dd = stoi(dt.substr(6, 2));
-  unsigned hh = stoi(dt.substr(8, 2));
-  unsigned ii = stoi(dt.substr(10, 2));
+  unsigned yy, mm, dd, hh, ii;
+  try {
+    yy = stoi(dt.substr(0, 4));
+    mm = stoi(dt.substr(4, 2));
+    dd = stoi(dt.substr(6, 2));
+    hh = stoi(dt.substr(8, 2));
+    ii = stoi(dt.substr(10, 2));
+  } catch (const std::exception &e) {
+    LogFormat("Skysight: failed to parse image filename: %s", e.what());
+    return;
+  }
 
   BrokenDateTime d = BrokenDateTime(yy, mm, dd, hh, ii);
   if (!d.IsPlausible())
