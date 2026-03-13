@@ -533,7 +533,13 @@ SkysightAPI::GetData(SkysightCallType t, const TCHAR *const layer,
   sync
   */
   if (!force_recache && CacheAvailable(path, t)) {
-    ParseResponse(path.c_str(), true, ra);
+    try {
+      ParseResponse(path.c_str(), true, ra);
+    } catch (const std::exception &e) {
+      LogFormat("Skysight: ParseResponse error (cached): %s", e.what());
+    } catch (...) {
+      LogFormat("Skysight: ParseResponse unknown error (cached)");
+    }
     return true;
   }
 

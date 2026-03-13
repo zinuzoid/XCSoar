@@ -223,24 +223,32 @@ SkysightAsyncRequest::Tick() noexcept
 
   mutex.unlock();
 
-  tstring resultStr;
+  try {
+    tstring resultStr;
 
-  if (args.to_file) {
-    status = RequestToFile();
-    resultStr = args.path.c_str();
-  } else {
-    status = RequestToBuffer(resultStr);
-  }
+    if (args.to_file) {
+      status = RequestToFile();
+      resultStr = args.path.c_str();
+    } else {
+      status = RequestToBuffer(resultStr);
+    }
 
-  if (status == Status::Complete) {
-    SkysightAPI::ParseResponse(resultStr.c_str(), true, args);
-  } else if(status == Status::EmergencyStop) {
-    LogFormat("Emergency stop response: %s", resultStr.c_str());
-    SkysightAPI::ParseResponse(_T("Received 429 EmergencyStop signal from Skysight."),
-    false, args);
-  } else {
-    SkysightAPI::ParseResponse(_T("Could not fetch data from Skysight server."),
-			       false, args);
+    if (status == Status::Complete) {
+      SkysightAPI::ParseResponse(resultStr.c_str(), true, args);
+    } else if(status == Status::EmergencyStop) {
+      LogFormat("Emergency stop response: %s", resultStr.c_str());
+      SkysightAPI::ParseResponse(_T("Received 429 EmergencyStop signal from Skysight."),
+      false, args);
+    } else {
+      SkysightAPI::ParseResponse(_T("Could not fetch data from Skysight server."),
+                                 false, args);
+    }
+  } catch (const std::exception &e) {
+    LogFormat("SkysightAsyncRequest::Tick error: %s", e.what());
+    status = Status::Error;
+  } catch (...) {
+    LogFormat("SkysightAsyncRequest::Tick unknown error");
+    status = Status::Error;
   }
 
   mutex.lock();
