@@ -122,6 +122,11 @@ TrailRenderer::Draw(Canvas &canvas, const TraceComputer &trace_computer,
 
   const GeoBounds bounds = projection.GetScreenBounds().Scale(4);
 
+#ifdef ENABLE_OPENGL
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
+#endif
+
   PixelPoint last_point(0, 0);
   bool last_valid = false;
   for (const auto &i : trace) {
@@ -137,6 +142,15 @@ TrailRenderer::Draw(Canvas &canvas, const TraceComputer &trace_computer,
     auto pt = projection.GeoToScreen(gp);
 
     if (last_valid) {
+#ifdef ENABLE_OPENGL
+      // compute age-based alpha: 1.0 (current) -> 0.4 (>=10min old)
+      auto age_s = basic.time.ToDuration().count()
+        - std::chrono::duration_cast<FloatDuration>(i.GetTime()).count();
+      float age_frac = std::clamp(static_cast<float>(age_s / 600.0), 0.0f, 1.0f);
+      float alpha = 1.0f - 0.6f * age_frac;
+      glBlendColor(0, 0, 0, alpha);
+#endif
+
       if (settings.type == TrailSettings::Type::ALTITUDE) {
         unsigned index = GetAltitudeColorIndex(i.GetAltitude(),
                                                value_min, value_max);
@@ -175,6 +189,10 @@ TrailRenderer::Draw(Canvas &canvas, const TraceComputer &trace_computer,
     last_point = pt;
     last_valid = true;
   }
+
+#ifdef ENABLE_OPENGL
+  glDisable(GL_BLEND);
+#endif
 
   if (last_valid)
     canvas.DrawLine(last_point, pos);
