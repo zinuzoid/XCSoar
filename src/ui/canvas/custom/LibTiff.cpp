@@ -4,6 +4,7 @@
 #include "LibTiff.hpp"
 #include "UncompressedImage.hpp"
 #include "system/Path.hpp"
+#include "system/FileUtil.hpp"
 #include "util/ScopeExit.hxx"
 
 #include <stdexcept>
@@ -62,6 +63,49 @@ public:
   }
 };
 
+/**
+ * Validate that TIFF strip data fits within the actual file size.
+ * Corrupted or truncated TIFFs can cause libtiff to memcpy past
+ * valid memory in DumpModeDecode, resulting in a segfault.
+ */
+static void
+ValidateTiffStrips(TIFF *tiff, uint64_t file_size)
+{
+  if (TIFFIsTiled(tiff)) {
+    ttile_t num_tiles = TIFFNumberOfTiles(tiff);
+    if (num_tiles == 0)
+      throw std::runtime_error("TIFF file has no tiles");
+
+    uint64_t *offsets = nullptr;
+    uint64_t *byte_counts = nullptr;
+    if (!TIFFGetField(tiff, TIFFTAG_TILEOFFSETS, &offsets) || !offsets ||
+        !TIFFGetField(tiff, TIFFTAG_TILEBYTECOUNTS, &byte_counts) ||
+        !byte_counts)
+      throw std::runtime_error("TIFF file missing tile metadata");
+
+    for (ttile_t i = 0; i < num_tiles; i++) {
+      if (offsets[i] + byte_counts[i] > file_size)
+        throw std::runtime_error("TIFF file is truncated");
+    }
+  } else {
+    tstrip_t num_strips = TIFFNumberOfStrips(tiff);
+    if (num_strips == 0)
+      throw std::runtime_error("TIFF file has no strips");
+
+    uint64_t *offsets = nullptr;
+    uint64_t *byte_counts = nullptr;
+    if (!TIFFGetField(tiff, TIFFTAG_STRIPOFFSETS, &offsets) || !offsets ||
+        !TIFFGetField(tiff, TIFFTAG_STRIPBYTECOUNTS, &byte_counts) ||
+        !byte_counts)
+      throw std::runtime_error("TIFF file missing strip metadata");
+
+    for (tstrip_t i = 0; i < num_strips; i++) {
+      if (offsets[i] + byte_counts[i] > file_size)
+        throw std::runtime_error("TIFF file is truncated");
+    }
+  }
+}
+
 static UncompressedImage
 LoadTiff(TIFFRGBAImage &img)
 {
@@ -79,8 +123,10 @@ LoadTiff(TIFFRGBAImage &img)
 }
 
 static UncompressedImage
-LoadTiff(TiffLoader &tiff)
+LoadTiff(TiffLoader &tiff, uint64_t file_size)
 {
+  ValidateTiffStrips(tiff.Get(), file_size);
+
   TIFFRGBAImage img;
   tiff.RGBAImageBegin(img);
 
@@ -92,8 +138,12 @@ LoadTiff(TiffLoader &tiff)
 UncompressedImage
 LoadTiff(Path path)
 {
+  uint64_t file_size = File::GetSize(path);
+  if (file_size == 0)
+    throw std::runtime_error("TIFF file is empty or inaccessible");
+
   TiffLoader tiff(path);
-  return LoadTiff(tiff);
+  return LoadTiff(tiff, file_size);
 }
 
 #ifdef USE_GEOTIFF
@@ -142,7 +192,11 @@ LoadGeoTiff(Path path)
       throw std::runtime_error("Invalid GeoTIFF bounds");
   }
 
-  return std::make_pair(LoadTiff(tiff), bounds);
+  uint64_t file_size = File::GetSize(path);
+  if (file_size == 0)
+    throw std::runtime_error("GeoTIFF file is empty or inaccessible");
+
+  return std::make_pair(LoadTiff(tiff, file_size), bounds);
 }
 
 #endif
