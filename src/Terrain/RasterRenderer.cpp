@@ -147,11 +147,6 @@ RasterRenderer::ScanMap(const RasterMap &map,
        RasterBuffer interpolation) */
     quantisation_effective = std::max(1, (int)q);
 
-    /* disable slope shading when zoomed in very near (not enough
-       terrain resolution to make a useful slope calculation) */
-    if (quantisation_effective > 25)
-      quantisation_effective = 0;
-
   } else
     /* disable slope shading when zoomed out very far (too tiny) */
     quantisation_effective = 0;
