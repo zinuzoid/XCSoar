@@ -296,25 +296,36 @@ Waypoints::Replace(const WaypointPtr &orig, Waypoint &&replacement) noexcept
 
   replacement.id = orig->id;
 
+  bool out_of_bounds = false;
   if (waypoint_tree.HaveBounds()) {
     replacement.Project(task_projection);
 
     const WaypointTree::Point point(replacement.flat_location.x,
                                     replacement.flat_location.y);
     if (!waypoint_tree.IsWithinBounds(point))
-      ScheduleOptimise();
+      out_of_bounds = true;
   }
 
   WaypointPtr new_ptr(new Waypoint(std::move(replacement)));
   name_tree.Add(new_ptr);
 
+  // Search BEFORE any structural modifications
+  // (ScheduleOptimise flattens the tree and clears bounds)
   auto f = waypoint_tree.FindNearestIf(waypoint_tree.GetPosition(orig), 0,
                                        [&orig](const WaypointPtr &ptr){
                                          return ptr == orig;
                                        });
   assert(f.first != waypoint_tree.end());
 
-  waypoint_tree.Replace(f.first, std::move(new_ptr));
+  if (out_of_bounds) {
+    // New position is outside tree bounds — can't use Replace which
+    // would misplace the leaf. Erase and re-add instead.
+    waypoint_tree.erase(f.first);
+    ScheduleOptimise();
+    waypoint_tree.Add(std::move(new_ptr));
+  } else {
+    waypoint_tree.Replace(f.first, std::move(new_ptr));
+  }
 
   ++serial;
 }
