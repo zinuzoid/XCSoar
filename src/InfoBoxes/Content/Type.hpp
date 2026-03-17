@@ -158,6 +158,7 @@ namespace InfoBoxFactory
     e_Speed_Maximum_Efficiency,
     e_NetworkWidget,
     e_Barogram_with_meter,
+    e_NetworkWidget_2,
 
     e_NUM_TYPES /* Last item */
   };

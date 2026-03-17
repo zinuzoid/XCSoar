@@ -20,73 +20,86 @@ namespace NetworkWidget
 void
 Glue::OnTimer([[maybe_unused]] const NMEAInfo &basic) noexcept
 {
-  if (inject_task) return;
-
   const NetworkWidgetSettings &settings =
       CommonInterface::GetComputerSettings().network_widget;
 
-  if (settings.url.empty() ||
-      !clock.CheckUpdate(std::chrono::seconds(settings.interval)))
-    return;
+  const auto interval = std::chrono::seconds(settings.interval);
 
-  inject_task.Start(CoTick(basic, settings.url),
-                    BIND_THIS_METHOD(OnCompletion));
+  if (!inject_task0 && !settings.urls[0].empty() &&
+      clock[0].CheckUpdate(interval))
+  {
+    inject_task0.Start(CoTick(basic, 0, settings.urls[0]),
+                       BIND_THIS_METHOD(OnCompletion0));
+  }
+
+  if (!inject_task1 && !settings.urls[1].empty() &&
+      clock[1].CheckUpdate(interval))
+  {
+    inject_task1.Start(CoTick(basic, 1, settings.urls[1]),
+                       BIND_THIS_METHOD(OnCompletion1));
+  }
 }
 
 Co::InvokeTask
-Glue::CoTick(const NMEAInfo &basic, StaticString<256> url)
+Glue::CoTick(const NMEAInfo &basic, unsigned index, StaticString<256> url)
 {
   CurlEasy easy{url};
   Curl::Setup(easy);
 
   Curl::CoResponse res = co_await Curl::CoRequest(curl, std::move(easy));
-  // LogFormat("url: %s res.body: %s", url.c_str(), res.body.c_str());
 
   if (res.status != 200)
   {
-    throw FmtRuntimeError("NetworkWidget error status: {} body: {}",
-                          res.status, res.body);
+    throw FmtRuntimeError("NetworkWidget[{}] error status: {} body: {}",
+                          index, res.status, res.body);
   }
 
   std::istringstream istr(res.body);
   std::string line;
   {
-    if (istr.eof()) throw FmtRuntimeError("NetworkWidget zero line body");
+    if (istr.eof()) throw FmtRuntimeError("NetworkWidget[{}] zero line body", index);
 
-    const std::lock_guard lock{data.mutex};
+    const std::lock_guard lock{data[index].mutex};
     std::getline(istr, line);
-    data.line1 = line;
+    data[index].line1 = line;
 
     if (!istr.eof())
     {
       std::getline(istr, line);
-      data.line2 = line;
+      data[index].line2 = line;
     }
     else
     {
-      data.line2 = "";
+      data[index].line2 = "";
     }
 
     if (!istr.eof())
     {
       std::getline(istr, line);
-      data.line3 = line;
+      data[index].line3 = line;
     }
     else
     {
-      data.line3 = "";
+      data[index].line3 = "";
     }
-    data.validity.Update(basic.clock);
+    data[index].validity.Update(basic.clock);
   }
 
-  LogFormat("NetworkWidget::OnCompletion: %s|%s|%s'", data.line1.c_str(),
-            data.line2.c_str(), data.line3.c_str());
+  LogFormat("NetworkWidget[%u]::OnCompletion: %s|%s|%s'", index,
+            data[index].line1.c_str(), data[index].line2.c_str(),
+            data[index].line3.c_str());
 }
 
 void
-Glue::OnCompletion(std::exception_ptr error) noexcept
+Glue::OnCompletion0(std::exception_ptr error) noexcept
 {
-  if (error) LogError(error, "NetworkWidget request failed");
+  if (error) LogError(error, "NetworkWidget[0] request failed");
+}
+
+void
+Glue::OnCompletion1(std::exception_ptr error) noexcept
+{
+  if (error) LogError(error, "NetworkWidget[1] request failed");
 }
 
 } // namespace NetworkWidget

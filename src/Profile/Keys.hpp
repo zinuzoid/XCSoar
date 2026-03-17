@@ -265,6 +265,7 @@ constexpr std::string_view JETProviderRadarAccessToken = "JETProviderRadarAccess
 
 constexpr std::string_view NetworkWidgetInterval = "NetworkWidgetInterval";
 constexpr std::string_view NetworkWidgetUrl = "NetworkWidgetUrl";
+constexpr std::string_view NetworkWidgetUrl2 = "NetworkWidgetUrl2";
 
 constexpr std::string_view PCMetUsername = "PCMetUsername";
 constexpr std::string_view PCMetPassword = "PCMetPassword";
