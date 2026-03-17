@@ -26,7 +26,10 @@ NetworkWidgetConfigPanel::Prepare(ContainerWindow &parent,
 
   RowFormWidget::Prepare(parent, rc);
 
-  AddMultiLine(_("Undocumented experimental feature, use at your own risk!"));
+  AddMultiLine(_("Network Widget InfoBoxes periodically fetch data from URLs and display the response. "
+                  "Each line of the response maps to: line 1 = value, line 2 = subtitle, line 3 = title. "
+                  "Configure up to 2 independent URLs below.\n\n"
+                  "** EXPERIMENTAL: This feature is subject to change. **"));
 
   if (jet_settings.radar.access_token.Contains("JIM") ||
       jet_settings.radar.access_token.Contains("DEV"))
@@ -43,8 +46,11 @@ NetworkWidgetConfigPanel::Prepare(ContainerWindow &parent,
   }
   SetExpertRow(INTERVAL);
 
-  AddText(_("Url"), nullptr, settings.url);
-  SetExpertRow(URL);
+  AddText(_("Url 1"), nullptr, settings.urls[0]);
+  SetExpertRow(URL_0);
+
+  AddText(_("Url 2"), nullptr, settings.urls[1]);
+  SetExpertRow(URL_1);
 }
 
 bool
@@ -58,7 +64,8 @@ NetworkWidgetConfigPanel::Save(bool &_changed) noexcept
   changed |= SaveValue(INTERVAL, ProfileKeys::NetworkWidgetInterval,
                        settings.interval);
 
-  changed |= SaveValue(URL, ProfileKeys::NetworkWidgetUrl, settings.url);
+  changed |= SaveValue(URL_0, ProfileKeys::NetworkWidgetUrl, settings.urls[0]);
+  changed |= SaveValue(URL_1, ProfileKeys::NetworkWidgetUrl2, settings.urls[1]);
 
   _changed |= changed;
 

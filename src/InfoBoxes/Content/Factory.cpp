@@ -1214,10 +1214,10 @@ static constexpr MetaData meta_data[] = {
 
   // e_NetworkWidget
   {
-    N_("Network Widget"),
-    N_("Network Widget"),
-    N_("Network Widget"),
-    IBFHelper<InfoBoxContentNetwork>::Create,
+    N_("Network Widget 1"),
+    N_("NetWidget1"),
+    N_("Network Widget slot 1"),
+    IBFHelperInt<InfoBoxContentNetwork, 0>::Create,
   },
 
     // e_Barogram_with_meter
@@ -1226,6 +1226,14 @@ static constexpr MetaData meta_data[] = {
     N_("Barogram w/meter"),
     N_("Trace of altitude during flight, including hardcoded height in meter"),
     IBFHelper<InfoBoxContentBarogramWithMeter>::Create,
+  },
+
+  // e_NetworkWidget_2
+  {
+    N_("Network Widget 2"),
+    N_("NetWidget2"),
+    N_("Network Widget slot 2"),
+    IBFHelperInt<InfoBoxContentNetwork, 1>::Create,
   },
 
 };

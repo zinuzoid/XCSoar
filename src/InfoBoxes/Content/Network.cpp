@@ -18,7 +18,7 @@ InfoBoxContentNetwork::Update(InfoBoxData &data) noexcept
 {
   if (net_components != nullptr && net_components->tracking != nullptr)
   {
-    NetworkWidget::Data &widget_data = net_components->networkWidget->data;
+    NetworkWidget::Data &widget_data = net_components->networkWidget->data[index];
     const NMEAInfo &basic = CommonInterface::Basic();
 
     std::lock_guard lock(widget_data.mutex);

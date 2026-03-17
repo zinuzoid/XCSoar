@@ -4,6 +4,7 @@
 #pragma once
 
 #include "NMEA/Validity.hpp"
+#include "Settings.hpp"
 #include "co/InjectTask.hxx"
 #include "event/DeferEvent.hxx"
 #include "lib/curl/Global.hxx"
@@ -33,21 +34,25 @@ class Glue
 public:
   explicit Glue(CurlGlobal &_curl) noexcept
       : curl(_curl),
-        inject_task(curl.GetEventLoop()){};
+        inject_task0(curl.GetEventLoop()),
+        inject_task1(curl.GetEventLoop()){};
   ~Glue() noexcept = default;
 
   void OnTimer(const NMEAInfo &basic) noexcept;
 
-  Data data;
+  Data data[NetworkWidgetSettings::NETWORK_WIDGET_SLOTS];
 
 private:
   CurlGlobal &curl;
-  PeriodClock clock;
+  PeriodClock clock[NetworkWidgetSettings::NETWORK_WIDGET_SLOTS];
   mutable Mutex mutex;
-  Co::InjectTask inject_task;
+  Co::InjectTask inject_task0;
+  Co::InjectTask inject_task1;
 
-  Co::InvokeTask CoTick(const NMEAInfo &basic, StaticString<256> url);
-  void OnCompletion(std::exception_ptr error) noexcept;
+  Co::InvokeTask CoTick(const NMEAInfo &basic, unsigned index,
+                        StaticString<256> url);
+  void OnCompletion0(std::exception_ptr error) noexcept;
+  void OnCompletion1(std::exception_ptr error) noexcept;
 };
 
 } // namespace NetworkWidget

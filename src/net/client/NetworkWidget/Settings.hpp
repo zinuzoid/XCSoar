@@ -9,13 +9,15 @@
 
 struct NetworkWidgetSettings
 {
+  static constexpr unsigned NETWORK_WIDGET_SLOTS = 2;
 
   std::chrono::duration<unsigned> interval;
-  StaticString<256> url;
+  StaticString<256> urls[NETWORK_WIDGET_SLOTS];
 
   void SetDefaults()
   {
     interval = std::chrono::seconds(60);
-    url.clear();
+    for (auto &u : urls)
+      u.clear();
   }
 };
