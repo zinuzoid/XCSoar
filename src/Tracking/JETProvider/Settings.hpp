@@ -39,12 +39,22 @@ struct JETProviderSettings {
       interval = std::chrono::seconds(5);
       access_token.clear();
     }
+
+    bool operator!=(const Radar &other) const {
+      return enabled != other.enabled ||
+             interval != other.interval ||
+             access_token != other.access_token;
+    }
   };
 
   Radar radar;
 
   void SetDefaults() {
     radar.SetDefaults();
+  }
+
+  bool operator!=(const JETProviderSettings &other) const {
+    return radar != other.radar;
   }
 };
 

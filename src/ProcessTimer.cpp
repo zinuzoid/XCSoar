@@ -279,6 +279,7 @@ ProcessTimer() noexcept
 #ifdef HAVE_TRACKING
     if (net_components->tracking) {
       net_components->tracking->SetSettings(CommonInterface::GetComputerSettings().tracking);
+      net_components->tracking->SetJETSettings(CommonInterface::GetComputerSettings().jet_provider_setting);
       net_components->tracking->OnTimer(CommonInterface::Basic(), CommonInterface::Calculated());
     }
 #endif

@@ -24,6 +24,15 @@ TrackingGlue::SetSettings(const TrackingSettings &_settings)
 }
 
 void
+TrackingGlue::SetJETSettings(const JETProviderSettings &_settings)
+{
+  if (jet_provider_settings != _settings) {
+    jet_provider_settings = _settings;
+    OnJETProviderReset();
+  }
+}
+
+void
 TrackingGlue::OnTimer(const MoreData &basic, const DerivedInfo &calculated)
 {
   try {

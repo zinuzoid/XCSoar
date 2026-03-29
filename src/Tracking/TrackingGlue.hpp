@@ -12,6 +12,7 @@
 #include "Tracking/SkyLines/Data.hpp"
 #include "Tracking/LiveTrack24/Glue.hpp"
 #include "Tracking/JETProvider/JETProvider.hpp"
+#include "Tracking/JETProvider/Settings.hpp"
 #include "thread/StandbyThread.hpp"
 #include "time/PeriodClock.hpp"
 #include "Geo/GeoPoint.hpp"
@@ -35,6 +36,7 @@ class TrackingGlue final
   JETProvider::Glue jet_provider;
   
   JETProvider::Data jet_provider_data;
+  JETProviderSettings jet_provider_settings;
 
   /**
    * The Unix UTC time stamp that was last submitted to the tracking
@@ -53,6 +55,7 @@ public:
   TrackingGlue(EventLoop &event_loop, CurlGlobal &curl) noexcept;
 
   void SetSettings(const TrackingSettings &_settings);
+  void SetJETSettings(const JETProviderSettings &_settings);
 
   void OnTimer(const MoreData &basic, const DerivedInfo &calculated);
 
