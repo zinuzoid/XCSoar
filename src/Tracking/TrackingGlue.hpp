@@ -36,6 +36,11 @@ class TrackingGlue final
   JETProvider::Glue jet_provider;
   
   JETProvider::Data jet_provider_data;
+
+  /**
+   * Stored copy of the settings used to detect changes
+   * and reset the JETProvider data accordingly.
+   */
   JETProviderSettings jet_provider_settings;
 
   /**
