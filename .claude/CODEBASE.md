@@ -2,7 +2,7 @@
 
 > A tactical glide computer for paragliding and soaring pilots - JET fork with paragliding-specific features
 
-**Version:** 7.43_JET_1.36
+**Version:** See `VERSION.txt`
 **License:** GPL-2.0-or-later
 **Language:** C++ (primary), Java (Android), Python, Lua
 
