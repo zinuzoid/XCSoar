@@ -15,6 +15,7 @@
 #include "Form/DataField/Listener.hpp"
 #include "DataGlobals.hpp"
 #include "Weather/Skysight/Skysight.hpp"
+#include "LogFile.hpp"
 
 enum ControlIndex {
 #ifdef HAVE_PCMET
@@ -143,7 +144,13 @@ WeatherConfigPanel::Save(bool &_changed) noexcept
 
   changed |= SaveValue(SKYSIGHT_REGION, ProfileKeys::SkysightRegion,
                     settings.skysight.region);        
-  DataGlobals::GetSkysight()->Init();         
+  try {
+    DataGlobals::GetSkysight()->Init();
+  } catch (const std::exception &e) {
+    LogFormat("Skysight Init error: %s", e.what());
+  } catch (...) {
+    LogFormat("Skysight Init unknown error");
+  }
 #endif
 
   _changed |= changed;
