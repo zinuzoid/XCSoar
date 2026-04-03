@@ -144,8 +144,9 @@ RasterRenderer::ScanMap(const RasterMap &map,
     auto q = map_pixel_size / pixel_size;
 
     /* round down to reduce slope shading artefacts (caused by
-       RasterBuffer interpolation) */
-    quantisation_effective = std::max(1, (int)q);
+       RasterBuffer interpolation); cap at 128 to bound the slope
+       arithmetic and prevent integer overflow at extreme zoom levels */
+    quantisation_effective = std::clamp((int)q, 1, 128);
 
   } else
     /* disable slope shading when zoomed out very far (too tiny) */
@@ -280,9 +281,9 @@ RasterRenderer::GenerateSlopeImage(unsigned height_scale,
 
   const unsigned height_slope_factor =
     std::clamp((unsigned)pixel_size, 1u,
-               /* this upper limit avoids integer overflows in the
-                  "mag" formula; it effectively limits "dd2" so
-                  calculating its square will not overflow */
+               /* this upper limit keeps "dd2" reasonable for
+                  visual quality; square_mag uses 64-bit arithmetic
+                  so overflow is no longer a concern here */
                8192u / (quantisation_effective * quantisation_effective));
   
   const auto *src = height_matrix.GetData();
@@ -369,14 +370,11 @@ RasterRenderer::GenerateSlopeImage(unsigned height_scale,
         const int dd0 = p22 * int(p31);
         const int dd1 = int(p20) * p32;
         const unsigned dd2 = p20 * p31 * height_slope_factor;
-        const int num = (int(dd2) * sz + dd0 * sx + dd1 * sy);
-        const unsigned square_mag = dd0 * dd0 + dd1 * dd1 + dd2 * dd2;
-        const unsigned mag = (unsigned)sqrt(square_mag);
-        /* this is a workaround for a SIGFPE (division by zero)
-           observed by our users on some Android devices (e.g. Nexus
-           7), even though we did our best to make sure that the
-           integer arithmetics above can't overflow */
-        /* TODO: debug this problem and replace this workaround */
+        const int num = (int)((int64_t)dd2 * sz + (int64_t)dd0 * sx + (int64_t)dd1 * sy);
+        const auto square_mag = (int64_t)dd0 * dd0 + (int64_t)dd1 * dd1 + (int64_t)dd2 * dd2;
+        const unsigned mag = (unsigned)sqrt((double)square_mag);
+        /* mag|1 avoids division by zero; square_mag is zero only
+           when all surrounding heights are identical (flat terrain) */
         const int sval = num / int(mag|1);
         const int sindex = (sval - sz) * contrast / 128;
         *p++ = oColorBuf[int(h) + 256 * std::clamp(sindex, -63, 63)];
