@@ -435,7 +435,7 @@ Skysight::FromUnixTime(uint64_t t)
 void
 Skysight::Render(bool force_update)
 {
-  if (displayed_metric.metric) {
+  if (displayed_metric.metric && !displayed_metric.metric->id.empty()) {
     //set by dl callback
     if (update_flag) {
       //TODO: use const char in metric rather than string/cstr

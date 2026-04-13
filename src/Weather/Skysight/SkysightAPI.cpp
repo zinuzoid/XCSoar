@@ -611,6 +611,9 @@ SkysightAPI::GetImageAt(const TCHAR *const layer, BrokenDateTime fctime,
 			BrokenDateTime maxtime,
 			SkysightCallback cb)
 {
+  if (layer == nullptr || *layer == '\0')
+    return false;
+
   // round time to nearest 30-min forecast slot
   if ((fctime.minute >= 15) && (fctime.minute < 45)) fctime.minute = 30;
   else if (fctime.minute >= 45) {
