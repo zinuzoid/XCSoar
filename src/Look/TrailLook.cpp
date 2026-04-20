@@ -69,6 +69,7 @@ GetPortableColor(TrailSettings::Type type, short ramp_h)
   case TrailSettings::Type::VARIO_2:
   case TrailSettings::Type::VARIO_2_DOTS:
   case TrailSettings::Type::VARIO_DOTS_AND_LINES:
+  case TrailSettings::Type::VARIO_3_DOTS:
     return GetVario2Color(ramp_h);
   case TrailSettings::Type::VARIO_EINK:
     return GetVarioEinkColor(ramp_h);
