@@ -93,6 +93,7 @@ static constexpr StaticEnumChoice trail_type_list[] = {
        "Orange to red = climb. Light blue to dark blue = sink. "
        "Zero lift is presented as a yellow line.") },
   { TrailSettings::Type::VARIO_EINK, N_("Vario E-ink"), N_("E-ink friendly color scheme, lighter and thicker dots means lift while darker and thinner means sink.") },
+  { TrailSettings::Type::VARIO_3_DOTS, N_("Vario #3 (Static, with dots)"), N_("Same colour scheme as Vario #2 but with a fixed vario range: -3 m/s (sink) to +5 m/s (lift).") },
   { TrailSettings::Type::ALTITUDE, N_("Altitude"), N_("The colour scheme corresponds to the height.") },
   nullptr
 };

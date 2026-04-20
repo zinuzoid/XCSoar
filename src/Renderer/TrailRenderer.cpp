@@ -72,6 +72,9 @@ GetMinMax(TrailSettings::Type type, const TracePointVector &trace) noexcept
       value_max = std::max(i.GetAltitude(), value_max);
       value_min = std::min(i.GetAltitude(), value_min);
     }
+  } else if (type == TrailSettings::Type::VARIO_3_DOTS) {
+    value_min = -3.0;
+    value_max = 5.0;
   } else {
     value_max = 0.75;
     value_min = -2.0;
@@ -163,7 +166,8 @@ TrailRenderer::Draw(Canvas &canvas, const TraceComputer &trace_computer,
             (settings.type == TrailSettings::Type::VARIO_1_DOTS ||
              settings.type == TrailSettings::Type::VARIO_2_DOTS ||
              settings.type == TrailSettings::Type::VARIO_DOTS_AND_LINES ||
-             settings.type == TrailSettings::Type::VARIO_EINK)) {
+             settings.type == TrailSettings::Type::VARIO_EINK ||
+             settings.type == TrailSettings::Type::VARIO_3_DOTS)) {
           canvas.SelectNullPen();
           canvas.Select(look.trail_brushes[color_index]);
           canvas.DrawCircle({(pt.x + last_point.x) / 2, (pt.y + last_point.y) / 2},
