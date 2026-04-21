@@ -4,6 +4,7 @@
 #pragma once
 
 #include "MapWindow.hpp"
+#include "Blackboard/BlackboardListener.hpp"
 #include "time/PeriodClock.hpp"
 #include "UIUtil/TrackingGestureManager.hpp"
 #include "UIUtil/KineticManager.hpp"
@@ -41,7 +42,7 @@ public:
 };
 
 
-class GlueMapWindow : public MapWindow {
+class GlueMapWindow : public MapWindow, private NullBlackboardListener {
   TopographyThread *topography_thread = nullptr;
 
   TerrainThread *terrain_thread = nullptr;
@@ -210,6 +211,9 @@ protected:
                    const PixelPoint aircraft_pos) noexcept override;
   void RenderTrackBearing(Canvas &canvas,
                           const PixelPoint aircraft_pos) noexcept override;
+
+  /* virtual methods from class BlackboardListener */
+  void OnGPSUpdate(const MoreData &basic) override;
 
   /* virtual methods from class Window */
   void OnCreate() override;

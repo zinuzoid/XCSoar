@@ -32,11 +32,15 @@ GlueMapWindow::OnCreate()
   MapWindow::OnCreate();
 
   visible_projection.SetScale(CommonInterface::GetMapSettings().cruise_scale);
+
+  CommonInterface::GetLiveBlackboard().AddListener(*this);
 }
 
 void
 GlueMapWindow::OnDestroy() noexcept
 {
+  CommonInterface::GetLiveBlackboard().RemoveListener(*this);
+
   /* stop the TopographyThread and the TerrainThread */
   SetTopography(nullptr);
   SetTerrain(nullptr);
@@ -48,6 +52,14 @@ GlueMapWindow::OnDestroy() noexcept
   map_item_timer.Cancel();
 
   MapWindow::OnDestroy();
+}
+
+void
+GlueMapWindow::OnGPSUpdate([[maybe_unused]] const MoreData &basic)
+{
+  if (!CommonInterface::GetMapSettings().vario_bar_enabled)
+    return;
+  DeferRedraw();
 }
 
 bool
