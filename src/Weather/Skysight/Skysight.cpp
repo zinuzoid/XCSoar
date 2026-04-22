@@ -140,23 +140,30 @@ SkysightImageFile::SkysightImageFile(Path _filename, Path _path) {
  *
  */
 bool
-Skysight::IsActiveMetric(const TCHAR *const id)
+Skysight::IsActiveMetricLocked(const TCHAR *const id) const
 {
-  for (auto &i : active_metrics)
+  for (const auto &i : active_metrics)
     if (!i.metric->id.compare(id))
       return true;
-
   return false;
+}
+
+bool
+Skysight::IsActiveMetric(const TCHAR *const id)
+{
+  const std::lock_guard lock{active_metrics_mutex};
+  return IsActiveMetricLocked(id);
 }
 
 bool
 Skysight::ActiveMetricsFull()
 {
+  const std::lock_guard lock{active_metrics_mutex};
   return (active_metrics.size() >= SKYSIGHT_MAX_METRICS);
 }
 
 int
-Skysight::AddActiveMetric(const TCHAR *const id)
+Skysight::AddActiveMetricLocked(const TCHAR *const id)
 {
   bool metric_exists = false;
   std::vector<SkysightMetric>::iterator i;
@@ -168,10 +175,10 @@ Skysight::AddActiveMetric(const TCHAR *const id)
   if (!metric_exists)
     return -3;
 
-  if (IsActiveMetric(id))
+  if (IsActiveMetricLocked(id))
     return -1;
 
-  if (ActiveMetricsFull())
+  if (active_metrics.size() >= SKYSIGHT_MAX_METRICS)
     return -2;
 
   SkysightActiveMetric m = SkysightActiveMetric(&(*i), 0, 0, 0);
@@ -179,17 +186,24 @@ Skysight::AddActiveMetric(const TCHAR *const id)
   GetActiveMetricState(id, m);
 
   active_metrics.push_back(m);
-  SaveActiveMetrics();
+  SaveActiveMetricsLocked();
   return active_metrics.size() - 1;
+}
+
+int
+Skysight::AddActiveMetric(const TCHAR *const id)
+{
+  const std::lock_guard lock{active_metrics_mutex};
+  return AddActiveMetricLocked(id);
 }
 
 void
 Skysight::RefreshActiveMetric(tstring id)
 {
-  std::vector<SkysightActiveMetric>::iterator i;
-  for (i = active_metrics.begin(); i < active_metrics.end(); ++i) {
-    if (!i->metric->id.compare(id)) {
-      GetActiveMetricState(id, (*i));
+  const std::lock_guard lock{active_metrics_mutex};
+  for (auto &i : active_metrics) {
+    if (!i.metric->id.compare(id)) {
+      GetActiveMetricState(id, i);
     }
   }
 }
@@ -197,31 +211,31 @@ Skysight::RefreshActiveMetric(tstring id)
 SkysightActiveMetric
 Skysight::GetActiveMetric(int index)
 {
-  assert(index < (int)active_metrics.size());
-  auto &i = active_metrics.at(index);
-
-  return i;
+  const std::lock_guard lock{active_metrics_mutex};
+  if (index < 0 || (size_t)index >= active_metrics.size()) {
+    LogFormat("Skysight: GetActiveMetric index %d out of range (size=%zu)",
+              index, active_metrics.size());
+    return SkysightActiveMetric{nullptr, 0, 0, 0};
+  }
+  return active_metrics[index];
 }
 
 SkysightActiveMetric
 Skysight::GetActiveMetric(const tstring id)
 {
-  std::vector<SkysightActiveMetric>::iterator i;
-
-  for (i = active_metrics.begin(); i < active_metrics.end(); ++i)
-    if (!i->metric->id.compare(id)) {
-      return (*i);
-    }
-
-  assert(i < active_metrics.end());
-
-  return (*i);
+  const std::lock_guard lock{active_metrics_mutex};
+  for (auto &i : active_metrics)
+    if (!i.metric->id.compare(id))
+      return i;
+  LogFormat("Skysight: GetActiveMetric(id) '%s' not found", id.c_str());
+  return SkysightActiveMetric{nullptr, 0, 0, 0};
 }
 
 void
 Skysight::SetActveMetricUpdateState(const tstring id, bool state)
 {
-  for (auto &i: active_metrics) {
+  const std::lock_guard lock{active_metrics_mutex};
+  for (auto &i : active_metrics) {
     if (!i.metric->id.compare(id)) {
       i.updating = state;
       return;
@@ -232,76 +246,94 @@ Skysight::SetActveMetricUpdateState(const tstring id, bool state)
 void
 Skysight::RemoveActiveMetric(int index)
 {
+  const std::lock_guard lock{active_metrics_mutex};
   assert(index < (int)active_metrics.size());
   active_metrics.erase(active_metrics.begin() + index);
-  SaveActiveMetrics();
+  SaveActiveMetricsLocked();
 }
 
 void
 Skysight::RemoveActiveMetric(const tstring id)
 {
-  std::vector<SkysightActiveMetric>::iterator i;
-
-  for (i = active_metrics.begin(); i < active_metrics.end(); ++i) {
-    if (i->metric->id == id)
-      active_metrics.erase(i);
+  const std::lock_guard lock{active_metrics_mutex};
+  bool removed = false;
+  for (auto i = active_metrics.begin(); i != active_metrics.end(); ) {
+    if (i->metric->id == id) {
+      i = active_metrics.erase(i);
+      removed = true;
+    } else {
+      ++i;
+    }
   }
-  SaveActiveMetrics();
+  if (!removed)
+    LogFormat("Skysight: RemoveActiveMetric '%s' not found", id.c_str());
+  SaveActiveMetricsLocked();
 }
 
 bool
 Skysight::ActiveMetricsUpdating()
 {
-  for (auto i: active_metrics)
+  const std::lock_guard lock{active_metrics_mutex};
+  for (const auto &i : active_metrics)
     if (i.updating) return true;
-
   return false;
 }
 
 int
 Skysight::NumActiveMetrics()
 {
+  const std::lock_guard lock{active_metrics_mutex};
   return (int)active_metrics.size();
 }
 
 void
-Skysight::SaveActiveMetrics()
+Skysight::SaveActiveMetricsLocked()
 {
   tstring am_list;
 
-  if (NumActiveMetrics()) {
-    for(auto &i: active_metrics) {
+  if (!active_metrics.empty()) {
+    for (const auto &i : active_metrics) {
       am_list += i.metric->id;
       am_list += ",";
     }
     am_list.pop_back();
-  } else {
-    am_list = "";
   }
 
   Profile::Set(ProfileKeys::SkysightActiveMetrics, am_list.c_str());
 }
 
 void
+Skysight::SaveActiveMetrics()
+{
+  const std::lock_guard lock{active_metrics_mutex};
+  SaveActiveMetricsLocked();
+}
+
+void
 Skysight::LoadActiveMetrics()
 {
-  active_metrics.clear();
+  {
+    const std::lock_guard lock{active_metrics_mutex};
+    active_metrics.clear();
 
-  const char *s = Profile::Get(ProfileKeys::SkysightActiveMetrics);
-  if (s == NULL)
-    return;
-  tstring am_list = tstring(s);
-  size_t pos;
-  while ((pos = am_list.find(",")) != tstring::npos) {
-    AddActiveMetric(am_list.substr(0, pos).c_str());
-    am_list.erase(0, pos + 1);
+    const char *s = Profile::Get(ProfileKeys::SkysightActiveMetrics);
+    if (s == NULL)
+      return;
+    tstring am_list = tstring(s);
+    size_t pos;
+    while ((pos = am_list.find(",")) != tstring::npos) {
+      AddActiveMetricLocked(am_list.substr(0, pos).c_str());
+      am_list.erase(0, pos + 1);
+    }
+    AddActiveMetricLocked(am_list.c_str()); // last one
   }
-  AddActiveMetric(am_list.c_str()); // last one
 
   const TCHAR *const d = Profile::Get(ProfileKeys::SkysightDisplayedMetric);
   if (d == NULL)
     return;
 
+  // IsActiveMetric and SetDisplayedMetric each take active_metrics_mutex
+  // internally; they must NOT be called while we still hold it (non-recursive).
   if (!IsActiveMetric(d))
     return;
 
@@ -505,10 +537,16 @@ Skysight::DownloadActiveMetric(tstring id = "*")
 {
   BrokenDateTime now = Skysight::GetNow();
   if (id == "*") {
-    for (auto &i: active_metrics) {
-      SetActveMetricUpdateState(i.metric->id, true);
-      api->GetImageAt(i.metric->id.c_str(), now, now + std::chrono::seconds(60*60*24),
-		     DownloadComplete);
+    std::vector<tstring> ids;
+    {
+      const std::lock_guard lock{active_metrics_mutex};
+      for (const auto &i : active_metrics)
+        ids.push_back(i.metric->id);
+    }
+    for (const auto &mid : ids) {
+      SetActveMetricUpdateState(mid, true);
+      api->GetImageAt(mid.c_str(), now, now + std::chrono::seconds(60*60*24),
+                      DownloadComplete);
     }
   } else {
     SetActveMetricUpdateState(id, true);

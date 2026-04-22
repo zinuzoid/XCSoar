@@ -58,6 +58,7 @@ Copyright_License {
 #include "util/StaticString.hxx"
 #include "Language/Language.hpp"
 #include "time/BrokenDateTime.hpp"
+#include "LogFile.hpp"
 #include "Formatter/TimeFormatter.hpp"
 #include "Formatter/LocalTimeFormatter.hpp"
 
@@ -84,7 +85,13 @@ private:
 void
 SkysightListItemRenderer::Draw(Canvas &canvas, const PixelRect rc, unsigned i) {
   const ComputerSettings &settings = CommonInterface::GetComputerSettings();
-  SkysightActiveMetric m = SkysightActiveMetric(skysight->GetActiveMetric(i));
+  SkysightActiveMetric m = skysight->GetActiveMetric(i);
+  if (m.metric == nullptr) {
+    LogFormat("Skysight: Draw row %u has null metric (stale index)", i);
+    row_renderer.DrawFirstRow(canvas, rc, _T(""));
+    row_renderer.DrawSecondRow(canvas, rc, _T(""));
+    return;
+  }
 
   tstring first_row = tstring(m.metric->name);
   if (skysight->displayed_metric == m.metric->id.c_str())
@@ -248,8 +255,12 @@ SkysightWidget::UpdateList()
 
   if ((int)index < skysight->NumActiveMetrics()) {
     SkysightActiveMetric a = skysight->GetActiveMetric(index);
-    item_updating = a.updating;
-    item_active = (skysight->displayed_metric == a.metric->id.c_str());
+    if (a.metric != nullptr) {
+      item_updating = a.updating;
+      item_active = (skysight->displayed_metric == a.metric->id.c_str());
+    } else {
+      LogFormat("Skysight: UpdateList got null metric for cursor %u", index);
+    }
   }
 
   bool any_updating = skysight->ActiveMetricsUpdating();
