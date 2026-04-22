@@ -39,6 +39,7 @@ Copyright_License {
 #include "Weather/Skysight/Metrics.hpp"
 #include "Weather/Skysight/SkysightAPI.hpp"
 #include "Blackboard/BlackboardListener.hpp"
+#include "thread/Mutex.hxx"
 
 #define SKYSIGHT_MAX_METRICS 5
 
@@ -144,7 +145,12 @@ private:
   bool SetDisplayedMetric(const TCHAR *const id,
 			  BrokenDateTime forecast_time = BrokenDateTime());
   BrokenDateTime GetForecastTime(BrokenDateTime curr_time);
+  mutable Mutex active_metrics_mutex;
   std::vector<SkysightActiveMetric> active_metrics;
+
+  bool IsActiveMetricLocked(const TCHAR *const id) const;
+  int AddActiveMetricLocked(const TCHAR *const id);
+  void SaveActiveMetricsLocked();
 
   std::vector<SkysightImageFile> ScanFolder(tstring search_pattern);
   void CleanupFiles();
