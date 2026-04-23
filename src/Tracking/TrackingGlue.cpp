@@ -6,7 +6,7 @@
 #include "NMEA/MoreData.hpp"
 #include "LogFile.hpp"
 #include "util/Macros.hpp"
-#include "Interface.hpp"
+#include "time/Stamp.hpp"
 
 TrackingGlue::TrackingGlue(EventLoop &event_loop,
                            CurlGlobal &curl) noexcept
@@ -59,7 +59,7 @@ TrackingGlue::OnTraffic(uint32_t pilot_id, unsigned time_of_day_ms,
     skylines.RequestUserName(pilot_id);
 }
 
-void TrackingGlue::OnJETTraffic(std::vector<JETProvider::Traffic> traffics, Validity validity, bool success)
+void TrackingGlue::OnJETTraffic(std::vector<JETProvider::Traffic> traffics, Validity validity, bool success, TimeStamp now)
 {
   const std::lock_guard<Mutex> lock(jet_provider_data.mutex);
 
@@ -68,7 +68,20 @@ void TrackingGlue::OnJETTraffic(std::vector<JETProvider::Traffic> traffics, Vali
   if (success) {
     jet_provider_data.traffics.clear();
     for (JETProvider::Traffic traffic : traffics) {
+      ClimbAverageCalculator &calc =
+        climb_avg_map[std::string(traffic.traffic_id)];
+      traffic.climb_rate_avg30s =
+        calc.GetAverage(now, traffic.altitude, std::chrono::seconds{30});
       jet_provider_data.traffics[traffic.traffic_id] = traffic;
+    }
+
+    // Prune stale calculators for targets not seen in a while
+    constexpr FloatDuration MAX_AGE = std::chrono::minutes{1};
+    for (auto it = climb_avg_map.begin(); it != climb_avg_map.end();) {
+      if (it->second.Expired(now, MAX_AGE))
+        it = climb_avg_map.erase(it);
+      else
+        ++it;
     }
   }
 
@@ -78,8 +91,9 @@ void TrackingGlue::OnJETTraffic(std::vector<JETProvider::Traffic> traffics, Vali
 
 void TrackingGlue::OnJETProviderReset() {
   if (jet_provider_data.traffics.size() > 0) {
-    OnJETTraffic(std::vector<JETProvider::Traffic>(), Validity(), true);
+    OnJETTraffic(std::vector<JETProvider::Traffic>(), Validity(), true, TimeStamp::Undefined());
   }
+  climb_avg_map.clear();
 }
 
 void
