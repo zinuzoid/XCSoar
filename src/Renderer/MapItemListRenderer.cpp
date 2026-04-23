@@ -32,6 +32,7 @@
 #include "FLARM/FlarmNetRecord.hpp"
 #include "Weather/Features.hpp"
 #include "FLARM/List.hpp"
+#include "FLARM/TrafficClimbAltIndicators.hpp"
 #include "time/RoughTime.hpp"
 #include "time/BrokenDateTime.hpp"
 
@@ -301,7 +302,8 @@ Draw(Canvas &canvas, PixelRect rc,
      const TrafficMapItem &item,
      const TwoTextRowsRenderer &row_renderer,
      const TrafficLook &traffic_look,
-     const TrafficList *traffic_list)
+     const TrafficList *traffic_list,
+     const MapSettings &settings)
 {
   const unsigned line_height = rc.GetHeight();
   const unsigned text_padding = Layout::GetTextPadding();
@@ -313,10 +315,14 @@ Draw(Canvas &canvas, PixelRect rc,
   const PixelPoint pt(rc.left + line_height / 2, rc.top + line_height / 2);
 
   // Render the representation of the traffic icon
-  if (traffic != nullptr)
-    TrafficRenderer::Draw(canvas, traffic_look, false,
+  if (traffic != nullptr) {
+    const bool vario_traffic = settings.use_vario_traffic_colours;
+    const TrafficClimbAltIndicators indicators =
+      TrafficClimbAltIndicators::GetClimbAltIndicators(*traffic);
+    TrafficRenderer::Draw(canvas, traffic_look, false, vario_traffic,
                           *traffic, traffic->track,
-                          item.color, pt);
+                          item.color, pt, indicators);
+  }
 
   rc.left += line_height + text_padding;
 
@@ -467,7 +473,7 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 
   case MapItem::Type::TRAFFIC:
     ::Draw(canvas, rc, (const TrafficMapItem &)item,
-           row_renderer, traffic_look, traffic_list);
+           row_renderer, traffic_look, traffic_list, settings);
     break;
 
 #ifdef HAVE_SKYLINES_TRACKING

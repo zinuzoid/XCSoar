@@ -7,21 +7,72 @@
 #include "ui/canvas/Pen.hpp"
 #include "ui/canvas/Brush.hpp"
 #include "ui/canvas/Icon.hpp"
+#include "FLARM/TrafficClimbAltIndicators.hpp"
 
 class Font;
 
-struct TrafficLook {
-  static constexpr Color safe_above_color{0x1d,0x9b,0xc5};
-  static constexpr Color safe_below_color{0x1d,0xc5,0x10};
+struct TrafficLook
+{
+  static constexpr uint8_t num_alt_based_colour_options = 3;
+  static constexpr uint8_t num_vario_based_colour_options = 3;
+
+  struct vario_traffic_colors
+  {
+    struct above
+    {
+      static constexpr Color climb_good = {0xff, 0x66, 0xff}; // light pink
+      static constexpr Color climb_up   = {0xff, 0xff, 0x66}; // light yellow
+      static constexpr Color climb_down = {0x66, 0x66, 0xff}; // light blue
+    };
+
+    struct same
+    {
+      static constexpr Color climb_good = {0xff, 0x00, 0xff}; // pink
+      static constexpr Color climb_up   = {0xff, 0xff, 0x00}; // yellow
+      static constexpr Color climb_down = {0x00, 0x00, 0xff}; // blue
+    };
+
+    struct below
+    {
+      static constexpr Color climb_good = {0x99, 0x00, 0x66}; // dark pink
+      static constexpr Color climb_up   = {0x99, 0x99, 0x00}; // dark yellow
+      static constexpr Color climb_down = {0x00, 0x00, 0x99}; // dark blue
+    };
+  };
+
+  struct TrafficLookColor
+  {
+    static constexpr Color above = {0x1d, 0x9b, 0xc5};
+    static constexpr Color same  = {0xff, 0x00, 0xff};
+    static constexpr Color below = {0x1d, 0xc5, 0x10};
+  };
+
   static constexpr Color warning_color{0xfe,0x84,0x38};
   static constexpr Color warning_in_altitude_range_color{0xff,0x00,0xff};
   static constexpr Color alarm_color{0xfb,0x35,0x2f};
   static constexpr Color offline_color{0x00,0x00,0x00};
 
-  Brush safe_above_brush;
-  Brush safe_below_brush;
+  struct basic_traffic_brushes_t
+  {
+    Brush above;
+    Brush same;
+    Brush below;
+  } basic_traffic_brushes;
+
+  typedef struct Climb_Indication_s {
+    Brush climb_good;
+    Brush climb_up;
+    Brush climb_down;
+  } Climb_Indication_t;
+
+  struct vario_traffic_brushes_t
+  {
+    Climb_Indication_t above;
+    Climb_Indication_t same;
+    Climb_Indication_t below;
+  } vario_traffic_brushes;
+
   Brush warning_brush;
-  Brush warning_in_altitude_range_brush;
   Brush alarm_brush;
   Brush offline_brush;
 
@@ -48,4 +99,7 @@ struct TrafficLook {
   const Font *font;
 
   void Initialise(const Font &font);
+
+  Brush GetBasicTrafficBrush(const TrafficClimbAltIndicators &indicators) const noexcept;
+  Brush GetVarioTrafficBrush(const TrafficClimbAltIndicators &indicators) const noexcept;
 };

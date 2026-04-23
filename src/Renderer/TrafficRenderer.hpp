@@ -4,6 +4,7 @@
 #pragma once
 
 #include "FLARM/Color.hpp"
+#include "FLARM/TrafficClimbAltIndicators.hpp"
 
 struct PixelPoint;
 class Canvas;
@@ -16,9 +17,10 @@ namespace TrafficRenderer
 {
 void
 Draw(Canvas &canvas, const TrafficLook &traffic_look,
-     bool fading,
+     bool fading, bool vario_traffic,
      const FlarmTraffic &traffic, Angle angle,
-     FlarmColor color, PixelPoint pt) noexcept;
+     FlarmColor color, PixelPoint pt,
+     TrafficClimbAltIndicators indicators) noexcept;
 
 void
 Draw(Canvas &canvas, const TrafficLook &traffic_look,
