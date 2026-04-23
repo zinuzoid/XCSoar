@@ -16,7 +16,6 @@
 #include "thread/StandbyThread.hpp"
 #include "time/PeriodClock.hpp"
 #include "Geo/GeoPoint.hpp"
-#include "time/BrokenDateTime.hpp"
 
 #include <map>
 #include <string>
@@ -47,13 +46,6 @@ class TrackingGlue final
    * server.  This attribute is used to detect time warps.
    */
   std::chrono::system_clock::time_point last_timestamp{};
-
-  BrokenDateTime date_time;
-  GeoPoint location;
-  unsigned altitude;
-  unsigned ground_speed;
-  Angle track;
-  bool flying = false, last_flying;
 
 public:
   TrackingGlue(EventLoop &event_loop, CurlGlobal &curl) noexcept;
