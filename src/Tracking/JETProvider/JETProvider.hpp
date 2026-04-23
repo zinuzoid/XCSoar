@@ -27,6 +27,7 @@ Copyright_License {
 #include "NMEA/Info.hpp"
 #include "NMEA/Derived.hpp"
 #include "time/PeriodClock.hpp"
+#include "time/Stamp.hpp"
 #include "Language/Language.hpp"
 #include "thread/Mutex.hxx"
 #include "lib/curl/Request.hxx"
@@ -53,6 +54,7 @@ struct Traffic {
   int altitude = -1;
   double speed = -1;
   double vspeed = -1;
+  double climb_rate_avg30s = -1;
   const char *type = nullptr;
   int icon_type = -1;
 };
@@ -73,7 +75,7 @@ struct Data {
 
 class Handler {
 public:
-  virtual void OnJETTraffic(std::vector<JETProvider::Traffic> traffics, Validity validity, bool success) = 0;
+  virtual void OnJETTraffic(std::vector<JETProvider::Traffic> traffics, Validity validity, bool success, TimeStamp now) = 0;
   virtual void OnJETProviderError(std::exception_ptr e) = 0;
   virtual void OnJETProviderReset() = 0;
 };

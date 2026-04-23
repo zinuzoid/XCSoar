@@ -11,14 +11,16 @@
 #include "FLARM/Friends.hpp"
 #include "Tracking/SkyLines/Data.hpp"
 #include "util/StringCompare.hxx"
+#include "FLARM/TrafficClimbAltIndicators.hpp"
 
 #include <cassert>
 
 static void
 DrawFlarmTraffic(Canvas &canvas, const WindowProjection &projection,
-                 const TrafficLook &look, bool fading,
+                 const TrafficLook &look, bool fading, bool vario_traffic,
                  const PixelPoint aircraft_pos,
-                 const FlarmTraffic &traffic) noexcept
+                 const FlarmTraffic &traffic,
+                 double set_mc, double current_30s_vario) noexcept
 {
   assert(traffic.location_available);
 
@@ -65,9 +67,12 @@ DrawFlarmTraffic(Canvas &canvas, const WindowProjection &projection,
 
   auto color = FlarmFriends::GetFriendColor(traffic.id);
 
-  TrafficRenderer::Draw(canvas, look, fading, traffic,
+  const TrafficClimbAltIndicators indicators =
+    TrafficClimbAltIndicators::GetClimbAltIndicators(traffic, set_mc, current_30s_vario);
+
+  TrafficRenderer::Draw(canvas, look, fading, vario_traffic, traffic,
                         traffic.track - projection.GetScreenAngle(),
-                        color, sc);
+                        color, sc, indicators);
 }
 
 /**
@@ -95,21 +100,25 @@ MapWindow::DrawFLARMTraffic(Canvas &canvas,
 
   canvas.Select(*traffic_look.font);
 
+  const bool vario_traffic = GetMapSettings().use_vario_traffic_colours;
+  const double set_mc = GetComputerSettings().polar.glide_polar_task.GetMC();
+  const double current_30s_vario = Calculated().average;
+
   // Circle through the FLARM targets
   for (const auto &traffic : flarm.list) {
     if (!traffic.location_available)
       continue;
 
-    DrawFlarmTraffic(canvas, projection, traffic_look, false,
-                     aircraft_pos, traffic);
+    DrawFlarmTraffic(canvas, projection, traffic_look, false, vario_traffic,
+                     aircraft_pos, traffic, set_mc, current_30s_vario);
   }
 
   if (const auto &fading = GetFadingFlarmTraffic(); !fading.empty()) {
     for (const auto &[id, traffic] : fading) {
       assert(traffic.location_available);
 
-      DrawFlarmTraffic(canvas, projection, traffic_look, true,
-                       aircraft_pos, traffic);
+      DrawFlarmTraffic(canvas, projection, traffic_look, true, vario_traffic,
+                       aircraft_pos, traffic, set_mc, current_30s_vario);
     }
   }
 }
@@ -271,6 +280,10 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
 
   canvas.Select(*traffic_look.font);
 
+  const bool vario_traffic_jet = GetMapSettings().use_vario_traffic_colours;
+  const double jet_set_mc = GetComputerSettings().polar.glide_polar_task.GetMC();
+  const double jet_30s_vario = Calculated().average;
+
   // Circle through the FLARM targets
   for (auto it = jet_provider_data->traffics.begin(),
       end = jet_provider_data->traffics.end();
@@ -323,6 +336,7 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
     FlarmTraffic t;
     t.alarm_level = FlarmTraffic::AlarmType::NONE;
     t.relative_altitude = (RoughAltitude) 100;
+    t.climb_rate_avg30s = traffic.climb_rate_avg30s;
     if (!jet_provider_data->validity.IsValid() || !jet_provider_data->success) {
       t.alarm_level = FlarmTraffic::AlarmType::OFFLINE;
     } else {
@@ -352,9 +366,11 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
         circle = FlarmColor::MAGENTA;
       }
     }
-    TrafficRenderer::Draw(canvas, traffic_look, false, t,
+    const TrafficClimbAltIndicators jet_indicators =
+      TrafficClimbAltIndicators::GetClimbAltIndicators(t, jet_set_mc, jet_30s_vario);
+    TrafficRenderer::Draw(canvas, traffic_look, false, vario_traffic_jet, t,
                           Angle::Degrees(traffic.track) - projection.GetScreenAngle(),
-                          circle, sc);
+                          circle, sc, jet_indicators);
   }
 
 }

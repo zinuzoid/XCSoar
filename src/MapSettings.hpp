@@ -162,6 +162,9 @@ struct MapSettings {
    */
   bool fade_traffic;
 
+  /** Show FLARM / JETProvider traffic colours according to climb rate and relative altitude */
+  bool use_vario_traffic_colours;
+
   /** Display climb band on map */
   bool show_thermal_profile;
 

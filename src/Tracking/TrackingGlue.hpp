@@ -12,10 +12,14 @@
 #include "Tracking/SkyLines/Data.hpp"
 #include "Tracking/LiveTrack24/Glue.hpp"
 #include "Tracking/JETProvider/JETProvider.hpp"
+#include "Computer/ClimbAverageCalculator.hpp"
 #include "thread/StandbyThread.hpp"
 #include "time/PeriodClock.hpp"
 #include "Geo/GeoPoint.hpp"
 #include "time/BrokenDateTime.hpp"
+
+#include <map>
+#include <string>
 
 struct TrackingSettings;
 struct MoreData;
@@ -33,8 +37,10 @@ class TrackingGlue final
   LiveTrack24::Glue livetrack24;
 
   JETProvider::Glue jet_provider;
-  
+
   JETProvider::Data jet_provider_data;
+
+  std::map<std::string, ClimbAverageCalculator> climb_avg_map;
 
   /**
    * The Unix UTC time stamp that was last submitted to the tracking
@@ -67,7 +73,7 @@ private:
                  const AGeoPoint &bottom, const AGeoPoint &top,
                  double lift) override;
   void OnSkyLinesError(std::exception_ptr e) override;
-  void OnJETTraffic(std::vector<JETProvider::Traffic> traffics, Validity validity, bool success) override;
+  void OnJETTraffic(std::vector<JETProvider::Traffic> traffics, Validity validity, bool success, TimeStamp now) override;
   void OnJETProviderReset() override;
   void OnJETProviderError(std::exception_ptr e) override;
 

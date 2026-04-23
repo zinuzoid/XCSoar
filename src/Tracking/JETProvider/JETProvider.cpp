@@ -106,9 +106,9 @@ JETProvider::Glue::CoTick(const NMEAInfo &basic) noexcept
 
   RadarParser::Radar radar;
   if (RadarParser::ParseRadarBuffer(basic, response.body.c_str(), radar)) {
-    handler->OnJETTraffic(radar.traffics, radar.validity, true);
+    handler->OnJETTraffic(radar.traffics, radar.validity, true, basic.clock);
   } else {
-    handler->OnJETTraffic(std::vector<JETProvider::Traffic>(), radar.validity, false);
+    handler->OnJETTraffic(std::vector<JETProvider::Traffic>(), radar.validity, false, basic.clock);
   }
 }
 
@@ -117,6 +117,6 @@ JETProvider::Glue::OnCompletion(std::exception_ptr error) noexcept
 {
   if (error) {
     LogError(error, "JETProvider error");
-    handler->OnJETTraffic(std::vector<JETProvider::Traffic>(), Validity{}, false);
+    handler->OnJETTraffic(std::vector<JETProvider::Traffic>(), Validity{}, false, TimeStamp::Undefined());
   }
 }
