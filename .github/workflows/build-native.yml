@@ -16,10 +16,10 @@ jobs:
         include:
           - os: ubuntu-22.04
             target: UNIX
-            target_bin: xcsoar_${{ needs.release.outputs.version }}_amd64
-            target_bin_path: ''
-            target_final: xcsoar_
-            target_ext: .deb
+            target_bin: xcsoar
+            target_bin_path: bin
+            target_final: xcsoar
+            target_ext: 
             target_upload: false
             target_container: debian:bookworm-slim
           - os: ubuntu-22.04
