@@ -21,9 +21,9 @@ InitialiseAsioThread()
 void
 DeinitialiseAsioThread()
 {
-  delete std::exchange(global_cares_channel, nullptr);
-
   asio_thread->Stop();
+
+  delete std::exchange(global_cares_channel, nullptr);
   delete asio_thread;
   asio_thread = nullptr;
 }
