@@ -20,6 +20,8 @@ AsioThread::Stop()
 
   /* wait for the thread to finish */
   Join();
+
+  event_loop.SetAlive(false);
 }
 
 void
