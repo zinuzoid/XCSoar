@@ -53,22 +53,22 @@ public:
  * Skysight chart which is overlaid
  */
 struct SkysightActiveMetric {
-  SkysightMetric *metric;
+  tstring id;
   double from = 0;
   double to = 0;
   double mtime = 0;
   bool updating = false;
 
 public:
-  SkysightActiveMetric(SkysightMetric *_metric, uint64_t _from,
-		       uint64_t _to, uint64_t _mtime): 
-    metric(_metric), from(_from), to(_to), mtime(_mtime) {}
+  SkysightActiveMetric(tstring _id, uint64_t _from,
+		       uint64_t _to, uint64_t _mtime):
+    id(std::move(_id)), from(_from), to(_to), mtime(_mtime) {}
   ~SkysightActiveMetric() = default;
   SkysightActiveMetric(const SkysightActiveMetric &m):
-    metric(m.metric), from(m.from), to(m.to), mtime(m.mtime),
+    id(m.id), from(m.from), to(m.to), mtime(m.mtime),
     updating(m.updating) {}
   SkysightActiveMetric& operator=(const SkysightActiveMetric &m) {
-    metric = m.metric;
+    id = m.id;
     from = m.from;
     to = m.to;
     mtime = m.mtime;
@@ -78,21 +78,21 @@ public:
 };
 
 struct DisplayedMetric {
-  SkysightMetric *metric;
+  tstring id;
   BrokenDateTime forecast_index;
 
-  DisplayedMetric() { metric = nullptr; };
+  DisplayedMetric() {}
 
-  DisplayedMetric(SkysightMetric *_metric, BrokenDateTime _fc_index):
-    metric(_metric), forecast_index(_fc_index) {};
+  DisplayedMetric(tstring _id, BrokenDateTime _fc_index):
+    id(std::move(_id)), forecast_index(_fc_index) {}
 
-  void clear() { metric = nullptr; }
+  void clear() { id.clear(); }
 
-  bool operator == (const TCHAR *const id) {
-    if (!metric || !id)
+  bool operator == (const TCHAR *const rhs_id) {
+    if (!rhs_id)
       return false;
 
-    return (metric->id.compare(id) == 0);
+    return (id.compare(rhs_id) == 0);
   };
 
   bool operator < (const BrokenDateTime &t) {

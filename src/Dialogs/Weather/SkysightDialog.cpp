@@ -86,15 +86,15 @@ void
 SkysightListItemRenderer::Draw(Canvas &canvas, const PixelRect rc, unsigned i) {
   const ComputerSettings &settings = CommonInterface::GetComputerSettings();
   SkysightActiveMetric m = skysight->GetActiveMetric(i);
-  if (m.metric == nullptr) {
+  if (m.id.empty()) {
     LogFormat("Skysight: Draw row %u has null metric (stale index)", i);
     row_renderer.DrawFirstRow(canvas, rc, _T(""));
     row_renderer.DrawSecondRow(canvas, rc, _T(""));
     return;
   }
 
-  tstring first_row = tstring(m.metric->name);
-  if (skysight->displayed_metric == m.metric->id.c_str())
+  tstring first_row = skysight->GetMetric(m.id).name;
+  if (skysight->displayed_metric == m.id.c_str())
     first_row += " [ACTIVE]";
 
   StaticString<256> second_row;
@@ -255,9 +255,9 @@ SkysightWidget::UpdateList()
 
   if ((int)index < skysight->NumActiveMetrics()) {
     SkysightActiveMetric a = skysight->GetActiveMetric(index);
-    if (a.metric != nullptr) {
+    if (!a.id.empty()) {
       item_updating = a.updating;
-      item_active = (skysight->displayed_metric == a.metric->id.c_str());
+      item_active = (skysight->displayed_metric == a.id.c_str());
     } else {
       LogFormat("Skysight: UpdateList got null metric for cursor %u", index);
     }
@@ -320,8 +320,8 @@ void SkysightWidget::UpdateClicked()
   unsigned index = GetList().GetCursorIndex();
   assert(index < (unsigned)skysight->NumActiveMetrics());
 
-  SkysightActiveMetric a = skysight->GetActiveMetric(index);  
-  if (!skysight->DownloadActiveMetric(a.metric->id))
+  SkysightActiveMetric a = skysight->GetActiveMetric(index);
+  if (!skysight->DownloadActiveMetric(a.id))
     ShowMessageBox(_("Couldn't update data."), _("Update Error"), MB_OK);
   UpdateList();
 }
@@ -341,12 +341,12 @@ void SkysightWidget::RemoveClicked()
   SkysightActiveMetric a = skysight->GetActiveMetric(index);
   StaticString<256> tmp;
   tmp.Format(_("Do you want to remove \"%s\"?"),
-             a.metric->name.c_str());
+             skysight->GetMetric(a.id).name.c_str());
 
   if (ShowMessageBox(tmp, _("Remove"), MB_YESNO) == IDNO)
     return;
 
-  skysight->RemoveActiveMetric(a.metric->id);
+  skysight->RemoveActiveMetric(a.id);
 
   UpdateList();
 }
@@ -357,8 +357,8 @@ SkysightWidget::ActivateClicked()
   unsigned index = GetList().GetCursorIndex();
   assert(index < (unsigned)skysight->NumActiveMetrics());
 
-  SkysightActiveMetric a = skysight->GetActiveMetric(index);  
-  if (!skysight->DisplayActiveMetric(a.metric->id.c_str()))
+  SkysightActiveMetric a = skysight->GetActiveMetric(index);
+  if (!skysight->DisplayActiveMetric(a.id.c_str()))
     ShowMessageBox(_("Couldn't display data. There is no forecast data available for this time."),
 		   _("Display Error"), MB_OK);
   UpdateList();

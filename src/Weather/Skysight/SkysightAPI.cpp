@@ -58,30 +58,26 @@ SkysightAPI::~SkysightAPI() {
 SkysightMetric
 SkysightAPI::GetMetric(int index)
 {
+  const std::lock_guard lock{metrics_mutex};
   assert(index < (int)metrics.size());
-  auto &i = metrics.at(index);
-  
-  return i;
+  return metrics.at(index);
 }
 
 SkysightMetric
 SkysightAPI::GetMetric(const tstring id)
 {
-  std::vector<SkysightMetric>::iterator i;
-  for(i = metrics.begin(); i<metrics.end();++i) {
-    if(!i->id.compare(id)) {
-      assert(i < metrics.end());
-      return (*i);
-    }
-  }
-
-  return (*i);
+  const std::lock_guard lock{metrics_mutex};
+  for (auto &i : metrics)
+    if (!i.id.compare(id))
+      return i;
+  return SkysightMetric(_T(""), _T(""), _T(""));
 }
 
 //TODO: Use auto ptr, use TCHAR for all, try to whittle down to pointer only ver
 SkysightMetric *
 SkysightAPI::GetMetric(const TCHAR *const id)
 {
+  const std::lock_guard lock{metrics_mutex};
   bool metric_exists = false;
   std::vector<SkysightMetric>::iterator i;
   for (i = metrics.begin(); i < metrics.end(); ++i)
@@ -95,19 +91,31 @@ SkysightAPI::GetMetric(const TCHAR *const id)
 }
 
 bool SkysightAPI::MetricExists(const tstring id) {
-
-  std::vector<SkysightMetric>::iterator i;
-  for(i = metrics.begin(); i<metrics.end();++i)
-    if(!i->id.compare(id)) {
+  const std::lock_guard lock{metrics_mutex};
+  for (auto &i : metrics)
+    if (!i.id.compare(id))
       return true;
-    }
   return false;
 }
 
 int
 SkysightAPI::NumMetrics()
 {
-  return (int)metrics.size(); 
+  const std::lock_guard lock{metrics_mutex};
+  return (int)metrics.size();
+}
+
+bool
+SkysightAPI::TryGetMetricName(const tstring &id, tstring &name_out) const
+{
+  const std::lock_guard lock{metrics_mutex};
+  for (const auto &i : metrics) {
+    if (i.id == id) {
+      name_out = i.name;
+      return true;
+    }
+  }
+  return false;
 }
 
 const tstring
@@ -343,41 +351,45 @@ SkysightAPI::ParseLayers(const SkysightRequestArgs &args,
     return false;
   }
 
-  metrics.clear();
   bool success = false;
 
-  for (auto &i: details) {
-    boost::property_tree::ptree &node = i.second;
-    auto id = node.find("id");
-    auto legend = node.find("legend");
-    if (id != node.not_found() && legend != node.not_found()) {
-      SkysightMetric m = SkysightMetric(
-        tstring(id->second.data()), 
-        tstring(node.find("name")->second.data()),
-        tstring(node.find("description")->second.data())
-      );
+  {
+    const std::lock_guard lock{metrics_mutex};
+    metrics.clear();
 
-      auto colours = legend->second.find("colors");
-      if (colours != legend->second.not_found()) {
-        success = true;
-        for (auto &j: colours->second) {
-          try {
-            auto c = j.second.get_child("color").begin();
-            m.legend.insert(
-	      std::pair<float, LegendColor>(
-	        std::stof(j.second.find("value")->second.data()),
-	        {
-		  static_cast<unsigned char>(std::stoi(c->second.data())),
-		    static_cast<unsigned char>(std::stoi(std::next(c, 1)->second.data())),
-		    static_cast<unsigned char>(std::stoi(std::next(c, 2)->second.data()))
-		    }
-	        ));
-          } catch (const std::exception &e) {
-            LogFormat("Skysight: failed to parse legend entry: %s", e.what());
-            continue;
+    for (auto &i: details) {
+      boost::property_tree::ptree &node = i.second;
+      auto id = node.find("id");
+      auto legend = node.find("legend");
+      if (id != node.not_found() && legend != node.not_found()) {
+        SkysightMetric m = SkysightMetric(
+          tstring(id->second.data()),
+          tstring(node.find("name")->second.data()),
+          tstring(node.find("description")->second.data())
+        );
+
+        auto colours = legend->second.find("colors");
+        if (colours != legend->second.not_found()) {
+          success = true;
+          for (auto &j: colours->second) {
+            try {
+              auto c = j.second.get_child("color").begin();
+              m.legend.insert(
+                std::pair<float, LegendColor>(
+                  std::stof(j.second.find("value")->second.data()),
+                  {
+                    static_cast<unsigned char>(std::stoi(c->second.data())),
+                    static_cast<unsigned char>(std::stoi(std::next(c, 1)->second.data())),
+                    static_cast<unsigned char>(std::stoi(std::next(c, 2)->second.data()))
+                  }
+                ));
+            } catch (const std::exception &e) {
+              LogFormat("Skysight: failed to parse legend entry: %s", e.what());
+              continue;
+            }
           }
+          metrics.push_back(m);
         }
-        metrics.push_back(m);
       }
     }
   }
@@ -408,14 +420,17 @@ SkysightAPI::ParseLastUpdates(const SkysightRequestArgs &args,
   }
 
   bool success = false;
-  for (auto &i: metrics) {
-    for (auto &j : details) {
-      auto id = j.second.find("layer_id");
-      auto time = j.second.find("time");
-      if ((id != j.second.not_found()) && (time != j.second.not_found())
-	  && (i.id.compare(id->second.data()) == 0)) {
-        i.last_update = std::strtoull(time->second.data().c_str(), NULL, 0);
-        success = true;
+  {
+    const std::lock_guard lock{metrics_mutex};
+    for (auto &i: metrics) {
+      for (auto &j : details) {
+        auto id = j.second.find("layer_id");
+        auto time = j.second.find("time");
+        if ((id != j.second.not_found()) && (time != j.second.not_found())
+	    && (i.id.compare(id->second.data()) == 0)) {
+          i.last_update = std::strtoull(time->second.data().c_str(), NULL, 0);
+          success = true;
+        }
       }
     }
   }
@@ -496,9 +511,10 @@ SkysightAPI::ParseData(const SkysightRequestArgs &args, __attribute__((unused)) 
 {
   auto output_img = GetPath(SkysightCallType::Image, args.layer.c_str(),
 			    args.from);
+  SkysightMetric m = GetMetric(tstring(args.layer.c_str()));
   queue.AddDecodeJob(std::make_unique<CDFDecoder>(args.path.c_str(), output_img.c_str(),
-                                        args.layer.c_str(), args.from, 
-                                        GetMetric(args.layer.c_str())->legend, args.cb));
+                                        args.layer.c_str(), args.from,
+                                        m.legend, args.cb));
   return true;
 }
 

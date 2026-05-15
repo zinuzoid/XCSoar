@@ -143,7 +143,7 @@ bool
 Skysight::IsActiveMetricLocked(const TCHAR *const id) const
 {
   for (const auto &i : active_metrics)
-    if (!i.metric->id.compare(id))
+    if (!i.id.compare(id))
       return true;
   return false;
 }
@@ -165,14 +165,7 @@ Skysight::ActiveMetricsFull()
 int
 Skysight::AddActiveMetricLocked(const TCHAR *const id)
 {
-  bool metric_exists = false;
-  std::vector<SkysightMetric>::iterator i;
-  for (i = api->metrics.begin(); i < api->metrics.end(); ++i)
-    if (!i->id.compare(id)) {
-      metric_exists = true;
-      break;
-    }
-  if (!metric_exists)
+  if (!api->MetricExists(tstring(id)))
     return -3;
 
   if (IsActiveMetricLocked(id))
@@ -181,7 +174,7 @@ Skysight::AddActiveMetricLocked(const TCHAR *const id)
   if (active_metrics.size() >= SKYSIGHT_MAX_METRICS)
     return -2;
 
-  SkysightActiveMetric m = SkysightActiveMetric(&(*i), 0, 0, 0);
+  SkysightActiveMetric m{tstring(id), 0, 0, 0};
 
   GetActiveMetricState(id, m);
 
@@ -202,7 +195,7 @@ Skysight::RefreshActiveMetric(tstring id)
 {
   const std::lock_guard lock{active_metrics_mutex};
   for (auto &i : active_metrics) {
-    if (!i.metric->id.compare(id)) {
+    if (!i.id.compare(id)) {
       GetActiveMetricState(id, i);
     }
   }
@@ -215,7 +208,7 @@ Skysight::GetActiveMetric(int index)
   if (index < 0 || (size_t)index >= active_metrics.size()) {
     LogFormat("Skysight: GetActiveMetric index %d out of range (size=%zu)",
               index, active_metrics.size());
-    return SkysightActiveMetric{nullptr, 0, 0, 0};
+    return SkysightActiveMetric{_T(""), 0, 0, 0};
   }
   return active_metrics[index];
 }
@@ -225,10 +218,10 @@ Skysight::GetActiveMetric(const tstring id)
 {
   const std::lock_guard lock{active_metrics_mutex};
   for (auto &i : active_metrics)
-    if (!i.metric->id.compare(id))
+    if (!i.id.compare(id))
       return i;
   LogFormat("Skysight: GetActiveMetric(id) '%s' not found", id.c_str());
-  return SkysightActiveMetric{nullptr, 0, 0, 0};
+  return SkysightActiveMetric{_T(""), 0, 0, 0};
 }
 
 void
@@ -236,7 +229,7 @@ Skysight::SetActveMetricUpdateState(const tstring id, bool state)
 {
   const std::lock_guard lock{active_metrics_mutex};
   for (auto &i : active_metrics) {
-    if (!i.metric->id.compare(id)) {
+    if (!i.id.compare(id)) {
       i.updating = state;
       return;
     }
@@ -258,7 +251,7 @@ Skysight::RemoveActiveMetric(const tstring id)
   const std::lock_guard lock{active_metrics_mutex};
   bool removed = false;
   for (auto i = active_metrics.begin(); i != active_metrics.end(); ) {
-    if (i->metric->id == id) {
+    if (i->id == id) {
       i = active_metrics.erase(i);
       removed = true;
     } else {
@@ -293,7 +286,7 @@ Skysight::SaveActiveMetricsLocked()
 
   if (!active_metrics.empty()) {
     for (const auto &i : active_metrics) {
-      am_list += i.metric->id;
+      am_list += i.id;
       am_list += ",";
     }
     am_list.pop_back();
@@ -399,7 +392,7 @@ Skysight::GetActiveMetricState(tstring metric_name, SkysightActiveMetric &m)
       updated  = std::max(updated, i.mtime);
     }
     if (MetricExists(metric_name)) {
-      m.metric =new SkysightMetric(GetMetric(metric_name));
+      m.id = metric_name;
       m.from = min_date;
       m.to = max_date;
       m.mtime = updated;
@@ -467,11 +460,10 @@ Skysight::FromUnixTime(uint64_t t)
 void
 Skysight::Render(bool force_update)
 {
-  if (displayed_metric.metric && !displayed_metric.metric->id.empty()) {
+  if (!displayed_metric.id.empty()) {
     //set by dl callback
     if (update_flag) {
-      //TODO: use const char in metric rather than string/cstr
-      DisplayActiveMetric(displayed_metric.metric->id.c_str());
+      DisplayActiveMetric(displayed_metric.id.c_str());
     }
 
     //Request next images
@@ -479,9 +471,8 @@ Skysight::Render(bool force_update)
     if (force_update ||
 	(!update_flag && displayed_metric < GetForecastTime(now))) {
       force_update = false;
-      //TODO: use const char in metric rather than string/cstr
-      api->GetImageAt(displayed_metric.metric->id.c_str(), now, now + std::chrono::seconds(60*60),
-		     DownloadComplete);
+      api->GetImageAt(displayed_metric.id.c_str(), now,
+		      now + std::chrono::seconds(60*60), DownloadComplete);
     }
   }
 }
@@ -512,8 +503,7 @@ Skysight::SetDisplayedMetric(const TCHAR *const id,
   if (!IsActiveMetric(id))
     return false;
 
-  SkysightMetric *m = api->GetMetric(id);
-  displayed_metric = DisplayedMetric(m, forecast_time);
+  displayed_metric = DisplayedMetric(tstring(id), forecast_time);
 
   return true;
 }
@@ -541,7 +531,7 @@ Skysight::DownloadActiveMetric(tstring id = "*")
     {
       const std::lock_guard lock{active_metrics_mutex};
       for (const auto &i : active_metrics)
-        ids.push_back(i.metric->id);
+        ids.push_back(i.id);
     }
     for (const auto &mid : ids) {
       SetActveMetricUpdateState(mid, true);
@@ -644,9 +634,11 @@ Skysight::DisplayActiveMetric(const TCHAR *const id)
 
   auto path = AllocatedPath::Build(Skysight::GetLocalPath(), filename.c_str());
   StaticString<256> desc;
+  tstring metric_name;
+  api->TryGetMetricName(displayed_metric.id, metric_name);
   desc.Format("Skysight: %s (%04u-%02u-%02u %02u:%02u)",
-	      displayed_metric.metric->name.c_str(), bdt.year, bdt.month, 
-	      bdt.day, bdt.hour, bdt.minute);
+	      metric_name.empty() ? displayed_metric.id.c_str() : metric_name.c_str(),
+	      bdt.year, bdt.month, bdt.day, bdt.hour, bdt.minute);
   tstring label = desc.c_str();
 
   auto *map = UIGlobals::GetMap();
