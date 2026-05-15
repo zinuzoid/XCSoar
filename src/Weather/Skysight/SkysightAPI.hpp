@@ -33,6 +33,7 @@ Copyright_License {
 #include "system/Path.hpp"
 #include <tchar.h>
 #include "LocalPath.hpp"
+#include "thread/Mutex.hxx"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
@@ -58,13 +59,14 @@ public:
   ~SkysightAPI();
 
   void FetchInitialData(tstring email, tstring password, SkysightCallback cb);
-  
+
   bool IsInited();
   SkysightMetric GetMetric(int index);
   SkysightMetric GetMetric(const tstring id);
   SkysightMetric *GetMetric(const TCHAR *const id);
   bool MetricExists(const tstring id);
   int NumMetrics();
+  bool TryGetMetricName(const tstring &id, tstring &name_out) const;
 
   bool GetImageAt(const TCHAR *const layer, BrokenDateTime fctime,
 		  BrokenDateTime maxtime, SkysightCallback cb = nullptr);
@@ -81,6 +83,7 @@ protected:
   bool inited_regions;
   bool inited_layers;
   bool inited_lastupdates;
+  mutable Mutex metrics_mutex;
   SkysightAPIQueue queue;
   const AllocatedPath cache_path;
 
