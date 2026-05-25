@@ -44,6 +44,7 @@ CoGet(CurlGlobal &curl, const char *url)
 {
   CurlEasy easy{url};
   Curl::Setup(easy);
+  easy.SetTimeout(15);
 
   co_return co_await Curl::CoRequest(curl, std::move(easy));
 }
