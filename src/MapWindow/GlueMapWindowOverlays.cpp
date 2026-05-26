@@ -242,7 +242,7 @@ GlueMapWindow::DrawFinalGlide(Canvas &canvas,
     const GlideResult &solution_mc0 = total.solution_mc0;
     const GlideSettings &glide_settings= GetComputerSettings().task.glide;
 
-    if (!task_stats.task_valid || !solution.IsOk() || !solution_mc0.IsDefined())
+    if (!task_stats.task_valid || !solution.IsDefined() || !solution_mc0.IsDefined())
       return;
 
     if (solution_mc0.SelectAltitudeDifference(glide_settings) < -1000 &&

@@ -44,7 +44,7 @@ FinalGlideBarRenderer::Draw(Canvas &canvas, const PixelRect &rc,
   const GlideResult &solution = total.solution_remaining;
   const GlideResult &solution_mc0 = total.solution_mc0;
 
-  if (!task_stats.task_valid || !solution.IsOk() || !solution_mc0.IsDefined())
+  if (!task_stats.task_valid || !solution.IsDefined() || !solution_mc0.IsDefined())
     return;
 
   const int y0 = (rc.bottom + rc.top) / 2;
