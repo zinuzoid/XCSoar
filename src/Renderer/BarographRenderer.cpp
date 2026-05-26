@@ -15,6 +15,9 @@
 #include "Engine/Task/TaskManager.hpp"
 #include "TaskLegRenderer.hpp"
 #include "GradientRenderer.hpp"
+#include "Math/Point2D.hpp"
+
+#include <vector>
 
 void
 BarographCaption(TCHAR *sTmp, const FlightStatistics &fs)
@@ -48,7 +51,8 @@ RenderBarographSpark(Canvas &canvas, const PixelRect rc,
                      const FlightStatistics &fs,
                      const NMEAInfo &nmea_info,
                      const DerivedInfo &derived_info,
-                     const ProtectedTaskManager *_task)
+                     const ProtectedTaskManager *_task,
+                     double window_hours)
 {
   const std::lock_guard lock{fs.mutex};
   ChartRenderer chart(chart_look, canvas, rc, false);
@@ -57,24 +61,57 @@ RenderBarographSpark(Canvas &canvas, const PixelRect rc,
   if (!fs.altitude.HasResult())
     return;
 
-  chart.ScaleXFromData(fs.altitude);
   chart.ScaleYFromData(fs.altitude);
   chart.ScaleYFromValue(0);
 
-  if (_task != nullptr) {
-    ProtectedTaskManager::Lease task(*_task);
-    canvas.SelectHollowBrush();
-    RenderTaskLegs(chart, task, nmea_info, derived_info, -1);
+  if (window_hours > 0) {
+    const double x_max = fs.altitude.GetMaxX();
+    const double x_min = std::max(fs.altitude.GetMinX(), x_max - window_hours);
+    chart.ScaleXFromValue(x_min);
+    chart.ScaleXFromValue(x_max);
+
+    std::vector<DoublePoint2D> alt_pts, terrain_pts;
+    for (const auto &s : fs.altitude.GetSlots())
+      if (s.x >= x_min)
+        alt_pts.push_back({s.x, s.y});
+    if (!fs.altitude_terrain.IsEmpty())
+      for (const auto &s : fs.altitude_terrain.GetSlots())
+        if (s.x >= x_min)
+          terrain_pts.push_back({s.x, s.y});
+
+    if (_task != nullptr) {
+      ProtectedTaskManager::Lease task(*_task);
+      canvas.SelectHollowBrush();
+      RenderTaskLegs(chart, task, nmea_info, derived_info, -1);
+    }
+
+    canvas.SelectNullPen();
+    canvas.Select(cross_section_look.terrain_brush);
+
+    if (terrain_pts.size() >= 2)
+      chart.DrawFilledLineGraph(terrain_pts);
+
+    if (alt_pts.size() >= 2)
+      chart.DrawLineGraph(alt_pts,
+                          inverse ? ChartLook::STYLE_WHITE : ChartLook::STYLE_BLACK);
+  } else {
+    chart.ScaleXFromData(fs.altitude);
+
+    if (_task != nullptr) {
+      ProtectedTaskManager::Lease task(*_task);
+      canvas.SelectHollowBrush();
+      RenderTaskLegs(chart, task, nmea_info, derived_info, -1);
+    }
+
+    canvas.SelectNullPen();
+    canvas.Select(cross_section_look.terrain_brush);
+
+    chart.DrawFilledLineGraph(fs.altitude_terrain);
+
+    chart.DrawLineGraph(fs.altitude, inverse? ChartLook::STYLE_WHITE: ChartLook::STYLE_BLACK);
   }
 
-  canvas.SelectNullPen();
-  canvas.Select(cross_section_look.terrain_brush);
-
-  chart.DrawFilledLineGraph(fs.altitude_terrain);
-
-  chart.DrawLineGraph(fs.altitude, inverse? ChartLook::STYLE_WHITE: ChartLook::STYLE_BLACK);
-
-  // draw dot
+  // draw dot at the most recent altitude point
   if (fs.altitude.GetCount()) {
     if (inverse)
       chart.GetCanvas().SelectWhiteBrush();
