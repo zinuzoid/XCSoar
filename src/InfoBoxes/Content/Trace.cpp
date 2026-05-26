@@ -155,6 +155,8 @@ InfoBoxContentBarogramWithMeter::Update(InfoBoxData &data) noexcept
                  basic.static_pressure_available.ToInteger());
 }
 
+static constexpr double BAROGRAM_WINDOW_HOURS = 2;
+
 void
 InfoBoxContentBarogram::OnCustomPaint(Canvas &canvas, const PixelRect &rc) noexcept
 {
@@ -165,7 +167,8 @@ InfoBoxContentBarogram::OnCustomPaint(Canvas &canvas, const PixelRect &rc) noexc
                        backend_components->glide_computer->GetFlightStats(),
                        CommonInterface::Basic(),
                        CommonInterface::Calculated(),
-                       backend_components->protected_task_manager.get());
+                       backend_components->protected_task_manager.get(),
+                       BAROGRAM_WINDOW_HOURS);
 }
 
 static void

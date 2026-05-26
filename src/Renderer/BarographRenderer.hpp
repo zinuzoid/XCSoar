@@ -26,7 +26,8 @@ RenderBarographSpark(Canvas &canvas, const PixelRect rc,
                      const FlightStatistics &fs,
                      const NMEAInfo &nmea_info,
                      const DerivedInfo &derived_info,
-                     const ProtectedTaskManager *_task);
+                     const ProtectedTaskManager *_task,
+                     double window_hours = 0);
 
 void
 RenderBarograph(Canvas &canvas, const PixelRect rc,
