@@ -1,6 +1,7 @@
 ---
 on:
   workflow_dispatch:
+  push:
 
 env:
   DEBUG: y
