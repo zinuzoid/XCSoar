@@ -45,7 +45,7 @@ public class ReceiveTaskActivity extends Activity {
 
     Log.d(TAG, "Received intent data='" + data + "'");
 
-    if (data.startsWith("xctsk:")) {
+    if (data.startsWith("xctsk:") || data.startsWith("XCTSK:")) {
       final String msg = NativeView.onReceiveXCTrackTask(data.substring(6));
       if (msg == null) {
         /* the data was handled successfully, and the main "XCSoar"
