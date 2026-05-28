@@ -50,10 +50,12 @@ DecodeXCTrackZ(std::string_view src)
 }
 
 static WaypointPtr
-MakeWaypoint(GeoPoint location, const TCHAR *name)
+MakeWaypoint(GeoPoint location, double elevation, const TCHAR *name)
 {
   Waypoint *wp = new Waypoint(location);
   wp->name = name;
+  wp->elevation = elevation;
+  wp->has_elevation = true;
   return WaypointPtr{wp};
 }
 
@@ -100,7 +102,7 @@ DecodeXCTrackTask(const boost::json::value &_j,
       throw std::invalid_argument{"Malfored name"};
 
     auto oz = std::make_unique<CylinderZone>(z.location, z.radius);
-    auto wp = MakeWaypoint(z.location, name_t.c_str());
+    auto wp = MakeWaypoint(z.location, z.altitude, name_t.c_str());
 
     std::unique_ptr<OrderedTaskPoint> tp;
 
