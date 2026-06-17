@@ -65,6 +65,7 @@ public:
   CurlGlobal *curl;
 
   Skysight(CurlGlobal &_curl);
+  ~Skysight();
 
   static void APIInited(const tstring details, const bool success,
 			const tstring layer_id, const uint64_t time_index);

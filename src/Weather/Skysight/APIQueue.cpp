@@ -33,7 +33,41 @@ Copyright_License {
 
 SkysightAPIQueue::~SkysightAPIQueue() {
 	LogFormat("SkysightAPIQueue::~SkysightAPIQueue %d", timer.IsActive());
+  StopAll();
+}
+
+void
+SkysightAPIQueue::StopAll()
+{
   timer.Cancel();
+
+  /*
+   * Stop and join every background worker thread before its owning
+   * std::unique_ptr (and this queue) is destroyed.  A thread still inside
+   * Tick() finishes its in-flight callback against a still-valid object and
+   * then exits; Done() -> StandbyThread::LockStop() joins it.  Without this the
+   * threads outlive the objects they call back into (use-after-free).
+   *
+   * Move the queues out under the lock and join the threads afterwards without
+   * holding it: a worker still inside Tick() may call back into AddRequest()
+   * (which takes request_queue_mutex), so joining while holding the lock would
+   * deadlock.
+   */
+  std::vector<std::unique_ptr<SkysightAsyncRequest>> requests;
+  std::vector<std::unique_ptr<CDFDecoder>> decodes;
+  {
+    std::lock_guard lock(request_queue_mutex);
+    requests = std::move(request_queue);
+    decodes = std::move(decode_queue);
+    request_queue.clear();
+    decode_queue.clear();
+  }
+
+  for (auto &i : requests)
+    i->Done();
+
+  for (auto &i : decodes)
+    i->Done();
 }
 
 void
