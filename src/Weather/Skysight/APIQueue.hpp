@@ -58,6 +58,13 @@ public:
   void AddDecodeJob(std::unique_ptr<CDFDecoder> &&job);
   void Clear(const tstring msg);
   void DoClearingQueue();
+
+  /**
+   * Stop and join all background worker threads and clear the queues.  Must be
+   * called before this queue (or the objects the worker callbacks reach into)
+   * is destroyed.
+   */
+  void StopAll();
 };
 
 #endif
