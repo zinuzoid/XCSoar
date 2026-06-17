@@ -349,6 +349,20 @@ Skysight::Skysight(CurlGlobal &_curl)
   Init();
 }
 
+Skysight::~Skysight()
+{
+  /*
+   * Tear down the API (and its background download/decode threads) while this
+   * object and its active_metrics_mutex are still alive, so any thread mid-way
+   * through the DownloadComplete callback finishes safely.  Only afterwards
+   * clear `self`, so any later stray callback hits the `if (!self)` guard.
+   */
+  delete api;
+  api = nullptr;
+  if (self == this)
+    self = nullptr;
+}
+
 void
 Skysight::Init()
 {

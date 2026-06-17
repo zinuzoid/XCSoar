@@ -52,6 +52,15 @@ SkysightAPI *SkysightAPI::self;
 
 SkysightAPI::~SkysightAPI() {
 	LogFormat("SkysightAPI::~SkysightAPI %d", timer.IsActive());
+  /*
+   * Stop all worker threads first: a thread inside SkysightAsyncRequest::Tick()
+   * reaches the static SkysightAPI::ParseResponse, which touches our members
+   * (metrics, region, queue) and `self`.  They must be joined before any of
+   * those is destroyed.
+   */
+  queue.StopAll();
+  if (self == this)
+    self = nullptr;
   timer.Cancel();
 }
 
