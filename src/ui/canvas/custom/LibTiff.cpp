@@ -7,6 +7,7 @@
 #include "system/FileUtil.hpp"
 #include "util/ScopeExit.hxx"
 
+#include <algorithm>
 #include <stdexcept>
 
 #include <tiffio.h>
@@ -64,13 +65,35 @@ public:
 };
 
 /**
- * Validate that TIFF strip data fits within the actual file size.
- * Corrupted or truncated TIFFs can cause libtiff to memcpy past
- * valid memory in DumpModeDecode, resulting in a segfault.
+ * Validate that TIFF strip/tile data is consistent before handing the file
+ * to libtiff's decoders.  Corrupted or truncated TIFFs can otherwise cause
+ * libtiff to memcpy past valid memory in DumpModeDecode, resulting in a
+ * segfault that no try/catch can recover from.
+ *
+ * Two classes of corruption are rejected:
+ *  - data that does not fit within the actual file (truncated download), and
+ *  - for uncompressed data, a declared strip/tile smaller than the size the
+ *    image geometry requires.  DumpModeDecode memcpy's the geometry-derived
+ *    size, so a short raw buffer is read past its end.
  */
 static void
 ValidateTiffStrips(TIFF *tiff, uint64_t file_size)
 {
+  /* Overflow-safe "offset + count <= file_size": adding the two uint64_t
+     values directly can wrap around for a corrupt header and pass the check,
+     after which libtiff reads past valid memory. */
+  const auto RangeWithinFile = [file_size](uint64_t offset,
+                                           uint64_t count) noexcept {
+    return count <= file_size && offset <= file_size - count;
+  };
+
+  /* The geometry cross-check only applies to uncompressed data; compressed
+     strips legitimately hold fewer raw bytes than their decoded size, and the
+     observed crash is specifically in DumpModeDecode (uncompressed). */
+  uint16_t compression = COMPRESSION_NONE;
+  TIFFGetFieldDefaulted(tiff, TIFFTAG_COMPRESSION, &compression);
+  const bool uncompressed = compression == COMPRESSION_NONE;
+
   if (TIFFIsTiled(tiff)) {
     ttile_t num_tiles = TIFFNumberOfTiles(tiff);
     if (num_tiles == 0)
@@ -83,9 +106,17 @@ ValidateTiffStrips(TIFF *tiff, uint64_t file_size)
         !byte_counts)
       throw std::runtime_error("TIFF file missing tile metadata");
 
+    /* tiles are padded to a constant full size */
+    const tmsize_t tile_size = uncompressed ? TIFFTileSize(tiff) : 0;
+    if (uncompressed && tile_size <= 0)
+      throw std::runtime_error("Invalid TIFF tile geometry");
+
     for (ttile_t i = 0; i < num_tiles; i++) {
-      if (offsets[i] + byte_counts[i] > file_size)
+      if (!RangeWithinFile(offsets[i], byte_counts[i]))
         throw std::runtime_error("TIFF file is truncated");
+
+      if (uncompressed && byte_counts[i] < (uint64_t)tile_size)
+        throw std::runtime_error("TIFF tile smaller than image geometry");
     }
   } else {
     tstrip_t num_strips = TIFFNumberOfStrips(tiff);
@@ -99,9 +130,36 @@ ValidateTiffStrips(TIFF *tiff, uint64_t file_size)
         !byte_counts)
       throw std::runtime_error("TIFF file missing strip metadata");
 
+    uint32_t height = 0, rows_per_strip = 0;
+    TIFFGetField(tiff, TIFFTAG_IMAGELENGTH, &height);
+    TIFFGetFieldDefaulted(tiff, TIFFTAG_ROWSPERSTRIP, &rows_per_strip);
+    /* a missing/absurd RowsPerStrip means "whole image in one strip" */
+    if (rows_per_strip == 0 || rows_per_strip > height)
+      rows_per_strip = height;
+
+    /* number of strips that cover the image height once (PlanarConfig
+       separate repeats this set once per sample plane) */
+    const uint32_t strips_per_plane =
+      rows_per_strip > 0 ? (height + rows_per_strip - 1) / rows_per_strip : 0;
+
     for (tstrip_t i = 0; i < num_strips; i++) {
-      if (offsets[i] + byte_counts[i] > file_size)
+      if (!RangeWithinFile(offsets[i], byte_counts[i]))
         throw std::runtime_error("TIFF file is truncated");
+
+      if (uncompressed) {
+        /* rows in this strip; the last strip of each plane may be partial */
+        uint32_t strip_in_plane = strips_per_plane > 0
+          ? (uint32_t)(i % strips_per_plane) : 0;
+        uint64_t row0 = (uint64_t)strip_in_plane * rows_per_strip;
+        uint32_t nrows = row0 < height
+          ? (uint32_t)std::min<uint64_t>(rows_per_strip, height - row0)
+          : rows_per_strip;
+
+        /* TIFFVStripSize is exactly the size DumpModeDecode will memcpy */
+        tmsize_t expected = TIFFVStripSize(tiff, nrows);
+        if (expected <= 0 || byte_counts[i] < (uint64_t)expected)
+          throw std::runtime_error("TIFF strip smaller than image geometry");
+      }
     }
   }
 }
