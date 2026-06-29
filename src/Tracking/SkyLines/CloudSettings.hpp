@@ -15,8 +15,8 @@ namespace SkyLinesTracking {
 struct CloudSettings {
   /**
    * Is submitting data to the (experimental) XCSoar Cloud enabled?
-   * TriState::UNKNOWN means the user has not yet been asked about
-   * it.
+   * Defaults to FALSE (disabled). Users can enable it manually in
+   * the "Tracking" settings.
    */
   TriState enabled;
 
@@ -25,7 +25,7 @@ struct CloudSettings {
   uint64_t key;
 
   void SetDefaults() {
-    enabled = TriState::UNKNOWN;
+    enabled = TriState::FALSE;
     show_thermals = true;
     key = 0;
   }

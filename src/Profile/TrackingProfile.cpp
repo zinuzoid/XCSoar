@@ -15,7 +15,7 @@ static void Load(const ProfileMap &map,
   bool bvalue;
   settings.enabled = map.Get(ProfileKeys::CloudEnabled, bvalue)
     ? (bvalue ? TriState::TRUE : TriState::FALSE)
-    : TriState::UNKNOWN;
+    : TriState::FALSE;
 
   map.Get(ProfileKeys::CloudShowThermals, settings.show_thermals);
 
