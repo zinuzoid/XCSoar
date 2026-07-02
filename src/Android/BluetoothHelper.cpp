@@ -161,7 +161,8 @@ BluetoothHelper::connect(JNIEnv *env, const char *address)
   const Java::String address2(env, address);
   auto obj = Java::CallObjectMethodRethrow(env, Get(), connect_method,
                                            address2.Get());
-  assert(obj);
+  if (!obj)
+    throw std::runtime_error{"Bluetooth connect failed"};
 
   return new PortBridge(env, obj);
 }
@@ -170,7 +171,8 @@ PortBridge *
 BluetoothHelper::createServer(JNIEnv *env)
 {
   auto obj = Java::CallObjectMethodRethrow(env, Get(), createServer_method);
-  assert(obj);
+  if (!obj)
+    throw std::runtime_error{"Bluetooth server creation failed"};
 
   return new PortBridge(env, obj);
 }
@@ -183,7 +185,8 @@ BluetoothHelper::connectHM10(JNIEnv *env, const char *address)
   const Java::String address2(env, address);
   auto obj = Java::CallObjectMethodRethrow(env, Get(), hm10connect_method,
                                            address2.Get());
-  assert(obj);
+  if (!obj)
+    throw std::runtime_error{"Bluetooth HM10 connect failed"};
 
   return new PortBridge(env, obj);
 }
@@ -196,7 +199,8 @@ BluetoothHelper::connectVectorVario(JNIEnv *env, const char *_address,
   auto listener = NativeSensorListener::Create(env, _listener);
   auto obj = Java::CallObjectMethodRethrow(env, Get(), vectorVarioConnect_method,
                                            address.Get(), listener.Get());
-  assert(obj);
+  if (!obj)
+    throw std::runtime_error{"Vector Vario connect failed"};
 
   return new PortBridge(env, obj);
 }
