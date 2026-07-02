@@ -34,21 +34,13 @@ public:
   void setListener(JNIEnv *env, PortListener *listener);
   void setInputListener(JNIEnv *env, DataHandler *handler);
 
-  int getState(JNIEnv *env) {
-    return env->CallIntMethod(Get(), getState_method);
-  }
+  int getState(JNIEnv *env) noexcept;
 
-  bool drain(JNIEnv *env) {
-    return env->CallBooleanMethod(Get(), drain_method);
-  }
+  bool drain(JNIEnv *env) noexcept;
 
-  int getBaudRate(JNIEnv *env) const {
-    return env->CallIntMethod(Get(), getBaudRate_method);
-  }
+  int getBaudRate(JNIEnv *env) const noexcept;
 
-  bool setBaudRate(JNIEnv *env, int baud_rate) {
-    return env->CallBooleanMethod(Get(), setBaudRate_method, baud_rate);
-  }
+  bool setBaudRate(JNIEnv *env, int baud_rate);
 
   std::size_t write(JNIEnv *env, std::span<const std::byte> src);
 };
