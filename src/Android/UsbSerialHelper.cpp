@@ -9,6 +9,8 @@
 #include "java/Env.hxx"
 #include "java/String.hxx"
 
+#include <stdexcept>
+
 static Java::TrivialClass cls;
 static jmethodID ctor;
 static jmethodID close_method;
@@ -88,7 +90,8 @@ UsbSerialHelper::Connect(JNIEnv *env, const char *name, unsigned baud)
   Java::String name2(env, name);
   auto obj = Java::CallObjectMethodRethrow(env, Get(), connect_method,
                                            name2.Get(), (int)baud);
-  assert(obj);
+  if (!obj)
+    throw std::runtime_error{"USB serial connect failed"};
 
   return new PortBridge(env, obj);
 }
