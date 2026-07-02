@@ -38,6 +38,7 @@ PortBridge::PortBridge(JNIEnv *env, jobject obj)
   :Java::GlobalCloseable(env, obj),
    write_buffer(env, env->NewByteArray(write_buffer_size))
 {
+  Java::RethrowException(env);
 }
 
 void
@@ -48,6 +49,7 @@ PortBridge::setListener(JNIEnv *env, PortListener *_listener)
     : Java::LocalObject{};
 
   env->CallVoidMethod(Get(), setListener_method, listener.Get());
+  Java::RethrowException(env);
 }
 
 void
@@ -58,6 +60,45 @@ PortBridge::setInputListener(JNIEnv *env, DataHandler *handler)
     : Java::LocalObject{};
 
   env->CallVoidMethod(Get(), setInputListener_method, listener.Get());
+  Java::RethrowException(env);
+}
+
+int
+PortBridge::getState(JNIEnv *env) noexcept
+{
+  int state = env->CallIntMethod(Get(), getState_method);
+  if (Java::DiscardException(env))
+    return 1; // STATE_FAILED
+
+  return state;
+}
+
+bool
+PortBridge::drain(JNIEnv *env) noexcept
+{
+  bool result = env->CallBooleanMethod(Get(), drain_method);
+  if (Java::DiscardException(env))
+    return false;
+
+  return result;
+}
+
+int
+PortBridge::getBaudRate(JNIEnv *env) const noexcept
+{
+  int baud_rate = env->CallIntMethod(Get(), getBaudRate_method);
+  if (Java::DiscardException(env))
+    return 0;
+
+  return baud_rate;
+}
+
+bool
+PortBridge::setBaudRate(JNIEnv *env, int baud_rate)
+{
+  bool result = env->CallBooleanMethod(Get(), setBaudRate_method, baud_rate);
+  Java::RethrowException(env);
+  return result;
 }
 
 std::size_t
