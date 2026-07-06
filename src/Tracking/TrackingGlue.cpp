@@ -21,10 +21,12 @@ TrackingGlue::SetSettings(const TrackingSettings &_settings)
 {
   skylines.SetSettings(_settings.skylines);
   livetrack24.SetSettings(_settings.livetrack24);
+  jet_provider.SetSettings(_settings.jet_provider);
 }
 
 void
-TrackingGlue::OnTimer(const MoreData &basic, const DerivedInfo &calculated)
+TrackingGlue::OnTimer(const MoreData &basic, const DerivedInfo &calculated,
+                      const GeoBounds &visible_bounds)
 {
   try {
     skylines.Tick(basic, calculated);
@@ -32,8 +34,13 @@ TrackingGlue::OnTimer(const MoreData &basic, const DerivedInfo &calculated)
     LogError(std::current_exception(), "SkyLines error");
   }
 
-  jet_provider.OnTimer(basic, calculated);
-  jet_provider_data.validity.Expire(basic.clock, std::chrono::seconds(JET_PROVIDER_TRAFFIC_OFFLINE_THRESHOLD_SECS));
+  jet_provider.OnTimer(basic, visible_bounds);
+
+  {
+    const std::lock_guard lock{jet_provider_data.mutex};
+    jet_provider_data.validity.Expire(basic.clock,
+                                      JETProvider::Data::OFFLINE_THRESHOLD);
+  }
 
   livetrack24.OnTimer(basic, calculated);
 }
@@ -59,40 +66,45 @@ TrackingGlue::OnTraffic(uint32_t pilot_id, unsigned time_of_day_ms,
     skylines.RequestUserName(pilot_id);
 }
 
-void TrackingGlue::OnJETTraffic(std::vector<JETProvider::Traffic> traffics, Validity validity, bool success, TimeStamp now)
+void
+TrackingGlue::OnJETTraffic(std::vector<JETProvider::Traffic> &&traffics,
+                           TimeStamp now)
 {
-  const std::lock_guard<Mutex> lock(jet_provider_data.mutex);
+  const std::lock_guard lock{jet_provider_data.mutex};
 
-  jet_provider_data.validity = validity;
-  jet_provider_data.success = success;
-  if (success) {
-    jet_provider_data.traffics.clear();
-    for (JETProvider::Traffic traffic : traffics) {
-      ClimbAverageCalculator &calc =
-        climb_avg_map[std::string(traffic.traffic_id)];
-      traffic.climb_rate_avg30s =
-        calc.GetAverage(now, traffic.altitude, std::chrono::seconds{30});
-      jet_provider_data.traffics[traffic.traffic_id] = traffic;
-    }
+  if (!jet_provider_data.success)
+    LogFormat("JETProvider online, %u traffic", (unsigned)traffics.size());
 
-    // Prune stale calculators for targets not seen in a while
-    constexpr FloatDuration MAX_AGE = std::chrono::minutes{1};
-    for (auto it = climb_avg_map.begin(); it != climb_avg_map.end();) {
-      if (it->second.Expired(now, MAX_AGE))
-        it = climb_avg_map.erase(it);
-      else
-        ++it;
-    }
+  jet_provider_data.validity.Update(now);
+  jet_provider_data.success = true;
+
+  jet_provider_data.traffics.clear();
+  for (JETProvider::Traffic &traffic : traffics) {
+    const std::string id = traffic.traffic_id;
+    ClimbAverageCalculator &calc = climb_avg_map[id];
+    traffic.climb_rate_avg30s =
+      calc.GetAverage(now, traffic.altitude, std::chrono::seconds{30});
+    jet_provider_data.traffics[id] = std::move(traffic);
   }
 
-  LogFormat("OnJETTraffic size:%d success:%d",
-    (int) jet_provider_data.traffics.size(), success);
+  // Prune stale calculators for targets not seen in a while
+  constexpr FloatDuration MAX_AGE = std::chrono::minutes{1};
+  for (auto it = climb_avg_map.begin(); it != climb_avg_map.end();) {
+    if (it->second.Expired(now, MAX_AGE))
+      it = climb_avg_map.erase(it);
+    else
+      ++it;
+  }
 }
 
-void TrackingGlue::OnJETProviderReset() {
-  if (jet_provider_data.traffics.size() > 0) {
-    OnJETTraffic(std::vector<JETProvider::Traffic>(), Validity(), true, TimeStamp::Undefined());
-  }
+void
+TrackingGlue::OnJETProviderReset()
+{
+  const std::lock_guard lock{jet_provider_data.mutex};
+
+  jet_provider_data.traffics.clear();
+  jet_provider_data.validity.Clear();
+  jet_provider_data.success = false;
   climb_avg_map.clear();
 }
 
@@ -145,4 +157,10 @@ void
 TrackingGlue::OnJETProviderError(std::exception_ptr e)
 {
   LogError(e, "JETProvider error");
+
+  /* mark the last poll as failed; the renderer keeps drawing the
+     retained traffic in "offline" style */
+  const std::lock_guard lock{jet_provider_data.mutex};
+  jet_provider_data.validity.Clear();
+  jet_provider_data.success = false;
 }

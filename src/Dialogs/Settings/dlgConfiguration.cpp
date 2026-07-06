@@ -55,9 +55,9 @@
 
 #ifdef HAVE_TRACKING
 #include "Panels/TrackingConfigPanel.hpp"
+#include "Panels/JETProviderConfigPanel.hpp"
 #endif
 
-#include "Panels/JETProviderConfigPanel.hpp"
 #include "Panels/NetworkWidgetConfigPanel.hpp"
 #include "Panels/CloudConfigPanel.hpp"
 
@@ -139,7 +139,9 @@ static constexpr TabMenuPage setup_pages[] = {
 #ifdef HAVE_VOLUME_CONTROLLER
   { N_("Audio"), CreateAudioConfigPanel },
 #endif
+#ifdef HAVE_TRACKING
   { N_("JET Provider"), CreateJETProviderConfigPanel },
+#endif
   { N_("Network Widget"), CreateNetworkWidgetConfigPanel },
   { nullptr, nullptr }
 };

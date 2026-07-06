@@ -268,13 +268,17 @@ void
 MapWindow::DrawJETProviderTraffic(Canvas &canvas,
   const PixelPoint) const noexcept
 {
-  if (jet_provider_data == nullptr || jet_provider_data->traffics.empty()) {
+  if (jet_provider_data == nullptr) {
     return;
   }
 
   const MoreData &basic = Basic();
 
   const std::lock_guard lock{jet_provider_data->mutex};
+
+  if (jet_provider_data->traffics.empty()) {
+    return;
+  }
 
   const WindowProjection &projection = render_projection;
 
@@ -315,8 +319,8 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
     TextInBoxMode mode;
     mode.shape = LabelShape::OUTLINED;
 
-    if (traffic.display && !StringIsEmpty(traffic.display))
-      TextInBox(canvas, traffic.display, sc_name,
+    if (!traffic.display.empty())
+      TextInBox(canvas, traffic.display.c_str(), sc_name,
                 mode, GetClientRect());
 
     char second_text[32];

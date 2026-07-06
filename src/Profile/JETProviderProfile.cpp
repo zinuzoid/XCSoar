@@ -23,7 +23,6 @@ Copyright_License {
 
 #include "JETProviderProfile.hpp"
 #include "Keys.hpp"
-#include "Weather/Settings.hpp"
 
 namespace Profile {
   static void Load(const ProfileMap &map, JETProviderSettings::Radar &settings) {

@@ -84,6 +84,7 @@ TEST_NAMES = \
 	TestAngle TestARange \
 	TestGrahamScan \
 	TestUnits TestEarth TestSunEphemeris \
+	TestRadarParser \
 	TestValidity TestUTM \
 	TestAllocatedGrid \
 	TestRadixTree TestGeoBounds TestGeoClip \
@@ -437,6 +438,14 @@ TEST_UNITS_SOURCES = \
 	$(TEST_SRC_DIR)/TestUnits.cpp
 TEST_UNITS_DEPENDS = MATH UNITS
 $(eval $(call link-program,TestUnits,TEST_UNITS))
+
+TEST_RADAR_PARSER_SOURCES = \
+	$(SRC)/Tracking/JETProvider/RadarParser.cpp \
+	$(TEST_SRC_DIR)/FakeLogFile.cpp \
+	$(TEST_SRC_DIR)/tap.c \
+	$(TEST_SRC_DIR)/TestRadarParser.cpp
+TEST_RADAR_PARSER_DEPENDS = GEO MATH UTIL UNITS
+$(eval $(call link-program,TestRadarParser,TEST_RADAR_PARSER))
 
 TEST_UNITS_FORMATTER_SOURCES = \
 	$(SRC)/Formatter/Units.cpp \

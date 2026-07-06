@@ -11,11 +11,14 @@
 #include "Tracking/SkyLines/Glue.hpp"
 #include "Tracking/SkyLines/Data.hpp"
 #include "Tracking/LiveTrack24/Glue.hpp"
-#include "Tracking/JETProvider/JETProvider.hpp"
+#include "Tracking/JETProvider/Data.hpp"
+#include "Tracking/JETProvider/Handler.hpp"
+#include "Tracking/JETProvider/Glue.hpp"
 #include "Computer/ClimbAverageCalculator.hpp"
 #include "thread/StandbyThread.hpp"
 #include "time/PeriodClock.hpp"
 #include "Geo/GeoPoint.hpp"
+#include "Geo/GeoBounds.hpp"
 
 #include <map>
 #include <string>
@@ -39,6 +42,10 @@ class TrackingGlue final
 
   JETProvider::Data jet_provider_data;
 
+  /**
+   * 30 second climb average per JET traffic id.  Protected by
+   * #jet_provider_data's mutex.
+   */
   std::map<std::string, ClimbAverageCalculator> climb_avg_map;
 
   /**
@@ -52,7 +59,13 @@ public:
 
   void SetSettings(const TrackingSettings &_settings);
 
-  void OnTimer(const MoreData &basic, const DerivedInfo &calculated);
+  /**
+   * @param visible_bounds the geographic area currently visible on
+   * the map (queried for JET traffic), or GeoBounds::Invalid() if no
+   * map is available; must be obtained on the calling (UI) thread
+   */
+  void OnTimer(const MoreData &basic, const DerivedInfo &calculated,
+               const GeoBounds &visible_bounds);
 
 private:
   /* virtual methods from SkyLinesTracking::Handler */
@@ -65,7 +78,10 @@ private:
                  const AGeoPoint &bottom, const AGeoPoint &top,
                  double lift) override;
   void OnSkyLinesError(std::exception_ptr e) override;
-  void OnJETTraffic(std::vector<JETProvider::Traffic> traffics, Validity validity, bool success, TimeStamp now) override;
+
+  /* virtual methods from JETProvider::Handler */
+  void OnJETTraffic(std::vector<JETProvider::Traffic> &&traffics,
+                    TimeStamp now) override;
   void OnJETProviderReset() override;
   void OnJETProviderError(std::exception_ptr e) override;
 

@@ -10,6 +10,7 @@
 #include "Tracking/SkyLines/Features.hpp"
 #include "Tracking/SkyLines/Settings.hpp"
 #include "Tracking/LiveTrack24/Settings.hpp"
+#include "Tracking/JETProvider/Settings.hpp"
 
 #include "util/StaticString.hxx"
 
@@ -17,10 +18,12 @@
 struct TrackingSettings {
   SkyLinesTracking::Settings skylines;
   LiveTrack24::Settings livetrack24;
+  JETProviderSettings jet_provider;
 
   void SetDefaults() {
     skylines.SetDefaults();
     livetrack24.SetDefaults();
+    jet_provider.SetDefaults();
   }
 };
 

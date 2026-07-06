@@ -18,6 +18,9 @@
 #include "BallastDumpManager.hpp"
 #include "Operation/Operation.hpp"
 #include "Tracking/TrackingGlue.hpp"
+#include "MapWindow/GlueMapWindow.hpp"
+#include "UIGlobals.hpp"
+#include "Geo/GeoBounds.hpp"
 #include "net/client/tim/Glue.hpp"
 #include "net/client/NetworkWidget/Glue.hpp"
 #include "ui/event/Idle.hpp"
@@ -278,8 +281,19 @@ ProcessTimer() noexcept
   if (net_components != nullptr) {
 #ifdef HAVE_TRACKING
     if (net_components->tracking) {
+      /* snapshot the visible map area on the UI thread; the JET
+         provider queries traffic for it from the I/O thread */
+      GeoBounds visible_bounds = GeoBounds::Invalid();
+      if (const GlueMapWindow *map = UIGlobals::GetMap()) {
+        const MapWindowProjection projection = map->VisibleProjection();
+        if (projection.IsValid())
+          visible_bounds = projection.GetScreenBounds();
+      }
+
       net_components->tracking->SetSettings(CommonInterface::GetComputerSettings().tracking);
-      net_components->tracking->OnTimer(CommonInterface::Basic(), CommonInterface::Calculated());
+      net_components->tracking->OnTimer(CommonInterface::Basic(),
+                                        CommonInterface::Calculated(),
+                                        visible_bounds);
     }
 #endif
 

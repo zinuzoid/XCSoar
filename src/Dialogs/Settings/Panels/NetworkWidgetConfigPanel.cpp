@@ -14,13 +14,26 @@
 #include "Form/DataField/Listener.hpp"
 #include "Form/Edit.hpp"
 #include "Profile/Profile.hpp"
+#include "Tracking/Features.hpp"
+
+[[gnu::pure]]
+static bool
+HasPrivilegedJETAccessToken() noexcept
+{
+#ifdef HAVE_TRACKING
+  const auto &access_token =
+      CommonInterface::GetComputerSettings().tracking.jet_provider
+      .radar.access_token;
+  return access_token.Contains("JIM") || access_token.Contains("DEV");
+#else
+  return false;
+#endif
+}
 
 void
 NetworkWidgetConfigPanel::Prepare(ContainerWindow &parent,
                                   const PixelRect &rc) noexcept
 {
-  const JETProviderSettings &jet_settings =
-      CommonInterface::GetComputerSettings().jet_provider_setting;
   const NetworkWidgetSettings &settings =
       CommonInterface::GetComputerSettings().network_widget;
 
@@ -31,8 +44,7 @@ NetworkWidgetConfigPanel::Prepare(ContainerWindow &parent,
                   "Configure up to 2 independent URLs below.\n\n"
                   "** EXPERIMENTAL: This feature is subject to change. **"));
 
-  if (jet_settings.radar.access_token.Contains("JIM") ||
-      jet_settings.radar.access_token.Contains("DEV"))
+  if (HasPrivilegedJETAccessToken())
   {
     AddDuration(_("Interval"), nullptr, std::chrono::seconds{1},
                 std::chrono::seconds{300}, std::chrono::seconds{1},

@@ -172,9 +172,9 @@ Profile::Load(const ProfileMap &map, ComputerSettings &settings)
 
 #ifdef HAVE_TRACKING
   Load(map, settings.tracking);
+  Load(map, settings.tracking.jet_provider);
 #endif
 
   Load(map, settings.weather);
-  Load(map, settings.jet_provider_setting);
   Load(map, settings.network_widget);
 }

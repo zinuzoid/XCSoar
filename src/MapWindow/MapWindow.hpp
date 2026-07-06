@@ -18,7 +18,7 @@
 #include "Renderer/TrailRenderer.hpp"
 #include "Weather/Features.hpp"
 #include "Tracking/SkyLines/Features.hpp"
-#include "Tracking/JETProvider/JETProvider.hpp"
+#include "Tracking/JETProvider/Data.hpp"
 #include "Engine/Task/TaskInterface.hpp"
 
 #include <memory>

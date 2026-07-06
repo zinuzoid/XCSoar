@@ -26,6 +26,7 @@ Copyright_License {
 #include "Interface.hpp"
 #include "Language/Language.hpp"
 #include "Profile/Keys.hpp"
+#include "Tracking/Features.hpp"
 #include "Widget/RowFormWidget.hpp"
 
 #include "Profile/Profile.hpp"
@@ -37,10 +38,11 @@ Copyright_License {
 
 
 void JETProviderConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc) noexcept {
-  const JETProviderSettings &settings =
-    CommonInterface::GetComputerSettings().jet_provider_setting;
-
   RowFormWidget::Prepare(parent, rc);
+
+#ifdef HAVE_TRACKING
+  const JETProviderSettings &settings =
+    CommonInterface::GetComputerSettings().tracking.jet_provider;
 
   AddMultiLine(_("Warning This is a BETA service! No service guarantee will be provided. Use at your own risk!"));
   AddMultiLine(_("\"Radar\" will request external traffic information from internet and show in XCSOAR map to increase your situation awareness!"));
@@ -72,24 +74,27 @@ void JETProviderConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &r
     nullptr,
     settings.radar.access_token);
   SetExpertRow(RADAR_ACCESS_TOKEN);
+#endif /* HAVE_TRACKING */
 }
 
 bool JETProviderConfigPanel::Save(bool &_changed) noexcept {
+#ifdef HAVE_TRACKING
   bool changed = false;
 
   JETProviderSettings &settings =
-    CommonInterface::SetComputerSettings().jet_provider_setting;
+    CommonInterface::SetComputerSettings().tracking.jet_provider;
 
   changed |= SaveValue(RADAR_ENABLED,
     ProfileKeys::JETProviderRadarEnabled, settings.radar.enabled);
 
   changed |= SaveValue(RADAR_INTERVAL,
     ProfileKeys::JETProviderRadarInterval, settings.radar.interval);
-  
+
   changed |= SaveValue(RADAR_ACCESS_TOKEN,
     ProfileKeys::JETProviderRadarAccessToken, settings.radar.access_token);
-  
+
   _changed |= changed;
+#endif /* HAVE_TRACKING */
 
   return true;
 }
