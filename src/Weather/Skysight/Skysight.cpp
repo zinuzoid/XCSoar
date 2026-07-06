@@ -213,7 +213,9 @@ struct SkysightSyncRequest {
 
 static Co::Task<SkysightSyncResult>
 RunSync(CurlGlobal &curl, SkysightDecoderThread &decoder,
-        const SkysightSyncRequest request)
+        /* not const: moved into the coroutine frame, and the
+           AllocatedPath member makes this move-only */
+        SkysightSyncRequest request)
 {
   SkysightSyncResult result;
 
@@ -274,8 +276,10 @@ RunSync(CurlGlobal &curl, SkysightDecoderThread &decoder,
       auto nc_path = DataFilePath(request.cache_path, request.region,
                                   download.layer_id, file.time, ".nc");
 
+      /* explicit copy: nc_path is still needed for the decode job */
       co_await SkysightAPI::DownloadDataFile(curl, result.session,
-                                             file.link, nc_path);
+                                             file.link,
+                                             AllocatedPath{Path{nc_path}});
 
       decoder.Push({std::move(nc_path), std::move(tif_path),
                     download.layer_id, file.time, download.legend});

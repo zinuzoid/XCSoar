@@ -142,7 +142,10 @@ FetchDataIndexJson(CurlGlobal &curl, const SkysightSession session,
 
 Co::Task<void>
 DownloadDataFile(CurlGlobal &curl, const SkysightSession session,
-                 const std::string url, const AllocatedPath path)
+                 const std::string url,
+                 /* not const: moved into the coroutine frame, and
+                    AllocatedPath is move-only */
+                 AllocatedPath path)
 {
   CurlEasy easy{url.c_str()};
   CurlSlist headers;
