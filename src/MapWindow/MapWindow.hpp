@@ -28,6 +28,7 @@ struct TrafficLook;
 class TopographyStore;
 class CachedTopographyRenderer;
 class RasterTerrain;
+class Skysight;
 class RaspStore;
 class RaspRenderer;
 class MapOverlay;
@@ -106,6 +107,13 @@ protected:
   RasterTerrain *terrain = nullptr;
 
   std::shared_ptr<RaspStore> rasp_store;
+
+  /**
+   * The Skysight glue object is owned by the map only for lifetime
+   * management (like #rasp_store); it renders through
+   * MapWindow::SetOverlay(), not through the render loop.
+   */
+  std::shared_ptr<Skysight> skysight;
 
   /**
    * The current RASP renderer.  Modifications to this pointer (but
@@ -215,7 +223,15 @@ public:
     return rasp_store;
   }
 
+  const std::shared_ptr<Skysight> &GetSkysight() const noexcept {
+    return skysight;
+  }
+
   void SetRasp(const std::shared_ptr<RaspStore> &_rasp_store) noexcept;
+
+  void SetSkysight(std::shared_ptr<Skysight> _skysight) noexcept {
+    skysight = std::move(_skysight);
+  }
 
 #ifdef ENABLE_OPENGL
   void SetOverlay(std::unique_ptr<MapOverlay> &&_overlay) noexcept;

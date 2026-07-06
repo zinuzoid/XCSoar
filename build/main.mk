@@ -636,7 +636,8 @@ XCSOAR_SOURCES += \
 	$(SRC)/Weather/Skysight/Protocol.cpp \
 	$(SRC)/Weather/Skysight/SkysightRegions.cpp \
 	$(SRC)/Weather/Skysight/CDFDecoder.cpp \
-	$(SRC)/Weather/Skysight/DecoderThread.cpp
+	$(SRC)/Weather/Skysight/DecoderThread.cpp \
+	$(SRC)/Weather/Skysight/Skysight.cpp
 
 XCSOAR_SOURCES += \
 	$(SRC)/Tracking/LiveTrack24/SessionID.cpp \

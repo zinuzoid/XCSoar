@@ -12,6 +12,7 @@
 #include <functional>
 #include <map>
 #include <string>
+#include <string_view>
 
 /**
  * A single reusable worker thread that converts downloaded NetCDF
@@ -44,9 +45,12 @@ public:
   };
 
 private:
-  /* both guarded by StandbyThread::mutex */
+  /* all guarded by StandbyThread::mutex */
   std::deque<Job> queue;
   std::deque<Result> results;
+
+  /** the layer id of the job currently being decoded (empty=none) */
+  std::string current_layer_id;
 
   const std::function<void()> on_results_changed;
 
@@ -62,6 +66,12 @@ public:
   void Push(Job job);
 
   std::deque<Result> TakeResults();
+
+  /** are there unfinished jobs (queued or being decoded)? */
+  bool HasJobs() noexcept;
+
+  /** are there unfinished jobs for this layer? */
+  bool HasJobs(std::string_view layer_id) noexcept;
 
 private:
   void Tick() noexcept override;

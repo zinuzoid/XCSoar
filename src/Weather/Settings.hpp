@@ -12,6 +12,10 @@
 
 #endif
 
+#ifdef HAVE_SKYSIGHT
+#include "Skysight/Settings.hpp"
+#endif
+
 struct WeatherSettings {
 #ifdef HAVE_PCMET
   PCMetSettings pcmet;
@@ -24,6 +28,10 @@ struct WeatherSettings {
   bool enable_tim;
 #endif
 
+#ifdef HAVE_SKYSIGHT
+  SkysightSettings skysight;
+#endif
+
   void SetDefaults() {
 #ifdef HAVE_PCMET
     pcmet.SetDefaults();
@@ -31,6 +39,10 @@ struct WeatherSettings {
 
 #ifdef HAVE_HTTP
     enable_tim = false;
+#endif
+
+#ifdef HAVE_SKYSIGHT
+    skysight.SetDefaults();
 #endif
   }
 };

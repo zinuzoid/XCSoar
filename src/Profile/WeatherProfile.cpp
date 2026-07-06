@@ -19,6 +19,18 @@ namespace Profile {
 
 #endif
 
+#ifdef HAVE_SKYSIGHT
+
+namespace Profile {
+  static void Load(const ProfileMap &map, SkysightSettings &settings) {
+    map.Get(ProfileKeys::SkysightEmail, settings.email);
+    map.Get(ProfileKeys::SkysightPassword, settings.password);
+    map.Get(ProfileKeys::SkysightRegion, settings.region);
+  }
+}
+
+#endif
+
 void
 Profile::Load(const ProfileMap &map, WeatherSettings &settings)
 {
@@ -28,5 +40,9 @@ Profile::Load(const ProfileMap &map, WeatherSettings &settings)
 
 #ifdef HAVE_HTTP
   map.Get(ProfileKeys::EnableThermalInformationMap, settings.enable_tim);
+#endif
+
+#ifdef HAVE_SKYSIGHT
+  Load(map, settings.skysight);
 #endif
 }

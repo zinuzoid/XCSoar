@@ -27,12 +27,35 @@ SkysightDecoderThread::TakeResults()
   return std::exchange(results, {});
 }
 
+bool
+SkysightDecoderThread::HasJobs() noexcept
+{
+  const std::lock_guard lock{mutex};
+  return !queue.empty() || !current_layer_id.empty();
+}
+
+bool
+SkysightDecoderThread::HasJobs(std::string_view layer_id) noexcept
+{
+  const std::lock_guard lock{mutex};
+
+  if (current_layer_id == layer_id)
+    return true;
+
+  for (const auto &job : queue)
+    if (job.layer_id == layer_id)
+      return true;
+
+  return false;
+}
+
 void
 SkysightDecoderThread::Tick() noexcept
 {
   while (!queue.empty() && !IsStopped()) {
     Job job = std::move(queue.front());
     queue.pop_front();
+    current_layer_id = job.layer_id;
 
     mutex.unlock();
 
@@ -49,6 +72,7 @@ SkysightDecoderThread::Tick() noexcept
     }
 
     mutex.lock();
+    current_layer_id.clear();
     results.push_back(std::move(result));
 
     /* cheap thread-safe notification; the owner reacts by calling
