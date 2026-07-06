@@ -13,6 +13,8 @@
 #include "util/NumberParser.hpp"
 #include "Form/DataField/Enum.hpp"
 #include "Form/DataField/Listener.hpp"
+#include "DataGlobals.hpp"
+#include "Weather/Skysight/Skysight.hpp"
 
 enum ControlIndex {
 #ifdef HAVE_PCMET
@@ -27,6 +29,14 @@ enum ControlIndex {
 #ifdef HAVE_HTTP
   ENABLE_TIM,
 #endif
+
+#ifdef HAVE_SKYSIGHT
+  SPACER,
+  SKYSIGHT_EMAIL,
+  SKYSIGHT_PASSWORD,
+  SKYSIGHT_REGION,
+  SKYSIGHT_STATUS,
+#endif
 };
 
 class WeatherConfigPanel final
@@ -40,6 +50,25 @@ public:
   void Prepare(ContainerWindow &parent, const PixelRect &rc) noexcept override;
   bool Save(bool &changed) noexcept override;
 };
+
+#ifdef HAVE_SKYSIGHT
+
+static void
+FillRegionControl(WndProperty &wp, const TCHAR *setting)
+{
+  DataFieldEnum *df = (DataFieldEnum *)wp.GetDataField();
+
+  if (const auto skysight = DataGlobals::GetSkysight())
+    for (const auto &region : skysight->GetRegions())
+      df->addEnumText(region.id.c_str(), region.name.c_str());
+
+  /* falls back to the first entry when the saved region no longer
+     exists */
+  df->SetValue(setting);
+  wp.RefreshDisplay();
+}
+
+#endif
 
 void
 WeatherConfigPanel::Prepare(ContainerWindow &parent,
@@ -68,6 +97,26 @@ WeatherConfigPanel::Prepare(ContainerWindow &parent,
   AddBoolean(_T("Thermal Information Map"),
              _("Show thermal locations downloaded from Thermal Information Map (thermalmap.info)."),
              settings.enable_tim);
+#endif
+
+#ifdef HAVE_SKYSIGHT
+  AddSpacer();
+
+  AddText(_T("Skysight Email"),
+          _T("The e-mail you use to log in to the skysight.io site."),
+          settings.skysight.email);
+  AddPassword(_T("Skysight Password"), _T("Your Skysight password."),
+              settings.skysight.password);
+  WndProperty *wp = AddEnum(_T("Skysight Region"),
+                            _T("The Skysight region to load data for."),
+                            (DataFieldListener *)nullptr);
+  FillRegionControl(*wp, settings.skysight.region);
+
+  const auto skysight = DataGlobals::GetSkysight();
+  AddReadOnly(_T("Skysight Status"), nullptr,
+              skysight
+              ? skysight->GetStatusText().c_str()
+              : _("Not available"));
 #endif
 }
 
@@ -98,6 +147,22 @@ WeatherConfigPanel::Save(bool &_changed) noexcept
 #ifdef HAVE_HTTP
   changed |= SaveValue(ENABLE_TIM, ProfileKeys::EnableThermalInformationMap,
                        settings.enable_tim);
+#endif
+
+#ifdef HAVE_SKYSIGHT
+  changed |= SaveValue(SKYSIGHT_EMAIL, ProfileKeys::SkysightEmail,
+                       settings.skysight.email);
+
+  changed |= SaveValue(SKYSIGHT_PASSWORD, ProfileKeys::SkysightPassword,
+                       settings.skysight.password);
+
+  changed |= SaveValue(SKYSIGHT_REGION, ProfileKeys::SkysightRegion,
+                       settings.skysight.region);
+
+  /* apply the (possibly unchanged) settings; this also resets a
+     stopped/backed-off state machine */
+  if (const auto skysight = DataGlobals::GetSkysight())
+    skysight->UpdateSettings();
 #endif
 
   _changed |= changed;

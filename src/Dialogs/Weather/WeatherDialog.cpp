@@ -5,6 +5,7 @@
 #include "NOAAList.hpp"
 #include "RASPDialog.hpp"
 #include "PCMetDialog.hpp"
+#include "SkysightDialog.hpp"
 #if 0
 #include "MapOverlayWidget.hpp"
 #endif
@@ -63,6 +64,13 @@ ShowWeatherDialog(const TCHAR *page)
     start_page = widget.GetSize();
 
   widget.AddTab(CreateRaspWidget(), _T("RASP"));
+
+#ifdef HAVE_SKYSIGHT
+  if (page != nullptr && StringIsEqual(page, _T("skysight")))
+    start_page = widget.GetSize();
+
+  widget.AddTab(CreateSkysightWidget(), _T("Skysight"));
+#endif
 
 #ifdef HAVE_PCMET
   if (page != nullptr && StringIsEqual(page, _T("pc_met")))
