@@ -219,7 +219,9 @@ Located in `lib/` (git submodules):
 
 Paragliding-specific features:
 - PPG fuel burn calculations
-- Skysight.io integration
+- Skysight.io integration (`src/Weather/Skysight/`: coroutine protocol
+  layer + single decoder thread + UI-thread glue object; see
+  `Skysight.hpp` for the threading contract)
 - Enhanced cross-section view
 - UI improvements (artificial horizon)
 - Modern Android SDK support

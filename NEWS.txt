@@ -1,4 +1,8 @@
 Version JET
+- Skysight integration rewritten: no more singletons or thread-per-request,
+  downloads run as coroutines off the render path, explicit login/retry
+  state machine with status shown in the dialog and weather settings,
+  nearest-available forecast selection; settings and cache stay compatible
 - Unlock minimal zoom level to 100m instead of 2 minutes distance
 - Fix XCTracer GPS from return null island position
 - Reduce Trail length from 60min/5min to 10min/2min
