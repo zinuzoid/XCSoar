@@ -59,7 +59,6 @@ MapWindow::OnDestroy() noexcept
   SetTopography(nullptr);
   SetTerrain(nullptr);
   SetRasp(nullptr);
-  SetSkysight(nullptr);
 
 #ifndef ENABLE_OPENGL
   buffer_canvas.Destroy();
