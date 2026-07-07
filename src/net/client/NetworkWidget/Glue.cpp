@@ -11,32 +11,27 @@
 #include "lib/curl/Global.hxx"
 #include "lib/curl/Setup.hxx"
 #include "lib/fmt/RuntimeError.hxx"
+#include "util/StringStrip.hxx"
 
-#include <sstream>
+#include <string_view>
 
 namespace NetworkWidget
 {
 
 void
-Glue::OnTimer([[maybe_unused]] const NMEAInfo &basic) noexcept
+Glue::OnTimer(const NMEAInfo &basic) noexcept
 {
   const NetworkWidgetSettings &settings =
       CommonInterface::GetComputerSettings().network_widget;
 
   const auto interval = std::chrono::seconds(settings.interval);
 
-  if (!inject_task0 && !settings.urls[0].empty() &&
-      clock[0].CheckUpdate(interval))
-  {
-    inject_task0.Start(CoTick(basic, 0, settings.urls[0]),
-                       BIND_THIS_METHOD(OnCompletion0));
-  }
-
-  if (!inject_task1 && !settings.urls[1].empty() &&
-      clock[1].CheckUpdate(interval))
-  {
-    inject_task1.Start(CoTick(basic, 1, settings.urls[1]),
-                       BIND_THIS_METHOD(OnCompletion1));
+  for (unsigned i = 0; i < NetworkWidgetSettings::NETWORK_WIDGET_SLOTS; ++i) {
+    Slot &slot = slots[i];
+    if (!slot.inject_task && !settings.urls[i].empty() &&
+        slot.clock.CheckUpdate(interval))
+      slot.inject_task.Start(CoTick(basic, i, settings.urls[i]),
+                             BIND_METHOD(slot, &Slot::OnCompletion));
   }
 }
 
@@ -49,57 +44,44 @@ Glue::CoTick(const NMEAInfo &basic, unsigned index, StaticString<256> url)
   Curl::CoResponse res = co_await Curl::CoRequest(curl, std::move(easy));
 
   if (res.status != 200)
-  {
     throw FmtRuntimeError("NetworkWidget[{}] error status: {} body: {}",
                           index, res.status, res.body);
+
+  // Split the body into up to three lines, trimming trailing CR/whitespace
+  // so a CRLF response does not leave carriage returns in the display.
+  std::string_view body{res.body};
+  std::string lines[3];
+  for (auto &line : lines) {
+    const auto nl = body.find('\n');
+    line.assign(StripRight(body.substr(0, nl)));
+    if (nl == std::string_view::npos) {
+      body = {};
+      break;
+    }
+    body.remove_prefix(nl + 1);
   }
 
-  std::istringstream istr(res.body);
-  std::string line;
+  Data &data = slots[index].data;
   {
-    if (istr.eof()) throw FmtRuntimeError("NetworkWidget[{}] zero line body", index);
-
-    const std::lock_guard lock{data[index].mutex};
-    std::getline(istr, line);
-    data[index].line1 = line;
-
-    if (!istr.eof())
-    {
-      std::getline(istr, line);
-      data[index].line2 = line;
-    }
-    else
-    {
-      data[index].line2 = "";
-    }
-
-    if (!istr.eof())
-    {
-      std::getline(istr, line);
-      data[index].line3 = line;
-    }
-    else
-    {
-      data[index].line3 = "";
-    }
-    data[index].validity.Update(basic.clock);
+    const std::lock_guard lock{data.mutex};
+    data.line1 = std::move(lines[0]);
+    data.line2 = std::move(lines[1]);
+    data.line3 = std::move(lines[2]);
+    data.validity.Update(basic.clock);
   }
 
   LogFormat("NetworkWidget[%u]::OnCompletion: %s|%s|%s'", index,
-            data[index].line1.c_str(), data[index].line2.c_str(),
-            data[index].line3.c_str());
+            data.line1.c_str(), data.line2.c_str(), data.line3.c_str());
 }
 
 void
-Glue::OnCompletion0(std::exception_ptr error) noexcept
+Glue::Slot::OnCompletion(std::exception_ptr error) noexcept
 {
-  if (error) LogError(error, "NetworkWidget[0] request failed");
-}
+  if (error)
+    LogError(error, "NetworkWidget request failed");
 
-void
-Glue::OnCompletion1(std::exception_ptr error) noexcept
-{
-  if (error) LogError(error, "NetworkWidget[1] request failed");
+  const std::lock_guard lock{data.mutex};
+  data.failed = error != nullptr;
 }
 
 } // namespace NetworkWidget
