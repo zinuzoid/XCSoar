@@ -15,6 +15,23 @@
 #include "Form/Edit.hpp"
 #include "Profile/Profile.hpp"
 
+#include <fmt/format.h>
+
+#include <string_view>
+
+/**
+ * Profile keys for each slot's URL, indexed by slot.  Keep in sync with
+ * NetworkWidgetSettings::NETWORK_WIDGET_SLOTS.
+ */
+static constexpr std::string_view network_widget_url_keys[] = {
+  ProfileKeys::NetworkWidgetUrl,
+  ProfileKeys::NetworkWidgetUrl2,
+};
+
+static_assert(std::size(network_widget_url_keys) ==
+                  NetworkWidgetSettings::NETWORK_WIDGET_SLOTS,
+              "NetworkWidget URL profile keys out of sync with slot count");
+
 void
 NetworkWidgetConfigPanel::Prepare(ContainerWindow &parent,
                                   const PixelRect &rc) noexcept
@@ -46,11 +63,10 @@ NetworkWidgetConfigPanel::Prepare(ContainerWindow &parent,
   }
   SetExpertRow(INTERVAL);
 
-  AddText(_("Url 1"), nullptr, settings.urls[0]);
-  SetExpertRow(URL_0);
-
-  AddText(_("Url 2"), nullptr, settings.urls[1]);
-  SetExpertRow(URL_1);
+  for (unsigned i = 0; i < NetworkWidgetSettings::NETWORK_WIDGET_SLOTS; ++i) {
+    AddText(fmt::format("Url {}", i + 1).c_str(), nullptr, settings.urls[i]);
+    SetExpertRow(URL_START + i);
+  }
 }
 
 bool
@@ -64,8 +80,9 @@ NetworkWidgetConfigPanel::Save(bool &_changed) noexcept
   changed |= SaveValue(INTERVAL, ProfileKeys::NetworkWidgetInterval,
                        settings.interval);
 
-  changed |= SaveValue(URL_0, ProfileKeys::NetworkWidgetUrl, settings.urls[0]);
-  changed |= SaveValue(URL_1, ProfileKeys::NetworkWidgetUrl2, settings.urls[1]);
+  for (unsigned i = 0; i < NetworkWidgetSettings::NETWORK_WIDGET_SLOTS; ++i)
+    changed |= SaveValue(URL_START + i, network_widget_url_keys[i],
+                         settings.urls[i]);
 
   _changed |= changed;
 
