@@ -24,8 +24,7 @@ enum NetworkWidgetControlIndex
 {
   TEXT1,
   INTERVAL,
-  URL_0,
-  URL_1,
+  URL_START,
 };
 
 std::unique_ptr<Widget> CreateNetworkWidgetConfigPanel();
