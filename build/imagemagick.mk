@@ -8,9 +8,10 @@ IM_PREFIX :=
 %_rgb.png: %.png
 	$(Q)$(IM_PREFIX)convert $< -background white -flatten +matte +dither -colors 64 $@
 
-# tile both images
+# tile both images (side by side); use convert instead of montage because
+# montage crashes (SIGABRT) in the debian:bookworm-slim ImageMagick build
 %_tile.png: %_alpha.png %_rgb.png
-	$(Q)$(IM_PREFIX)montage -tile 2x1 -geometry +0+0 $^ -depth 8 $@
+	$(Q)$(IM_PREFIX)convert $^ +append -depth 8 $@
 
 # Convert a raster graphic file to 8 bit BMP.
 #
