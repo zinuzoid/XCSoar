@@ -60,7 +60,7 @@ void JETProviderConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &r
       2);
   } else {
     AddDuration(_("Interval"), nullptr,
-      std::chrono::seconds{5},
+      std::chrono::seconds{15},
       std::chrono::seconds{60},
       std::chrono::seconds{5},
       settings.radar.interval,
