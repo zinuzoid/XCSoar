@@ -56,6 +56,9 @@ JETProvider::Glue::Glue(CurlGlobal &_curl, Handler *_handler)
 
 void
 JETProvider::Glue::OnTimer(const NMEAInfo &basic, [[maybe_unused]] const DerivedInfo &calculated) {
+  if (is_emergency_stop)
+    return;
+
   const JETProviderSettings &settings =
     CommonInterface::GetComputerSettings().jet_provider_setting;
   access_token = settings.radar.access_token;
@@ -70,6 +73,14 @@ JETProvider::Glue::OnTimer(const NMEAInfo &basic, [[maybe_unused]] const Derived
 
   if (inject_task)
     return;
+
+  if (total_requests++ > JET_PROVIDER_EMERGENCY_STOP_MAX_REQUESTS) {
+    LogFormat("JETProvider::Glue::OnTimer We're doing more than %d requests "
+      "for the session, stop all JETProvider future request!",
+      JET_PROVIDER_EMERGENCY_STOP_MAX_REQUESTS);
+    is_emergency_stop = true;
+    return;
+  }
 
   inject_task.Start(CoTick(basic), BIND_THIS_METHOD(OnCompletion));
 }
