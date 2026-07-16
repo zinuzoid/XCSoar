@@ -39,7 +39,7 @@ jobs:
           if [ "${{ matrix.os }}" = 'ubuntu-22.04' ]; then
             apt-get update
             apt-get install -y --no-install-recommends git \
-            ca-certificates rsync openssh-client
+            ca-certificates rsync openssh-client fonts-dejavu-core
           fi
 
       - name: Set vars for release
