@@ -37,6 +37,7 @@ Copyright_License {
 #include <map>
 
 #define JET_PROVIDER_TRAFFIC_OFFLINE_THRESHOLD_SECS 60
+#define JET_PROVIDER_EMERGENCY_STOP_MAX_REQUESTS 10000
 
 /**
  * API JET XCSOAR provider
@@ -90,6 +91,8 @@ PeriodClock clock;
 
 const char *access_token;
 char unauthorized_access_token[64] = "";
+bool is_emergency_stop = false;
+unsigned total_requests = 0;
 
 public:
   Glue(CurlGlobal &curl, Handler *_handler);
