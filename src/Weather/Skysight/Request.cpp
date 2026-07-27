@@ -309,6 +309,11 @@ SkysightRequest::RequestToFile()
     success = false;
   }
 
+  /* we run on the SkysightAsyncRequest thread, so the easy handle must
+     be removed from the multi handle on the curl event loop thread
+     before ~CurlRequest() destroys it */
+  request.StopIndirect();
+
   success &= fclose(file) == 0;
 
   if (!success) File::Delete(temp_path);
@@ -367,6 +372,9 @@ SkysightRequest::RequestToBuffer(tstring &response)
   } catch (const std::exception &exc) {
     success = false;
   }
+
+  /* see RequestToFile() */
+  request.StopIndirect();
 
   response = tstring(buffer,
 		     buffer + handler.GetReceived() / sizeof(buffer[0]));
