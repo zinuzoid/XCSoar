@@ -15,6 +15,11 @@ AsioThread::Start()
 void
 AsioThread::Stop()
 {
+  /* may have been stopped already by whoever needs the event loop to be
+     dead before tearing down objects which live on it */
+  if (!IsDefined())
+    return;
+
   /* set the "stop" flag and wake up the thread */
   event_loop.InjectBreak();
 
