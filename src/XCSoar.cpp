@@ -27,6 +27,7 @@
 #include "io/async/GlobalAsioThread.hpp"
 #include "io/async/AsioThread.hpp"
 #include "util/PrintException.hxx"
+#include "util/ScopeExit.hxx"
 
 #ifdef ENABLE_SDL
 /* this is necessary on Mac OS X, to let libSDL bootstrap Quartz
@@ -93,6 +94,11 @@ Main()
   ScopeGlobalPCMMixer global_pcm_mixer(asio_thread->GetEventLoop());
   ScopeGlobalPCMResourcePlayer global_pcm_resouce_player;
   ScopeGlobalVolumeController global_volume_controller;
+
+  /* join the event loop thread before the objects living on it (curl,
+     the PCM mixer) get destructed; without this, curl_multi_cleanup()
+     would run concurrently with EventLoop::Run() */
+  AtScopeExit() { asio_thread->Stop(); };
 
   // Perform application initialization and run loop
   int ret = EXIT_FAILURE;
