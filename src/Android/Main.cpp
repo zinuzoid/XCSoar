@@ -212,6 +212,11 @@ try {
   const ScopeGlobalAsioThread global_asio_thread;
   const Net::ScopeInit net_init(asio_thread->GetEventLoop());
 
+  /* join the event loop thread before CurlGlobal gets destructed;
+     without this, curl_multi_cleanup() would run concurrently with
+     EventLoop::Run() */
+  AtScopeExit() { asio_thread->Stop(); };
+
   InitialiseDataPath();
   AtScopeExit() { DeinitialiseDataPath(); };
 

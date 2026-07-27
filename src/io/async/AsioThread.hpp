@@ -25,7 +25,8 @@ public:
 
   /**
    * Stop the thread.  This method must be called before the
-   * destructor.
+   * destructor.  Calling it more than once is allowed; subsequent
+   * calls do nothing.
    */
   void Stop();
 
