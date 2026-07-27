@@ -221,7 +221,18 @@ curl = CmakeProject(
     [
         "-DBUILD_CURL_EXE=OFF",
         "-DBUILD_SHARED_LIBS=OFF",
-        "-DENABLE_ARES=ON",
+        # Do not use c-ares in libcurl.  curl 8.5.0 moved the async
+        # resolver state from the easy handle to struct connectdata, but
+        # left the c-ares socket state callback pointing at the easy
+        # handle which created the connection.  Since connections outlive
+        # easy handles in our shared multi handle, conn_free() ends up
+        # calling ares_destroy(), whose socket state callback then
+        # dereferences a freed struct Curl_easy in Curl_multi_closed().
+        # Upstream reverted this in 8.6.0 (https://curl.se/bug/?i=12524).
+        # Disabling ENABLE_ARES turns on ENABLE_THREADED_RESOLVER, which
+        # resolves via Android's getaddrinfo() and therefore also honours
+        # Private DNS, VPN and DNS64.
+        "-DENABLE_ARES=OFF",
         "-DCURL_DISABLE_LDAP=ON",
         "-DCURL_DISABLE_TELNET=ON",
         "-DCURL_DISABLE_DICT=ON",
