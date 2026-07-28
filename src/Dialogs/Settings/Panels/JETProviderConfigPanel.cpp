@@ -72,6 +72,29 @@ void JETProviderConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &r
     nullptr,
     settings.radar.access_token);
   SetExpertRow(RADAR_ACCESS_TOKEN);
+
+  AddBoolean(_("Trace Enabled"),
+    _("Overlay the live flight trace of the pilots listed below."),
+    settings.trace.enabled);
+  SetExpertRow(TRACE_ENABLED);
+
+  AddDuration(_("Trace Interval"), nullptr,
+    std::chrono::seconds{10},
+    std::chrono::seconds{300},
+    std::chrono::seconds{10},
+    settings.trace.interval,
+    2);
+  SetExpertRow(TRACE_INTERVAL);
+
+  AddText(_("Trace Source"),
+    _("The tracking network the pilot ids belong to, e.g. \"ogn\"."),
+    settings.trace.src);
+  SetExpertRow(TRACE_SRC);
+
+  AddText(_("Follow Pilot IDs"),
+    _("Comma separated list of pilot ids whose trace will be drawn."),
+    settings.trace.pilot_ids);
+  SetExpertRow(TRACE_PILOT_IDS);
 }
 
 bool JETProviderConfigPanel::Save(bool &_changed) noexcept {
@@ -88,7 +111,19 @@ bool JETProviderConfigPanel::Save(bool &_changed) noexcept {
   
   changed |= SaveValue(RADAR_ACCESS_TOKEN,
     ProfileKeys::JETProviderRadarAccessToken, settings.radar.access_token);
-  
+
+  changed |= SaveValue(TRACE_ENABLED,
+    ProfileKeys::JETProviderTraceEnabled, settings.trace.enabled);
+
+  changed |= SaveValue(TRACE_INTERVAL,
+    ProfileKeys::JETProviderTraceInterval, settings.trace.interval);
+
+  changed |= SaveValue(TRACE_SRC,
+    ProfileKeys::JETProviderTraceSrc, settings.trace.src);
+
+  changed |= SaveValue(TRACE_PILOT_IDS,
+    ProfileKeys::JETProviderTracePilotIds, settings.trace.pilot_ids);
+
   _changed |= changed;
 
   return true;
