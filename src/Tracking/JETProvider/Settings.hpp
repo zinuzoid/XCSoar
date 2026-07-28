@@ -41,10 +41,32 @@ struct JETProviderSettings {
     }
   };
 
+  /**
+   * Overlay the live flight trace of selected pilots on the map.
+   */
+  struct Trace {
+    bool enabled;
+    std::chrono::duration<unsigned> interval;
+    /** the tracking network the ids belong to, e.g. "ogn" */
+    StaticString<16> src;
+    /** comma separated list of pilot ids to follow */
+    StaticString<256> pilot_ids;
+
+    void SetDefaults() {
+      enabled = false;
+      interval = std::chrono::seconds(30);
+      src = "ogn";
+      pilot_ids.clear();
+    }
+  };
+
   Radar radar;
+
+  Trace trace;
 
   void SetDefaults() {
     radar.SetDefaults();
+    trace.SetDefaults();
   }
 };
 

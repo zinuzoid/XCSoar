@@ -242,6 +242,9 @@ MapWindow::Render(Canvas &canvas, const PixelRect &rc) noexcept
   // Render the snail trail
   RenderTrail(canvas, aircraft_pos);
 
+  // Render the live traces of the pilots we follow
+  DrawJETProviderTrace(canvas);
+
   DrawWaves(canvas);
 
   // Render estimate of thermal location

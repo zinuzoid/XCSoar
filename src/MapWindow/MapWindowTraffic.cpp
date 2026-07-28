@@ -264,6 +264,60 @@ MapWindow::DrawSkyLinesTraffic(Canvas &canvas) const noexcept
 
 #endif
 
+/**
+ * Draw the live flight trace of the pilots we follow, so the thermals
+ * they used and the lines they flew are visible on the map.
+ *
+ * The server currently sends positions only; once it also sends altitude
+ * and time, the polyline can be coloured by climb rate like the own snail
+ * trail (see TrailRenderer).
+ */
+void
+MapWindow::DrawJETProviderTrace(Canvas &canvas) const noexcept
+{
+  if (jet_provider_trace_data == nullptr)
+    return;
+
+  const std::lock_guard<Mutex> lock(jet_provider_trace_data->mutex);
+
+  if (jet_provider_trace_data->traces.empty())
+    return;
+
+  const WindowProjection &projection = render_projection;
+  /* generous bounds so a trace leaving the screen still joins up */
+  const GeoBounds bounds = projection.GetScreenBounds().Scale(4);
+
+  unsigned pen_index = 0;
+
+  for (const auto &i : jet_provider_trace_data->traces) {
+    const auto &trace = i.second;
+    if (trace.points.empty())
+      continue;
+
+    canvas.Select(traffic_look.trace_pens[pen_index % TrafficLook::NUM_TRACE_PENS]);
+    ++pen_index;
+
+    PixelPoint last_point(0, 0);
+    bool last_valid = false;
+
+    for (const auto &location : trace.points) {
+      if (!bounds.IsInside(location)) {
+        /* outside the map window; don't paint it */
+        last_valid = false;
+        continue;
+      }
+
+      const auto pt = projection.GeoToScreen(location);
+
+      if (last_valid)
+        canvas.DrawLinePiece(last_point, pt);
+
+      last_point = pt;
+      last_valid = true;
+    }
+  }
+}
+
 void
 MapWindow::DrawJETProviderTraffic(Canvas &canvas,
   const PixelPoint) const noexcept

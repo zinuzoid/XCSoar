@@ -94,6 +94,27 @@ struct TrafficLook
   Pen team_pen_yellow;
   Pen team_pen_magenta;
 
+  /**
+   * Pens for the live flight traces of other pilots; one per followed
+   * pilot, cycled so neighbouring traces are told apart.
+   */
+  static constexpr unsigned NUM_TRACE_PENS = 12;
+  static constexpr Color trace_colors[NUM_TRACE_PENS] = {
+    Color(0x74, 0xff, 0x00), // green
+    Color(0x00, 0x90, 0xff), // blue
+    Color(0xff, 0x00, 0xcb), // magenta
+    Color(0xff, 0xe8, 0x00), // yellow
+    Color(0xff, 0x30, 0x30), // red
+    Color(0x00, 0xe5, 0xd0), // cyan
+    Color(0xff, 0x8c, 0x00), // orange
+    Color(0x9d, 0x4e, 0xff), // purple
+    Color(0x00, 0x94, 0x7a), // teal
+    Color(0xff, 0x8f, 0xb0), // pink
+    Color(0x9b, 0x63, 0x2a), // brown
+    Color(0x28, 0x3c, 0xc8), // navy
+  };
+  Pen trace_pens[NUM_TRACE_PENS];
+
   MaskedIcon teammate_icon;
 
   const Font *font;

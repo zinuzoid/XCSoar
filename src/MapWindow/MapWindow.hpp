@@ -19,6 +19,7 @@
 #include "Weather/Features.hpp"
 #include "Tracking/SkyLines/Features.hpp"
 #include "Tracking/JETProvider/JETProvider.hpp"
+#include "Tracking/JETProvider/Trace.hpp"
 #include "Engine/Task/TaskInterface.hpp"
 
 #include <memory>
@@ -148,6 +149,8 @@ protected:
 
   const JETProvider::Data *jet_provider_data = nullptr;
 
+  const JETProvider::TraceData *jet_provider_trace_data = nullptr;
+
   bool compass_visible = true;
 
 #ifndef ENABLE_OPENGL
@@ -254,6 +257,10 @@ public:
     jet_provider_data = _data;
   }
 
+  void SetJETProviderTraceData(const JETProvider::TraceData *_data) {
+    jet_provider_trace_data = _data;
+  }
+
   void FlushCaches() noexcept;
 
   using MapWindowBlackboard::ReadBlackboard;
@@ -314,6 +321,7 @@ protected:
   void DrawFLARMTraffic(Canvas &canvas, PixelPoint aircraft_pos) const noexcept;
   void DrawGLinkTraffic(Canvas &canvas) const noexcept;
   void DrawJETProviderTraffic(Canvas &canvas, const PixelPoint aircraft_pos) const noexcept;
+  void DrawJETProviderTrace(Canvas &canvas) const noexcept;
 
   PixelPoint CalculatePixelPoint(PixelPoint p1, PixelPoint p2, double percent);
 

@@ -48,6 +48,7 @@ public:
   void AddTaskOZs(const ProtectedTaskManager &task);
   void AddTraffic(const TrafficList &flarm);
   void AddSkyLinesTraffic();
+  void AddJETProviderTrace();
   void AddThermals(const ThermalLocatorInfo &thermals,
                    const MoreData &basic, const DerivedInfo &calculated);
 

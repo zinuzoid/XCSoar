@@ -27,6 +27,7 @@
 #include "MapSettings.hpp"
 #include "Math/Screen.hpp"
 #include "Look/FinalGlideBarLook.hpp"
+#include "Look/TrafficLook.hpp"
 #include "Renderer/TrafficRenderer.hpp"
 #include "FLARM/Details.hpp"
 #include "FLARM/FlarmNetRecord.hpp"
@@ -417,6 +418,33 @@ Draw(Canvas &canvas, PixelRect rc,
 
 static void
 Draw(Canvas &canvas, PixelRect rc,
+     const TraceMapItem &item,
+     const TwoTextRowsRenderer &row_renderer,
+     const TrafficLook &traffic_look)
+{
+  const unsigned line_height = rc.GetHeight();
+  const unsigned text_padding = Layout::GetTextPadding();
+
+  /* a short line in the colour this trace is drawn with, so the entry
+     can be matched to the line on the map */
+  canvas.Select(traffic_look.trace_pens[item.color_index %
+                                        TrafficLook::NUM_TRACE_PENS]);
+
+  const int swatch_y = rc.top + int(line_height) / 2;
+  canvas.DrawLine({rc.left + int(text_padding), swatch_y},
+                  {rc.left + int(line_height) - int(text_padding), swatch_y});
+
+  rc.left += line_height + text_padding;
+
+  row_renderer.DrawFirstRow(canvas, rc, item.id);
+
+  StaticString<64> buffer;
+  buffer.UnsafeFormat(_("Live trace, %u points"), item.n_points);
+  row_renderer.DrawSecondRow(canvas, rc, buffer);
+}
+
+static void
+Draw(Canvas &canvas, PixelRect rc,
      const OverlayMapItem &item,
      const TwoTextRowsRenderer &row_renderer)
 {
@@ -481,6 +509,10 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
     ::Draw(canvas, rc, (const SkyLinesTrafficMapItem &)item, row_renderer);
     break;
 #endif
+
+  case MapItem::Type::TRACE:
+    ::Draw(canvas, rc, (const TraceMapItem &)item, row_renderer, traffic_look);
+    break;
 
   case MapItem::Type::THERMAL:
     ::Draw(canvas, rc, (const ThermalMapItem &)item, utc_offset,
