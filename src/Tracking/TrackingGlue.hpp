@@ -13,6 +13,7 @@
 #include "Tracking/LiveTrack24/Glue.hpp"
 #include "Tracking/JETProvider/JETProvider.hpp"
 #include "Computer/ClimbAverageCalculator.hpp"
+#include "Tracking/JETProvider/Trace.hpp"
 #include "thread/StandbyThread.hpp"
 #include "time/PeriodClock.hpp"
 #include "Geo/GeoPoint.hpp"
@@ -27,7 +28,8 @@ class CurlGlobal;
 
 class TrackingGlue final
   : private SkyLinesTracking::Handler,
-    private JETProvider::Handler
+    private JETProvider::Handler,
+    private JETProvider::TraceHandler
 {
   SkyLinesTracking::Glue skylines;
 
@@ -40,6 +42,10 @@ class TrackingGlue final
   JETProvider::Data jet_provider_data;
 
   std::map<std::string, ClimbAverageCalculator> climb_avg_map;
+
+  JETProvider::TraceGlue jet_trace;
+
+  JETProvider::TraceData jet_trace_data;
 
   /**
    * The Unix UTC time stamp that was last submitted to the tracking
@@ -69,12 +75,19 @@ private:
   void OnJETProviderReset() override;
   void OnJETProviderError(std::exception_ptr e) override;
 
+  /* virtual methods from JETProvider::TraceHandler */
+  void OnJETTrace(std::map<std::string, JETProvider::PilotTrace> traces,
+                  Validity validity, bool success) override;
+
 public:
   const SkyLinesTracking::Data &GetSkyLinesData() const {
     return skylines_data;
   }
   const JETProvider::Data &GetJETProviderData() const {
     return jet_provider_data;
+  }
+  const JETProvider::TraceData &GetJETProviderTraceData() const {
+    return jet_trace_data;
   }
 };
 

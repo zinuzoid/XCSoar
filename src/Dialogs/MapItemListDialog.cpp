@@ -39,6 +39,7 @@ HasDetails(const MapItem &item)
 #ifdef HAVE_SKYLINES_TRACKING
   case MapItem::Type::SKYLINES_TRAFFIC:
 #endif
+  case MapItem::Type::TRACE:
     return false;
 
   case MapItem::Type::AIRSPACE:
@@ -259,6 +260,7 @@ ShowMapItemDialog(const MapItem &item,
 #ifdef HAVE_SKYLINES_TRACKING
   case MapItem::Type::SKYLINES_TRAFFIC:
 #endif
+  case MapItem::Type::TRACE:
     break;
 
   case MapItem::Type::AIRSPACE:
