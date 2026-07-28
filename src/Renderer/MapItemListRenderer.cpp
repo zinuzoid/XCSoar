@@ -34,12 +34,16 @@
 #include "Weather/Features.hpp"
 #include "FLARM/List.hpp"
 #include "FLARM/TrafficClimbAltIndicators.hpp"
+#include "Tracking/JETProvider/TrafficDecode.hpp"
 #include "time/RoughTime.hpp"
 #include "time/BrokenDateTime.hpp"
+#include "Interface.hpp"
 
 #ifdef HAVE_NOAA
 #include "Renderer/NOAAListRenderer.hpp"
 #endif
+
+#include <cmath>
 
 using namespace std::chrono;
 
@@ -393,8 +397,6 @@ SinceInMinutes(TimeStamp now,
   return now_minutes - past_minutes;
 }
 
-#include "Interface.hpp"
-
 static void
 Draw(Canvas &canvas, PixelRect rc,
      const SkyLinesTrafficMapItem &item,
@@ -441,6 +443,100 @@ Draw(Canvas &canvas, PixelRect rc,
   StaticString<64> buffer;
   buffer.UnsafeFormat(_("Live trace, %u points"), item.n_points);
   row_renderer.DrawSecondRow(canvas, rc, buffer);
+}
+
+static void
+Draw(Canvas &canvas, PixelRect rc,
+     const JETProviderTrafficMapItem &item,
+     const TwoTextRowsRenderer &row_renderer,
+     const TrafficLook &traffic_look,
+     const MapSettings &settings)
+{
+  const unsigned line_height = rc.GetHeight();
+  const unsigned text_padding = Layout::GetTextPadding();
+
+  if (item.track >= 0) {
+    const MoreData &basic = CommonInterface::Basic();
+
+    /* the map item only knows the target's absolute altitude; the
+       relative altitude the icon needs is derived here, just like
+       MapWindow::DrawJETProviderTraffic() does */
+    FlarmTraffic traffic;
+    traffic.alarm_level = item.alarm_level;
+    traffic.type = JETProvider::ParseAircraftType(item.type.c_str())
+      .value_or(FlarmTraffic::AircraftType::UNKNOWN);
+    traffic.relative_altitude = (RoughAltitude)100;
+    traffic.climb_rate_avg30s = item.climb_rate_avg30s;
+    if (item.alarm_level != FlarmTraffic::AlarmType::OFFLINE &&
+        basic.gps_altitude_available)
+      traffic.relative_altitude =
+        (RoughAltitude)(item.altitude - basic.gps_altitude);
+
+    const TrafficClimbAltIndicators indicators =
+      TrafficClimbAltIndicators::GetClimbAltIndicators(traffic,
+                                                       CommonInterface::GetComputerSettings().polar.glide_polar_task.GetMC(),
+                                                       CommonInterface::Calculated().average);
+
+    const PixelPoint pt(rc.left + line_height / 2, rc.top + line_height / 2);
+    TrafficRenderer::Draw(canvas, traffic_look, false,
+                          settings.use_vario_traffic_colours, traffic,
+                          Angle::Degrees(item.track), item.color, pt,
+                          indicators);
+  }
+
+  rc.left += line_height + text_padding;
+
+  StaticString<256> title_string;
+  title_string.clear();
+  if (!item.name.empty())
+    title_string = item.name.c_str();
+
+  if (!item.traffic_id.empty() && item.traffic_id != item.name) {
+    title_string.append(_T(", "));
+    title_string.append(item.traffic_id);
+  }
+
+  if (!item.code.empty() && item.code != item.name) {
+    title_string.append(_T(", "));
+    title_string.append(item.code);
+  }
+
+  row_renderer.DrawFirstRow(canvas, rc, title_string);
+
+  StaticString<256> info_string;
+  if (const TCHAR *type_string =
+        JETProvider::DecodeAircraftType(item.type.c_str());
+      type_string != nullptr)
+    info_string = type_string;
+  else if (item.type.empty())
+    info_string = _("Unknown");
+  else
+    info_string.Format(_T("%s(%s)"), _("Unknown"), item.type.c_str());
+
+  if (item.altitude >= 0)
+    info_string.AppendFormat(_T(", %s: %s"), _("Alt"),
+                             FormatUserAltitude(item.altitude).c_str());
+
+  /* same threshold as MapWindow::DrawJETProviderTraffic(): the API
+     reports 0 both for "level" and for "no data" */
+  if (fabs(item.vspeed) >= 0.1)
+    info_string.AppendFormat(_T(", %s: %s"), _("Vario"),
+                             FormatUserVerticalSpeed(item.vspeed).c_str());
+
+  if (item.speed >= 0)
+    info_string.AppendFormat(_T(", %s: %s"), _("Spd"),
+                             FormatUserSpeed(item.speed).c_str());
+
+  if (item.epoch > 0) {
+    const auto age = duration_cast<seconds>(
+        std::chrono::system_clock::now() -
+        std::chrono::system_clock::from_time_t(item.epoch));
+    if (age.count() >= 0)
+      info_string.AppendFormat(_T(", %s %s"),
+                               FormatTimespanSmart(age).c_str(), _("ago"));
+  }
+
+  row_renderer.DrawSecondRow(canvas, rc, info_string);
 }
 
 static void
@@ -512,6 +608,11 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
 
   case MapItem::Type::TRACE:
     ::Draw(canvas, rc, (const TraceMapItem &)item, row_renderer, traffic_look);
+    break;
+
+  case MapItem::Type::JET_TRAFFIC:
+    ::Draw(canvas, rc, (const JETProviderTrafficMapItem &)item,
+           row_renderer, traffic_look, settings);
     break;
 
   case MapItem::Type::THERMAL:

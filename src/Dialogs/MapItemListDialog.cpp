@@ -40,6 +40,7 @@ HasDetails(const MapItem &item)
   case MapItem::Type::SKYLINES_TRAFFIC:
 #endif
   case MapItem::Type::TRACE:
+  case MapItem::Type::JET_TRAFFIC:
     return false;
 
   case MapItem::Type::AIRSPACE:
@@ -261,6 +262,7 @@ ShowMapItemDialog(const MapItem &item,
   case MapItem::Type::SKYLINES_TRAFFIC:
 #endif
   case MapItem::Type::TRACE:
+  case MapItem::Type::JET_TRAFFIC:
     break;
 
   case MapItem::Type::AIRSPACE:
