@@ -44,6 +44,7 @@ struct MapItem
 #ifdef HAVE_SKYLINES_TRACKING
     SKYLINES_TRAFFIC,
 #endif
+    TRACE,
     OVERLAY,
     RASP,
   } type;
@@ -212,4 +213,21 @@ struct ThermalMapItem: public MapItem
 
   ThermalMapItem(const ThermalSource &_thermal)
     :MapItem(Type::THERMAL), thermal(_thermal) {}
+};
+
+/**
+ * The live flight trace of a followed pilot, fetched by JETProvider.
+ */
+struct TraceMapItem: public MapItem
+{
+  StaticString<64> id;
+
+  unsigned n_points;
+
+  /** index into TrafficLook::trace_pens, matching the map */
+  unsigned color_index;
+
+  TraceMapItem(const TCHAR *_id, unsigned _n_points, unsigned _color_index)
+    :MapItem(Type::TRACE), id(_id), n_points(_n_points),
+     color_index(_color_index) {}
 };

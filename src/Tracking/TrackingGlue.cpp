@@ -12,7 +12,8 @@ TrackingGlue::TrackingGlue(EventLoop &event_loop,
                            CurlGlobal &curl) noexcept
   :skylines(event_loop, this),
    livetrack24(curl),
-   jet_provider(curl, this)
+   jet_provider(curl, this),
+   jet_trace(curl, this)
 {
 }
 
@@ -34,6 +35,9 @@ TrackingGlue::OnTimer(const MoreData &basic, const DerivedInfo &calculated)
 
   jet_provider.OnTimer(basic, calculated);
   jet_provider_data.validity.Expire(basic.clock, std::chrono::seconds(JET_PROVIDER_TRAFFIC_OFFLINE_THRESHOLD_SECS));
+
+  jet_trace.OnTimer(basic, calculated);
+  jet_trace_data.validity.Expire(basic.clock, std::chrono::seconds(JET_PROVIDER_TRACE_OFFLINE_THRESHOLD_SECS));
 
   livetrack24.OnTimer(basic, calculated);
 }
@@ -87,6 +91,24 @@ void TrackingGlue::OnJETTraffic(std::vector<JETProvider::Traffic> traffics, Vali
 
   LogFormat("OnJETTraffic size:%d success:%d",
     (int) jet_provider_data.traffics.size(), success);
+}
+
+void
+TrackingGlue::OnJETTrace(std::map<std::string, JETProvider::PilotTrace> traces,
+                         Validity validity, bool success)
+{
+  const std::lock_guard<Mutex> lock(jet_trace_data.mutex);
+
+  jet_trace_data.validity = validity;
+  jet_trace_data.success = success;
+
+  /* keep the previous traces when a poll failed outright, so a single
+     hiccup does not blank the overlay */
+  if (!traces.empty() || success)
+    jet_trace_data.traces = std::move(traces);
+
+  LogFormat("OnJETTrace pilots:%d success:%d",
+    (int) jet_trace_data.traces.size(), success);
 }
 
 void TrackingGlue::OnJETProviderReset() {

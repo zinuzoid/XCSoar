@@ -658,7 +658,9 @@ XCSOAR_SOURCES += \
 
 XCSOAR_SOURCES += \
 	$(SRC)/Tracking/JETProvider/JETProvider.cpp \
-	$(SRC)/Tracking/JETProvider/RadarParser.cpp
+	$(SRC)/Tracking/JETProvider/RadarParser.cpp \
+	$(SRC)/Tracking/JETProvider/Trace.cpp \
+	$(SRC)/Tracking/JETProvider/TraceParser.cpp
 
 ifeq ($(HAVE_PCM_PLAYER),y)
 XCSOAR_SOURCES += $(SRC)/Audio/VarioGlue.cpp

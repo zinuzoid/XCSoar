@@ -45,6 +45,10 @@ TrafficLook::Initialise(const Font &_font)
   team_pen_yellow.Create(width, team_color_yellow);
   team_pen_magenta.Create(width, team_color_magenta);
 
+  unsigned trace_width = Layout::ScalePenWidth(2);
+  for (unsigned i = 0; i < NUM_TRACE_PENS; ++i)
+    trace_pens[i].Create(trace_width, trace_colors[i]);
+
   teammate_icon.LoadResource(IDB_TEAMMATE_POS_ALL);
 
   font = &_font;
