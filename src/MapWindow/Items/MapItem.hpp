@@ -7,6 +7,7 @@
 #include "Geo/GeoVector.hpp"
 #include "FLARM/Id.hpp"
 #include "FLARM/Color.hpp"
+#include "FLARM/Traffic.hpp"
 #include "NMEA/ThermalLocator.hpp"
 #include "Weather/Features.hpp"
 #include "Engine/Waypoint/Ptr.hpp"
@@ -45,6 +46,7 @@ struct MapItem
     SKYLINES_TRAFFIC,
 #endif
     TRACE,
+    JET_TRAFFIC,
     OVERLAY,
     RASP,
   } type;
@@ -206,6 +208,50 @@ struct SkyLinesTrafficMapItem : public MapItem
 };
 
 #endif
+
+/**
+ * A target received from the JETProvider radar API.  This is a
+ * self-contained snapshot, because the JETProvider::Data map (and the
+ * heap strings it points to) is replaced on every poll.
+ */
+struct JETProviderTrafficMapItem : public MapItem
+{
+  /** absolute altitude [m]; negative if unknown */
+  int altitude;
+
+  /** ground speed [m/s]; negative if unknown */
+  double speed;
+
+  /** vertical speed [m/s] */
+  double vspeed;
+
+  /** average climb rate over the last 30 seconds [m/s]; negative if
+      unknown */
+  double climb_rate_avg30s;
+
+  /** true track [degrees]; negative if unknown */
+  int track;
+
+  FlarmTraffic::AlarmType alarm_level;
+
+  FlarmColor color;
+
+  /** display name / callsign */
+  StaticString<40> name;
+
+  /** competition code */
+  StaticString<16> code;
+
+  /** aircraft type */
+  StaticString<32> type;
+
+  JETProviderTrafficMapItem(const char *_name, const char *_code,
+                            const char *_type,
+                            int _altitude, double _speed, double _vspeed,
+                            double _climb_rate_avg30s, int _track,
+                            FlarmTraffic::AlarmType _alarm_level,
+                            FlarmColor _color) noexcept;
+};
 
 struct ThermalMapItem: public MapItem
 {
