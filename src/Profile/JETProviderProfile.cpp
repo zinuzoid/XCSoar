@@ -31,10 +31,18 @@ namespace Profile {
     map.Get(ProfileKeys::JETProviderRadarInterval, settings.interval);
     map.Get(ProfileKeys::JETProviderRadarAccessToken, settings.access_token);
   }
+
+  static void Load(const ProfileMap &map, JETProviderSettings::Trace &settings) {
+    map.Get(ProfileKeys::JETProviderTraceEnabled, settings.enabled);
+    map.Get(ProfileKeys::JETProviderTraceInterval, settings.interval);
+    map.Get(ProfileKeys::JETProviderTraceSrc, settings.src);
+    map.Get(ProfileKeys::JETProviderTracePilotIds, settings.pilot_ids);
+  }
 }
 
 void
 Profile::Load(const ProfileMap &map, JETProviderSettings &settings)
 {
   Load(map, settings.radar);
+  Load(map, settings.trace);
 }

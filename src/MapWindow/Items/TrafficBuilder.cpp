@@ -61,3 +61,40 @@ MapItemListBuilder::AddSkyLinesTraffic()
   }
 #endif
 }
+
+void
+MapItemListBuilder::AddJETProviderTrace()
+{
+#ifdef HAVE_TRACKING
+  if (net_components == nullptr || !net_components->tracking)
+    return;
+
+  const auto &data = net_components->tracking->GetJETProviderTraceData();
+  const std::lock_guard lock{data.mutex};
+
+  /* assign colours exactly like MapWindow::DrawJETProviderTrace() does,
+     so the list entry matches the line drawn on the map */
+  unsigned color_index = 0;
+
+  for (const auto &i : data.traces) {
+    if (list.full())
+      break;
+
+    const auto &trace = i.second;
+    if (trace.points.empty())
+      continue;
+
+    const unsigned this_color = color_index++;
+
+    /* pick up the trace if any part of it passes near the location the
+       user tapped */
+    for (const auto &point : trace.points) {
+      if (point.IsValid() && location.DistanceS(point) < range) {
+        list.append(new TraceMapItem(trace.id.c_str(), trace.points.size(),
+                                     this_color));
+        break;
+      }
+    }
+  }
+#endif
+}

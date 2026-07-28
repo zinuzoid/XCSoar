@@ -263,6 +263,10 @@ constexpr std::string_view LiveTrack24TrackingVehicleName = "TrackingVehicleName
 constexpr std::string_view JETProviderRadarEnabled = "JETProviderRadarEnabled";
 constexpr std::string_view JETProviderRadarInterval = "JETProviderRadarInterval";
 constexpr std::string_view JETProviderRadarAccessToken = "JETProviderRadarAccessToken";
+constexpr std::string_view JETProviderTraceEnabled = "JETProviderTraceEnabled";
+constexpr std::string_view JETProviderTraceInterval = "JETProviderTraceInterval";
+constexpr std::string_view JETProviderTraceSrc = "JETProviderTraceSrc";
+constexpr std::string_view JETProviderTracePilotIds = "JETProviderTracePilotIds";
 
 constexpr std::string_view NetworkWidgetInterval = "NetworkWidgetInterval";
 constexpr std::string_view NetworkWidgetUrl = "NetworkWidgetUrl";

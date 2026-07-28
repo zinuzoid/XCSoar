@@ -78,6 +78,7 @@ TEST_NAMES = \
 	TestOverwritingRingBuffer \
 	TestDateTime TestRoughTime TestWrapClock \
 	TestPolylineDecoder \
+	TestJETProviderTrace \
 	TestTransponderCode \
 	TestMath \
 	TestMathTables \
@@ -203,6 +204,14 @@ TEST_POLYLINE_DECODER_SOURCES = \
 	$(TEST_SRC_DIR)/TestPolylineDecoder.cpp
 TEST_POLYLINE_DECODER_DEPENDS = GEO UTIL
 $(eval $(call link-program,TestPolylineDecoder,TEST_POLYLINE_DECODER))
+
+TEST_JET_PROVIDER_TRACE_SOURCES = \
+	$(SRC)/Task/PolylineDecoder.cpp \
+	$(SRC)/Tracking/JETProvider/TraceParser.cpp \
+	$(TEST_SRC_DIR)/tap.c \
+	$(TEST_SRC_DIR)/TestJETProviderTrace.cpp
+TEST_JET_PROVIDER_TRACE_DEPENDS = GEO MATH UTIL
+$(eval $(call link-program,TestJETProviderTrace,TEST_JET_PROVIDER_TRACE))
 
 TEST_TRANSPONDER_CODE_SOURCES = \
 	$(SRC)/TransponderCode.cpp \
