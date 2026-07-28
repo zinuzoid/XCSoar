@@ -11,6 +11,8 @@
 #include "util/Macros.hpp"
 #include "Asset.hpp"
 
+#include <span>
+
 #ifdef ENABLE_OPENGL
 #include "ui/canvas/opengl/Scope.hpp"
 #endif
@@ -30,8 +32,19 @@ TrafficRenderer::Draw(Canvas &canvas, const TrafficLook &traffic_look,
     { 0, 3 },
   };
 
-  // Rotate and shift the arrow to the right position and angle
-  PolygonRotateShift(arrow, pt, angle, Layout::Scale(100U));
+  // Create point array that will form the paraglider wing polygon
+  BulkPixelPoint wing[] = {
+    { -9, 2 }, { -5, -3 }, { 0, -5 }, { 5, -3 }, { 9, 2 },
+    {  6, 2 }, {  0, -1 }, { -5, 2 },
+  };
+
+  const std::span<BulkPixelPoint> shape =
+    traffic.type == FlarmTraffic::AircraftType::PARA_GLIDER
+    ? std::span<BulkPixelPoint>{wing}
+    : std::span<BulkPixelPoint>{arrow};
+
+  // Rotate and shift the shape to the right position and angle
+  PolygonRotateShift(shape, pt, angle, Layout::Scale(100U));
 
   if (fading) {
     canvas.Select(traffic_look.fading_pen);
@@ -43,11 +56,11 @@ TrafficRenderer::Draw(Canvas &canvas, const TrafficLook &traffic_look,
     canvas.SelectHollowBrush();
 #endif
 
-    // Draw the arrow
+    // Draw the shape
 #ifdef ENABLE_OPENGL
     const ScopeAlphaBlend alpha_blend;
 #endif
-    canvas.DrawPolygon(arrow, ARRAY_SIZE(arrow));
+    canvas.DrawPolygon(shape.data(), shape.size());
   } else {
     // Select brush depending on AlarmLevel
     switch (traffic.alarm_level) {
@@ -72,8 +85,8 @@ TrafficRenderer::Draw(Canvas &canvas, const TrafficLook &traffic_look,
     // Select black pen
     canvas.SelectBlackPen();
 
-    // Draw the arrow
-    canvas.DrawPolygon(arrow, ARRAY_SIZE(arrow));
+    // Draw the shape
+    canvas.DrawPolygon(shape.data(), shape.size());
   }
 
   switch (color) {
