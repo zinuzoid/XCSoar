@@ -7,6 +7,8 @@
 #include "Engine/Airspace/AbstractAirspace.hpp"
 #include "Weather/Features.hpp"
 
+#include <string.h>
+
 static bool
 CompareWaypointItems(const WaypointMapItem *a, const WaypointMapItem *b)
 {
@@ -72,6 +74,10 @@ CompareMapItems(const MapItem *a, const MapItem *b)
     return strcmp(((const WeatherStationMapItem *)a)->station->code,
                   ((const WeatherStationMapItem *)b)->station->code) < 0;
 #endif
+
+  case MapItem::Type::JET_TRAFFIC:
+    return strcmp(((const JETProviderTrafficMapItem *)a)->name.c_str(),
+                  ((const JETProviderTrafficMapItem *)b)->name.c_str()) < 0;
 
   case MapItem::Type::SKYLINES_TRAFFIC:
   case MapItem::Type::TRACE:

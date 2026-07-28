@@ -10,6 +10,7 @@
 #include "Renderer/TrafficRenderer.hpp"
 #include "FLARM/Friends.hpp"
 #include "Tracking/SkyLines/Data.hpp"
+#include "Tracking/JETProvider/TrafficDecode.hpp"
 #include "util/StringCompare.hxx"
 #include "FLARM/TrafficClimbAltIndicators.hpp"
 
@@ -338,6 +339,9 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
   const double jet_set_mc = GetComputerSettings().polar.glide_polar_task.GetMC();
   const double jet_30s_vario = Calculated().average;
 
+  const bool online = jet_provider_data->validity.IsValid() &&
+    jet_provider_data->success;
+
   // Circle through the FLARM targets
   for (auto it = jet_provider_data->traffics.begin(),
       end = jet_provider_data->traffics.end();
@@ -386,45 +390,23 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
     }
     TextInBox(canvas, second_text, sc_bottom, mode, GetClientRect());
 
-    auto circle = FlarmColor::NONE;
+    const auto icon = JETProvider::DecodeIconType(traffic.icon_type, online);
+
     FlarmTraffic t;
-    t.alarm_level = FlarmTraffic::AlarmType::NONE;
+    t.alarm_level = icon.alarm_level;
+    t.type = JETProvider::ParseAircraftType(traffic.type)
+      .value_or(FlarmTraffic::AircraftType::UNKNOWN);
     t.relative_altitude = (RoughAltitude) 100;
     t.climb_rate_avg30s = traffic.climb_rate_avg30s;
-    if (!jet_provider_data->validity.IsValid() || !jet_provider_data->success) {
-      t.alarm_level = FlarmTraffic::AlarmType::OFFLINE;
-    } else {
-      if(basic.gps_altitude_available) {
-        t.relative_altitude = (RoughAltitude) (traffic.altitude - basic.gps_altitude);
-      }
-
-      int icon_color = traffic.icon_type & 0xf;
-      if(icon_color == 1) {
-        t.alarm_level = FlarmTraffic::AlarmType::NONE;
-      } else if(icon_color == 2) {
-        t.alarm_level = FlarmTraffic::AlarmType::LOW;
-      } else if(icon_color == 3) {
-        t.alarm_level = FlarmTraffic::AlarmType::URGENT;
-      }
-
-      int circle_color = traffic.icon_type >> 8 & 0xf;
-      if(circle_color == 1) {
-        circle = FlarmColor::NONE;
-      } else if(circle_color == 2) {
-        circle = FlarmColor::GREEN;
-      } else if(circle_color == 3) {
-        circle = FlarmColor::BLUE;
-      } else if(circle_color == 4) {
-        circle = FlarmColor::YELLOW;
-      } else if(circle_color == 5) {
-        circle = FlarmColor::MAGENTA;
-      }
+    if (online && basic.gps_altitude_available) {
+      t.relative_altitude = (RoughAltitude) (traffic.altitude - basic.gps_altitude);
     }
+
     const TrafficClimbAltIndicators jet_indicators =
       TrafficClimbAltIndicators::GetClimbAltIndicators(t, jet_set_mc, jet_30s_vario);
     TrafficRenderer::Draw(canvas, traffic_look, false, vario_traffic_jet, t,
                           Angle::Degrees(traffic.track) - projection.GetScreenAngle(),
-                          circle, sc, jet_indicators);
+                          icon.circle, sc, jet_indicators);
   }
 
 }

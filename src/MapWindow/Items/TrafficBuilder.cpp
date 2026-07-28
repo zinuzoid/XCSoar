@@ -7,6 +7,7 @@
 #include "FLARM/List.hpp"
 #include "FLARM/Friends.hpp"
 #include "Tracking/SkyLines/Data.hpp"
+#include "Tracking/JETProvider/TrafficDecode.hpp"
 #include "Tracking/TrackingGlue.hpp"
 #include "Components.hpp"
 #include "NetComponents.hpp"
@@ -95,6 +96,41 @@ MapItemListBuilder::AddJETProviderTrace()
         break;
       }
     }
+  }
+#endif
+}
+
+void
+MapItemListBuilder::AddJETProviderTraffic()
+{
+#ifdef HAVE_TRACKING
+  if (net_components == nullptr || !net_components->tracking)
+    return;
+
+  const auto &data = net_components->tracking->GetJETProviderData();
+  const std::lock_guard lock{data.mutex};
+
+  const bool online = data.validity.IsValid() && data.success;
+
+  for (const auto &i : data.traffics) {
+    if (list.full())
+      break;
+
+    const auto &traffic = i.second;
+
+    if (!traffic.location.IsValid() ||
+        location.DistanceS(traffic.location) >= range)
+      continue;
+
+    const auto icon = JETProvider::DecodeIconType(traffic.icon_type, online);
+
+    list.append(new JETProviderTrafficMapItem(traffic.traffic_id,
+                                              traffic.display, traffic.code,
+                                              traffic.type, traffic.altitude,
+                                              traffic.speed, traffic.vspeed,
+                                              traffic.climb_rate_avg30s,
+                                              traffic.track,
+                                              icon.alarm_level, icon.circle));
   }
 #endif
 }
