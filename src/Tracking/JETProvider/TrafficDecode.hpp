@@ -5,6 +5,7 @@
 
 #include "FLARM/Traffic.hpp"
 #include "FLARM/Color.hpp"
+#include "util/NumberParser.hxx"
 
 namespace JETProvider
 {
@@ -64,6 +65,28 @@ DecodeIconType(int icon_type, bool online) noexcept
   }
 
   return state;
+}
+
+/**
+ * Decode JETProvider::Traffic::type, the OGN/FLARM aircraft type code
+ * as a decimal string.
+ *
+ * @return the type name, or nullptr if the value is empty, is not a
+ * decimal number, or is not a known type code
+ */
+[[gnu::pure]]
+inline const TCHAR *
+DecodeAircraftType(const char *type) noexcept
+{
+  if (type == nullptr)
+    return nullptr;
+
+  const auto value = ParseInteger<uint8_t>(type);
+  if (!value)
+    return nullptr;
+
+  /* GetTypeString() returns nullptr for codes outside the table */
+  return FlarmTraffic::GetTypeString((FlarmTraffic::AircraftType)*value);
 }
 
 } // namespace JETProvider
