@@ -43,6 +43,8 @@ CoGet(CurlGlobal &curl, const char *url)
 {
   CurlEasy easy{url};
   Curl::Setup(easy);
+  /* let libcurl announce gzip support and decompress transparently */
+  easy.SetAcceptEncoding("gzip");
 
   co_return co_await Curl::CoRequest(curl, std::move(easy));
 }
