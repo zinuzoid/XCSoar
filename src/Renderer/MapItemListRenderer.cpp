@@ -34,6 +34,7 @@
 #include "Weather/Features.hpp"
 #include "FLARM/List.hpp"
 #include "FLARM/TrafficClimbAltIndicators.hpp"
+#include "Tracking/JETProvider/TrafficDecode.hpp"
 #include "time/RoughTime.hpp"
 #include "time/BrokenDateTime.hpp"
 #include "Interface.hpp"
@@ -462,6 +463,8 @@ Draw(Canvas &canvas, PixelRect rc,
        MapWindow::DrawJETProviderTraffic() does */
     FlarmTraffic traffic;
     traffic.alarm_level = item.alarm_level;
+    traffic.type = JETProvider::ParseAircraftType(item.type.c_str())
+      .value_or(FlarmTraffic::AircraftType::UNKNOWN);
     traffic.relative_altitude = (RoughAltitude)100;
     traffic.climb_rate_avg30s = item.climb_rate_avg30s;
     if (item.alarm_level != FlarmTraffic::AlarmType::OFFLINE &&
@@ -498,10 +501,14 @@ Draw(Canvas &canvas, PixelRect rc,
   row_renderer.DrawFirstRow(canvas, rc, title_string);
 
   StaticString<256> info_string;
-  if (!item.type.empty())
-    info_string = item.type.c_str();
-  else
+  if (const TCHAR *type_string =
+        JETProvider::DecodeAircraftType(item.type.c_str());
+      type_string != nullptr)
+    info_string = type_string;
+  else if (item.type.empty())
     info_string = _("Unknown");
+  else
+    info_string.Format(_T("%s(%s)"), _("Unknown"), item.type.c_str());
 
   if (item.altitude >= 0)
     info_string.AppendFormat(_T(", %s: %s"), _("Altitude"),

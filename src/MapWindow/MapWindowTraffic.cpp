@@ -394,6 +394,8 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
 
     FlarmTraffic t;
     t.alarm_level = icon.alarm_level;
+    t.type = JETProvider::ParseAircraftType(traffic.type)
+      .value_or(FlarmTraffic::AircraftType::UNKNOWN);
     t.relative_altitude = (RoughAltitude) 100;
     t.climb_rate_avg30s = traffic.climb_rate_avg30s;
     if (online && basic.gps_altitude_available) {
