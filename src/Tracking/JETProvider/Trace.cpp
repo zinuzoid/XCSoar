@@ -44,6 +44,8 @@ CoGet(CurlGlobal &curl, const char *url,
 {
   CurlEasy easy{url};
   Curl::Setup(easy);
+  /* let libcurl announce gzip support and decompress transparently */
+  easy.SetAcceptEncoding("gzip");
 
   /* Curl::Setup() only limits how long connecting may take; without a
      limit on the transfer too, a server that stalls mid-body would keep
