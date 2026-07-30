@@ -194,6 +194,14 @@ class DeviceDescriptor final
    * State for Nunchuk.
    */
   int joy_state_x, joy_state_y;
+
+  /**
+   * True if OnVarioSensor() has been called at least once for this
+   * device.  When set, OnBarometricPressureSensor() will skip calling
+   * ProvideNoncompVario() to avoid overwriting the dedicated vario
+   * sensor value with a Kalman-filter-derived approximation.
+   */
+  bool has_vario_sensor = false;
 #endif
 
   /**
