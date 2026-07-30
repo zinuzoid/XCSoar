@@ -168,8 +168,9 @@ DeviceDescriptor::OnBarometricPressureSensor(float pressure,
 
   basic.UpdateClock();
   basic.alive.Update(basic.clock);
-  basic.ProvideNoncompVario(ComputeNoncompVario(kalman_filter.GetXAbs(),
-                                                kalman_filter.GetXVel()));
+  if (!has_vario_sensor)
+    basic.ProvideNoncompVario(ComputeNoncompVario(kalman_filter.GetXAbs(),
+                                                  kalman_filter.GetXVel()));
   basic.ProvideStaticPressure(
       AtmosphericPressure::HectoPascal(kalman_filter.GetXAbs()));
 
@@ -269,6 +270,7 @@ DeviceDescriptor::OnVarioSensor(float vario) noexcept
 
   basic.UpdateClock();
   basic.alive.Update(basic.clock);
+  has_vario_sensor = true;
   basic.ProvideNoncompVario(vario);
 
   e.Commit();
