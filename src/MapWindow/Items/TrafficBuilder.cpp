@@ -124,7 +124,8 @@ MapItemListBuilder::AddJETProviderTraffic()
 
     const auto icon = JETProvider::DecodeIconType(traffic.icon_type, online);
 
-    list.append(new JETProviderTrafficMapItem(traffic.display, traffic.code,
+    list.append(new JETProviderTrafficMapItem(traffic.traffic_id,
+                                              traffic.display, traffic.code,
                                               traffic.type, traffic.altitude,
                                               traffic.speed, traffic.vspeed,
                                               traffic.climb_rate_avg30s,

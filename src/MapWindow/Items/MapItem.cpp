@@ -11,7 +11,8 @@ TaskOZMapItem::TaskOZMapItem(int _index, const ObservationZonePoint &_oz,
 
 TaskOZMapItem::~TaskOZMapItem() noexcept = default;
 
-JETProviderTrafficMapItem::JETProviderTrafficMapItem(const char *_name,
+JETProviderTrafficMapItem::JETProviderTrafficMapItem(const char *_traffic_id,
+                                                     const char *_name,
                                                      const char *_code,
                                                      const char *_type,
                                                      int _altitude,
@@ -27,6 +28,7 @@ JETProviderTrafficMapItem::JETProviderTrafficMapItem(const char *_name,
 {
   /* the JETProvider parser leaves these null when the CSV field was
      empty */
+  traffic_id = _traffic_id != nullptr ? _traffic_id : "";
   name = _name != nullptr ? _name : "";
   code = _code != nullptr ? _code : "";
   type = _type != nullptr ? _type : "";

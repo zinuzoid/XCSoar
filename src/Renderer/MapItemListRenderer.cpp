@@ -492,6 +492,11 @@ Draw(Canvas &canvas, PixelRect rc,
   else
     title_string = _("JET Traffic");
 
+  if (!item.traffic_id.empty() && item.traffic_id != item.name) {
+    title_string.append(_T(", "));
+    title_string.append(item.traffic_id);
+  }
+
   /* append the competition code, unless it is already the name */
   if (!item.code.empty() && item.code != item.name) {
     title_string.append(_T(", "));

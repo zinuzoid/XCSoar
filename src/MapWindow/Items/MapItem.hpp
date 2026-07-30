@@ -236,6 +236,9 @@ struct JETProviderTrafficMapItem : public MapItem
 
   FlarmColor color;
 
+  /** the radar API's unique target id */
+  StaticString<32> traffic_id;
+
   /** display name / callsign */
   StaticString<40> name;
 
@@ -245,7 +248,8 @@ struct JETProviderTrafficMapItem : public MapItem
   /** aircraft type */
   StaticString<32> type;
 
-  JETProviderTrafficMapItem(const char *_name, const char *_code,
+  JETProviderTrafficMapItem(const char *_traffic_id,
+                            const char *_name, const char *_code,
                             const char *_type,
                             int _altitude, double _speed, double _vspeed,
                             double _climb_rate_avg30s, int _track,
