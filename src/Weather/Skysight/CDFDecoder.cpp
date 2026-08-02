@@ -31,6 +31,7 @@ Copyright_License {
 
 #include "SkysightAPI.hpp"
 #include "util/AllocatedArray.hxx"
+#include "util/ScopeExit.hxx"
 #include "system/FileUtil.hpp"
 #include "LogFile.hpp"
 
@@ -153,17 +154,29 @@ bool CDFDecoder::Decode()
 #endif
 
   //Generate GeoTiff
-  TIFF *tf = XTIFFOpen(output_path.c_str(), "w");
-  if (!tf) {
+  /* write to a temporary file and rename it into place only once it is
+     complete: the render thread may load output_path at any time, and a
+     partially written file must never be visible to it.  Writing
+     directly to output_path (as before) truncates any previous file at
+     that path in place, and a reader that has it memory-mapped can then
+     fault reading past the new end of file. */
+  const auto temp_path = output_path.WithSuffix(".tiftemp");
+  File::Delete(temp_path);
+
+  bool published = false;
+  AtScopeExit(&temp_path, &published) {
+    if (!published)
+      File::Delete(temp_path);
+  };
+
+  TIFF *tf = XTIFFOpen(temp_path.c_str(), "w");
+  if (!tf)
     throw std::runtime_error("can't XTIFFOpen");
-    return DecodeError();
-  }
 
   GTIF *gt = GTIFNew(tf);
   if (!gt) {
     (void)TIFFClose(tf);
     throw std::runtime_error("can't GTIFNew");
-    return DecodeError();
   }
   double tp_topleft[6] = {0, 0, 0, lon_min, lat_min, 0};
   double pix_scale[3] = {lon_scale, -lat_scale, 0};
@@ -194,8 +207,11 @@ bool CDFDecoder::Decode()
   row = (TIFFScanlineSize(tf) > linebytes) ?
     (unsigned char *)_TIFFmalloc(linebytes) :
     (unsigned char *)_TIFFmalloc(TIFFScanlineSize(tf));
-  if (!row)
+  if (!row) {
+    TIFFClose(tf);
+    GTIFFree(gt);
     return DecodeError();
+  }
 
   TIFFSetField(tf, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize(tf, linebytes));
 
@@ -231,7 +247,12 @@ bool CDFDecoder::Decode()
   if (success)
     GTIFWriteKeys(gt);
 
-  (void)TIFFClose(tf);
+  /* TIFFClose() returns void, so flush explicitly to detect a write
+     error (e.g. ENOSPC) before publishing the file */
+  if (success && TIFFFlush(tf) != 1)
+    success = false;
+
+  TIFFClose(tf);
 
   if (row)
     _TIFFfree(row);
@@ -240,9 +261,15 @@ bool CDFDecoder::Decode()
 
   data_file.close();
   File::Delete(path);
-  return (success) ? DecodeSuccess() : DecodeError();
 
-  return false;
+  if (!success)
+    return DecodeError();
+
+  if (!File::Replace(temp_path, output_path))
+    return DecodeError();
+
+  published = true;
+  return DecodeSuccess();
 }
 
 void CDFDecoder::MakeCallback(bool result)
