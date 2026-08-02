@@ -38,10 +38,29 @@ TrafficRenderer::Draw(Canvas &canvas, const TrafficLook &traffic_look,
     {  6, 2 }, {  0, -1 }, { -5, 2 },
   };
 
-  const std::span<BulkPixelPoint> shape =
-    traffic.type == FlarmTraffic::AircraftType::PARA_GLIDER
-    ? std::span<BulkPixelPoint>{wing}
-    : std::span<BulkPixelPoint>{arrow};
+  // Create point array that will form the sailplane polygon
+  BulkPixelPoint sailplane_ar15[] = {
+    {   0, -7 }, {   1, -3 }, {   9, -2 }, {  17, -1 }, { 17,  0 },
+    {   9,  0 }, {   1,  1 }, {   1,  7 }, {   5,  8 }, {  5,  9 },
+    {   1,  9 },
+    {  -1,  9 }, {  -5,  9 }, {  -5,  8 }, {  -1,  7 }, { -1,  1 },
+    {  -9,  0 }, { -17,  0 }, { -17, -1 }, {  -9, -2 }, { -1, -3 },
+  };
+
+  std::span<BulkPixelPoint> shape;
+  switch (traffic.type) {
+  case FlarmTraffic::AircraftType::PARA_GLIDER:
+    shape = wing;
+    break;
+
+  case FlarmTraffic::AircraftType::GLIDER:
+    shape = sailplane_ar15;
+    break;
+
+  default:
+    shape = arrow;
+    break;
+  }
 
   // Rotate and shift the shape to the right position and angle
   PolygonRotateShift(shape, pt, angle, Layout::Scale(100U));
