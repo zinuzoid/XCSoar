@@ -35,10 +35,20 @@ Copyright_License {
 #include "system/FileUtil.hpp"
 #include "LogFile.hpp"
 
-static void tiff_errorhandler(const char* module, const char* fmt, va_list ap)
+#include <cstdio>
+
+static void
+tiff_errorhandler(const char *module, const char *fmt, va_list ap)
 {
-  LogFormat("%s", module);
-  LogFormat(fmt, ap);
+  /* libtiff hands us a va_list; passing it on to LogFormat() as a
+     variadic argument is undefined behaviour, so format it here
+     instead.  TIFFSetErrorHandler() is process-global, so this also
+     runs on the map render thread whenever it fails to load a .tif. */
+  char buffer[256];
+  if (vsnprintf(buffer, sizeof(buffer), fmt, ap) < 0)
+    return;
+
+  LogFormat("libtiff [%s]: %s", module != nullptr ? module : "?", buffer);
 }
 
 void CDFDecoder::DecodeAsync()
