@@ -38,7 +38,13 @@ class TiffLoader {
 
 public:
   explicit TiffLoader(Path path)
-    :tiff(TiffOpen(path, "r")) {
+    /* "m" disables libtiff's memory mapping: with mmap, a file that is
+       truncated or rewritten while we read it faults with SIGBUS inside
+       memcpy(), which no exception handler can recover from.  Reading
+       through the file API turns the same situation into a libtiff
+       error, which becomes a std::runtime_error the caller already
+       handles. */
+    :tiff(TiffOpen(path, "rm")) {
     if (tiff == nullptr)
       throw std::runtime_error("Failed to open TIFF file");
   }
