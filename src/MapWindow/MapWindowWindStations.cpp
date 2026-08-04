@@ -5,7 +5,7 @@
 #include "Look/MapLook.hpp"
 #include "MapSettings.hpp"
 #include "ui/canvas/Canvas.hpp"
-#include "Renderer/WindArrowRenderer.hpp"
+#include "Renderer/WindBarbRenderer.hpp"
 #include "Renderer/TextInBox.hpp"
 #include "Weather/WindsMobi/Glue.hpp"
 #include "Units/Units.hpp"
@@ -20,15 +20,6 @@ MapWindow::DrawWindStations(Canvas &canvas) noexcept
 {
   if (wind_stations == nullptr || !GetComputerSettings().wind_station.enabled)
     return;
-
-  /* fixed arrow size: with up to ~30 stations on screen at once, a
-     size that scales with wind strength (like the own-ship arrow)
-     would make strong-wind clusters unreadable.  Strength is instead
-     conveyed by colour band and the avg/gust label. */
-  constexpr unsigned ARROW_WIDTH = 7;
-  constexpr unsigned ARROW_TAIL_LENGTH = 2;
-  constexpr unsigned ARROW_LENGTH = 12;
-  constexpr unsigned ARROW_OFFSET = 0;
 
   const unsigned scale = Layout::Scale(100U);
   const Angle screen_angle = render_projection.GetScreenAngle();
@@ -47,30 +38,36 @@ MapWindow::DrawWindStations(Canvas &canvas) noexcept
 
     const bool stale = now - station.measured_at > std::chrono::minutes(20);
     const unsigned band = WindStationLook::BandIndex(station.wind_max);
-    const WindArrowLook &arrow_look =
+    const WindBarbLook &barb_look =
       (stale ? look.wind_station.stale_bands : look.wind_station.bands)[band];
 
     /* same convention as the own-ship wind arrow: SpeedVector::bearing
        is the direction the wind blows FROM */
-    const Angle angle = station.wind.bearing - screen_angle;
+    const Angle wind_from = station.wind.bearing - screen_angle;
 
-    WindArrowRenderer(arrow_look)
-      .DrawArrow(canvas, *p, angle,
-                ARROW_WIDTH, ARROW_LENGTH, ARROW_TAIL_LENGTH,
-                WindArrowStyle::FULL_ARROW, ARROW_OFFSET, scale);
+    /* the barb's staff/feather count is a fixed meteorological
+       convention in knots, independent of the user's display unit
+       (which only governs the avg/gust label text below) */
+    const unsigned speed_kt =
+      uround(Units::ToUserUnit(station.wind.norm, Unit::KNOTS));
+
+    const auto barb =
+      WindBarbRenderer(barb_look).Draw(canvas, *p, wind_from, speed_kt);
 
     StaticString<16> buffer;
     buffer.Format(_T("%d/%d"),
                  iround(Units::ToUserWindSpeed(station.wind.norm)),
                  iround(Units::ToUserWindSpeed(station.wind_max)));
 
+    /* tip_y already accounts for however long the staff grew to fit
+       this station's barbs and pennants */
     BulkPixelPoint label[] = {
-      { 0, -int(ARROW_OFFSET + ARROW_LENGTH + ARROW_TAIL_LENGTH + 2) },
+      { 0, barb.tip_y - 2 },
     };
-    PolygonRotateShift(label, *p, angle, scale);
+    PolygonRotateShift(label, *p, wind_from, scale);
 
     canvas.SetTextColor(COLOR_BLACK);
-    canvas.Select(*arrow_look.font);
+    canvas.Select(*look.wind_station.font);
 
     TextInBoxMode style;
     style.align = TextInBoxMode::Alignment::CENTER;

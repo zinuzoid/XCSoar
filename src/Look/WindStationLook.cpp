@@ -2,10 +2,7 @@
 // Copyright The XCSoar Project
 
 #include "WindStationLook.hpp"
-#include "Screen/Layout.hpp"
-#include "Asset.hpp"
 #include "ui/canvas/Color.hpp"
-#include "Look/Colors.hpp"
 
 namespace {
 
@@ -20,23 +17,13 @@ constexpr Color band_colors[WindStationLook::N_BANDS] = {
 } // namespace
 
 void
-WindStationLook::Initialise(const Font &font)
+WindStationLook::Initialise(const Font &_font)
 {
+  font = &_font;
+
   for (unsigned i = 0; i < N_BANDS; ++i) {
-    WindArrowLook &look = bands[i];
     const Color color = band_colors[i];
-
-    look.arrow_pen.Create(Layout::ScalePenWidth(1), DarkColor(color));
-    look.shaft_pen.Create(Pen::DASH2, Layout::ScalePenWidth(1), color);
-    look.arrow_brush.Create(IsDithered() ? color : ColorWithAlpha(color, ALPHA_OVERLAY));
-    look.font = &font;
-
-    WindArrowLook &stale = stale_bands[i];
-    const Color stale_color = Desaturate(LightColor(color));
-
-    stale.arrow_pen.Create(Layout::ScalePenWidth(1), DarkColor(stale_color));
-    stale.shaft_pen.Create(Pen::DASH2, Layout::ScalePenWidth(1), stale_color);
-    stale.arrow_brush.Create(IsDithered() ? stale_color : ColorWithAlpha(stale_color, ALPHA_OVERLAY));
-    stale.font = &font;
+    bands[i].Initialise(color);
+    stale_bands[i].Initialise(Desaturate(LightColor(color)));
   }
 }

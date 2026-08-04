@@ -3,15 +3,15 @@
 
 #pragma once
 
-#include "WindArrowLook.hpp"
+#include "WindBarbLook.hpp"
 
 class Font;
 
 /**
- * Look for the winds.mobi wind station map overlay.  Reuses
- * #WindArrowLook (and therefore the existing WindArrowRenderer)
- * unmodified, just with one set of pens/brushes per gust strength
- * band, plus a desaturated set for stale measurements.
+ * Look for the winds.mobi wind station map overlay: one
+ * #WindBarbLook per gust-strength band, plus a desaturated set for
+ * stale measurements, and the font used for the avg/gust label drawn
+ * alongside each barb.
  */
 struct WindStationLook {
   /** calm, moderate, strong, dangerous - by gust speed */
@@ -27,10 +27,14 @@ struct WindStationLook {
     35. / 3.6,
   };
 
-  WindArrowLook bands[N_BANDS];
+  WindBarbLook bands[N_BANDS];
 
   /** same bands, desaturated, used when the measurement is stale */
-  WindArrowLook stale_bands[N_BANDS];
+  WindBarbLook stale_bands[N_BANDS];
+
+  /** shared by every band: the barb colour carries the gust strength,
+      the label font does not need to */
+  const Font *font;
 
   void Initialise(const Font &font);
 

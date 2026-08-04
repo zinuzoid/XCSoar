@@ -9,6 +9,9 @@
 #include "MapWindow/Items/RaspMapItem.hpp"
 #include "MapWindow/Items/WindStationMapItem.hpp"
 #include "Look/WindStationLook.hpp"
+#include "Renderer/WindBarbRenderer.hpp"
+#include "Units/Units.hpp"
+#include "Math/Util.hpp"
 #include "Look/DialogLook.hpp"
 #include "Look/MapLook.hpp"
 #include "Renderer/AircraftRenderer.hpp"
@@ -251,23 +254,15 @@ Draw(Canvas &canvas, PixelRect rc,
   const bool stale = age > minutes{20};
 
   const unsigned band = WindStationLook::BandIndex(station.wind_max);
-  const WindArrowLook &arrow_look = (stale ? look.stale_bands : look.bands)[band];
+  const WindBarbLook &barb_look = (stale ? look.stale_bands : look.bands)[band];
 
   const PixelPoint pt(rc.left + line_height / 2, rc.top + line_height / 2);
 
-  /* a small arrow icon rotated to the wind bearing, same shape as
-     ArrivalAltitudeMapItem's hand-rolled icon above */
-  {
-    canvas.Select(arrow_look.arrow_pen);
-    canvas.Select(arrow_look.arrow_brush);
-
-    BulkPixelPoint arrow[] = {
-      { 0, -6 }, { -4, 5 }, { 0, 2 }, { 4, 5 },
-    };
-    PolygonRotateShift({arrow, ARRAY_SIZE(arrow)}, pt, station.wind.bearing,
-                       Layout::Scale(100U));
-    canvas.DrawPolygon(arrow, ARRAY_SIZE(arrow));
-  }
+  /* the same wind barb glyph as on the map, so the row can be matched
+     to the icon the user just tapped */
+  const unsigned speed_kt =
+    uround(Units::ToUserUnit(station.wind.norm, Unit::KNOTS));
+  WindBarbRenderer(barb_look).Draw(canvas, pt, station.wind.bearing, speed_kt);
 
   rc.left += line_height + text_padding;
 
