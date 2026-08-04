@@ -3,6 +3,7 @@
 
 #include "List.hpp"
 #include "MapItem.hpp"
+#include "WindStationMapItem.hpp"
 #include "Engine/Waypoint/Waypoint.hpp"
 #include "Engine/Airspace/AbstractAirspace.hpp"
 #include "Weather/Features.hpp"
@@ -74,6 +75,10 @@ CompareMapItems(const MapItem *a, const MapItem *b)
     return strcmp(((const WeatherStationMapItem *)a)->station->code,
                   ((const WeatherStationMapItem *)b)->station->code) < 0;
 #endif
+
+  case MapItem::Type::WIND_STATION:
+    return strcmp(((const WindStationMapItem *)a)->station.name.c_str(),
+                  ((const WindStationMapItem *)b)->station.name.c_str()) < 0;
 
   case MapItem::Type::JET_TRAFFIC:
     return strcmp(((const JETProviderTrafficMapItem *)a)->name.c_str(),

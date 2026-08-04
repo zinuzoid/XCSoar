@@ -46,6 +46,7 @@ namespace SkyLinesTracking {
 }
 
 namespace TIM { class Glue; }
+namespace WindsMobi { class Glue; }
 
 class MapWindow :
   public DoubleBufferWindow,
@@ -145,6 +146,7 @@ protected:
 
 #ifdef HAVE_HTTP
   const TIM::Glue *tim_glue = nullptr;
+  const WindsMobi::Glue *wind_stations = nullptr;
 #endif
 
   const JETProvider::Data *jet_provider_data = nullptr;
@@ -251,6 +253,10 @@ public:
   void SetThermalInfoMap(const TIM::Glue *_tim) noexcept {
     tim_glue = _tim;
   }
+
+  void SetWindStations(const WindsMobi::Glue *_wind_stations) noexcept {
+    wind_stations = _wind_stations;
+  }
 #endif
 
   void SetJETProviderData(const JETProvider::Data *_data) {
@@ -315,6 +321,10 @@ protected:
   void DrawTaskOffTrackIndicator(Canvas &canvas) noexcept;
   void DrawWaves(Canvas &canvas) noexcept;
   virtual void DrawThermalEstimate(Canvas &canvas) const noexcept;
+
+#ifdef HAVE_HTTP
+  void DrawWindStations(Canvas &canvas) const noexcept;
+#endif
 
   void DrawGlideThroughTerrain(Canvas &canvas) const noexcept;
   void DrawTerrainAbove(Canvas &canvas) noexcept;

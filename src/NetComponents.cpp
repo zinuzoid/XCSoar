@@ -5,12 +5,14 @@
 #include "Tracking/TrackingGlue.hpp"
 #include "net/client/tim/Glue.hpp"
 #include "net/client/NetworkWidget/Glue.hpp"
+#include "Weather/WindsMobi/Glue.hpp"
 
 NetComponents::NetComponents(EventLoop &event_loop, CurlGlobal &curl,
                              const TrackingSettings &tracking_settings) noexcept
   :tracking(new TrackingGlue(event_loop, curl)),
    tim(new TIM::Glue(curl)),
-   networkWidget(new NetworkWidget::Glue(curl))
+   networkWidget(new NetworkWidget::Glue(curl)),
+   wind_stations(new WindsMobi::Glue(curl))
 {
   tracking->SetSettings(tracking_settings);
 }

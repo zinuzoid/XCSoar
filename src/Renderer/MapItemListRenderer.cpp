@@ -7,6 +7,8 @@
 #include "MapWindow/Items/MapItem.hpp"
 #include "MapWindow/Items/OverlayMapItem.hpp"
 #include "MapWindow/Items/RaspMapItem.hpp"
+#include "MapWindow/Items/WindStationMapItem.hpp"
+#include "Look/WindStationLook.hpp"
 #include "Look/DialogLook.hpp"
 #include "Look/MapLook.hpp"
 #include "Renderer/AircraftRenderer.hpp"
@@ -232,6 +234,57 @@ Draw(Canvas &canvas, const PixelRect rc,
   NOAAListRenderer::Draw(canvas, rc, station, look, row_renderer);
 }
 #endif
+
+static void
+Draw(Canvas &canvas, PixelRect rc,
+     const WindStationMapItem &item,
+     const TwoTextRowsRenderer &row_renderer,
+     const WindStationLook &look)
+{
+  const unsigned line_height = rc.GetHeight();
+  const unsigned text_padding = Layout::GetTextPadding();
+
+  const WindsMobi::Station &station = item.station;
+
+  const auto age = duration_cast<seconds>(
+      std::chrono::system_clock::now() - station.measured_at);
+  const bool stale = age > minutes{20};
+
+  const unsigned band = WindStationLook::BandIndex(station.wind_max);
+  const WindArrowLook &arrow_look = (stale ? look.stale_bands : look.bands)[band];
+
+  const PixelPoint pt(rc.left + line_height / 2, rc.top + line_height / 2);
+
+  /* a small arrow icon rotated to the wind bearing, same shape as
+     ArrivalAltitudeMapItem's hand-rolled icon above */
+  {
+    canvas.Select(arrow_look.arrow_pen);
+    canvas.Select(arrow_look.arrow_brush);
+
+    BulkPixelPoint arrow[] = {
+      { 0, -6 }, { -4, 5 }, { 0, 2 }, { 4, 5 },
+    };
+    PolygonRotateShift({arrow, ARRAY_SIZE(arrow)}, pt, station.wind.bearing,
+                       Layout::Scale(100U));
+    canvas.DrawPolygon(arrow, ARRAY_SIZE(arrow));
+  }
+
+  rc.left += line_height + text_padding;
+
+  StaticString<256> title;
+  title = !station.name.empty() ? station.name.c_str() : station.id.c_str();
+  if (station.altitude >= 0)
+    title.AppendFormat(_T(" (%s)"), FormatUserAltitude(station.altitude).c_str());
+  row_renderer.DrawFirstRow(canvas, rc, title);
+
+  StaticString<256> info;
+  info.Format(_T("%s / %s, %s, %s %s"),
+             FormatUserWindSpeed(station.wind.norm).c_str(),
+             FormatUserWindSpeed(station.wind_max).c_str(),
+             FormatBearing(station.wind.bearing).c_str(),
+             FormatTimespanSmart(age).c_str(), _("ago"));
+  row_renderer.DrawSecondRow(canvas, rc, info);
+}
 
 static void
 Draw(Canvas &canvas, PixelRect rc,
@@ -585,6 +638,11 @@ MapItemListRenderer::Draw(Canvas &canvas, const PixelRect rc,
            row_renderer, look.noaa);
     break;
 #endif
+
+  case MapItem::Type::WIND_STATION:
+    ::Draw(canvas, rc, (const WindStationMapItem &)item,
+           row_renderer, look.wind_station);
+    break;
 
   case MapItem::Type::TRAFFIC:
     ::Draw(canvas, rc, (const TrafficMapItem &)item,

@@ -165,7 +165,8 @@ DIALOG_SOURCES += \
 	$(SRC)/Dialogs/Weather/PCMetDialog.cpp \
 	$(SRC)/Dialogs/Weather/SkysightDialog.cpp \
 	$(SRC)/Dialogs/Weather/NOAAList.cpp \
-	$(SRC)/Dialogs/Weather/NOAADetails.cpp
+	$(SRC)/Dialogs/Weather/NOAADetails.cpp \
+	$(SRC)/Dialogs/Weather/WindStationDetails.cpp
 endif
 
 XCSOAR_SOURCES := \
@@ -481,6 +482,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/Profile/PageProfile.cpp \
 	$(SRC)/Profile/UIProfile.cpp \
 	$(SRC)/Profile/JETProviderProfile.cpp \
+	$(SRC)/Profile/WindsMobiProfile.cpp \
 	$(SRC)/Profile/NetworkWidgetProfile.cpp \
 	$(SRC)/Profile/Settings.cpp \
 	$(SRC)/Profile/UnitsConfig.cpp \
@@ -661,6 +663,10 @@ XCSOAR_SOURCES += \
 	$(SRC)/Tracking/JETProvider/RadarParser.cpp \
 	$(SRC)/Tracking/JETProvider/Trace.cpp \
 	$(SRC)/Tracking/JETProvider/TraceParser.cpp
+
+XCSOAR_SOURCES += \
+	$(SRC)/Weather/WindsMobi/Parser.cpp \
+	$(SRC)/Weather/WindsMobi/Glue.cpp
 
 ifeq ($(HAVE_PCM_PLAYER),y)
 XCSOAR_SOURCES += $(SRC)/Audio/VarioGlue.cpp

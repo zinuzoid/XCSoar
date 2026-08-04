@@ -80,6 +80,11 @@ GlueMapWindow::ShowMapItems(const GeoPoint &location,
     builder.AddWeatherStations(*noaa_store);
 #endif
 
+#ifdef HAVE_HTTP
+  if (computer_settings.wind_station.enabled)
+    builder.AddWindStations();
+#endif
+
   builder.AddTraffic(basic.flarm.traffic);
 
 #ifdef HAVE_SKYLINES_TRACKING
