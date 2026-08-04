@@ -34,7 +34,8 @@ int main()
     const auto &s = stations[0];
     ok1(s.id == "holfuy-1636");
     ok1(s.name == "Pormenaz");
-    ok1(s.provider == "holfuy.com");
+    /* winds.mobi is credited alongside the original data provider */
+    ok1(s.provider == "holfuy.com via winds.mobi");
     ok1(s.altitude == 1000);
 
     /* "coordinates" is [longitude, latitude]; getting this backwards

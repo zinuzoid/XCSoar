@@ -25,8 +25,8 @@ struct Station {
   /** the station's short name */
   StaticString<48> name;
 
-  /** the data provider's name, e.g. "holfuy.com" */
-  StaticString<48> provider;
+  /** the data provider's name, e.g. "holfuy.com via winds.mobi" */
+  StaticString<64> provider;
 
   GeoPoint location;
 

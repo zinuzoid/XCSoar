@@ -77,8 +77,10 @@ ParseStation(const boost::json::object &json)
   if (const auto *name = json.if_contains("short"))
     station.name = name->as_string().c_str();
 
+  /* credit winds.mobi alongside the original data provider, since it
+     is a free community service aggregating everyone else's stations */
   if (const auto *provider = json.if_contains("pv-name"))
-    station.provider = provider->as_string().c_str();
+    station.provider.Format("%s via winds.mobi", provider->as_string().c_str());
 
   if (const auto *alt = json.if_contains("alt"))
     station.altitude = alt->to_number<int>();
