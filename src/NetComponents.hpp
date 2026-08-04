@@ -14,6 +14,7 @@ class CurlGlobal;
 class TrackingGlue;
 namespace TIM { class Glue; }
 namespace NetworkWidget { class Glue; }
+namespace WindsMobi { class Glue; }
 
 /**
  * This singleton manages global networking-related objects.
@@ -26,6 +27,7 @@ struct NetComponents {
 #ifdef HAVE_HTTP
   const std::unique_ptr<TIM::Glue> tim;
   const std::unique_ptr<NetworkWidget::Glue> networkWidget;
+  const std::unique_ptr<WindsMobi::Glue> wind_stations;
 #endif
 
   NetComponents(EventLoop &event_loop, CurlGlobal &curl,
