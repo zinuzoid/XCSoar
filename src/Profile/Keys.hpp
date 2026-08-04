@@ -267,6 +267,7 @@ constexpr std::string_view JETProviderTraceEnabled = "JETProviderTraceEnabled";
 constexpr std::string_view JETProviderTraceInterval = "JETProviderTraceInterval";
 constexpr std::string_view JETProviderTraceSrc = "JETProviderTraceSrc";
 constexpr std::string_view JETProviderTracePilotIds = "JETProviderTracePilotIds";
+constexpr std::string_view JETProviderWindEnabled = "JETProviderWindEnabled";
 
 constexpr std::string_view NetworkWidgetInterval = "NetworkWidgetInterval";
 constexpr std::string_view NetworkWidgetUrl = "NetworkWidgetUrl";

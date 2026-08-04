@@ -84,7 +84,7 @@ JETProvider::Glue::OnTimer(const NMEAInfo &basic, [[maybe_unused]] const Derived
 
   /* snapshot settings by value on the UI thread; the coroutine must
      never touch CommonInterface or UIGlobals from the curl thread
-     (see WindsMobi::Glue::OnTimer for the canonical pattern) */
+     (see JETProvider::WindGlue::OnTimer for the same pattern) */
   const JETProviderSettings &settings =
     CommonInterface::GetComputerSettings().jet_provider_setting;
   const StaticString<64> access_token = settings.radar.access_token;

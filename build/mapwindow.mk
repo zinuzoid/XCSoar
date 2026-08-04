@@ -19,6 +19,7 @@ LIBMAPWINDOW_SOURCES = \
 	$(SRC)/MapWindow/MapWindowTask.cpp \
 	$(SRC)/MapWindow/MapWindowThermal.cpp \
 	$(SRC)/MapWindow/MapWindowTraffic.cpp \
+	$(SRC)/MapWindow/MapWindowWindStations.cpp \
 	$(SRC)/MapWindow/MapWindowTrail.cpp \
 	$(SRC)/MapWindow/MapWindowWaypoints.cpp \
 	$(SRC)/MapWindow/GlueMapWindow.cpp \

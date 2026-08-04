@@ -60,13 +60,35 @@ struct JETProviderSettings {
     }
   };
 
+  /**
+   * Overlay nearby weather stations' wind measurements on the map.
+   */
+  struct Wind {
+    bool enabled;
+
+    void SetDefaults() {
+      enabled = false;
+    }
+  };
+
   Radar radar;
 
   Trace trace;
 
+  Wind wind;
+
   void SetDefaults() {
     radar.SetDefaults();
     trace.SetDefaults();
+    wind.SetDefaults();
+  }
+
+  /**
+   * The wind overlay rides on the radar's access token and status row,
+   * so it is only ever active while the radar is.
+   */
+  constexpr bool IsWindEnabled() const noexcept {
+    return radar.enabled && wind.enabled;
   }
 };
 

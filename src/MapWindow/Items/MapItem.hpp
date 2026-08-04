@@ -38,6 +38,7 @@ struct MapItem
 #ifdef HAVE_NOAA
     WEATHER,
 #endif
+    WIND_STATION,
     AIRSPACE,
     THERMAL,
     WAYPOINT,

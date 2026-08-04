@@ -38,6 +38,10 @@ namespace Profile {
     map.Get(ProfileKeys::JETProviderTraceSrc, settings.src);
     map.Get(ProfileKeys::JETProviderTracePilotIds, settings.pilot_ids);
   }
+
+  static void Load(const ProfileMap &map, JETProviderSettings::Wind &settings) {
+    map.Get(ProfileKeys::JETProviderWindEnabled, settings.enabled);
+  }
 }
 
 void
@@ -45,4 +49,5 @@ Profile::Load(const ProfileMap &map, JETProviderSettings &settings)
 {
   Load(map, settings.radar);
   Load(map, settings.trace);
+  Load(map, settings.wind);
 }

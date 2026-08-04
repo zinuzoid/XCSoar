@@ -13,7 +13,8 @@ TrackingGlue::TrackingGlue(EventLoop &event_loop,
   :skylines(event_loop, this),
    livetrack24(curl),
    jet_provider(curl, this),
-   jet_trace(curl, this)
+   jet_trace(curl, this),
+   jet_wind(curl, this)
 {
 }
 
@@ -37,11 +38,19 @@ TrackingGlue::OnTimer(const MoreData &basic, const DerivedInfo &calculated)
 
   jet_trace.OnTimer(basic, calculated);
 
+  jet_wind.OnTimer(basic, calculated);
+
   {
     const std::lock_guard lock{jet_provider_data.mutex};
 
     jet_provider_data.validity.Expire(basic.clock, std::chrono::seconds(JET_PROVIDER_TRAFFIC_OFFLINE_THRESHOLD_SECS));
     jet_trace_data.validity.Expire(basic.clock, std::chrono::seconds(JET_PROVIDER_TRACE_OFFLINE_THRESHOLD_SECS));
+  }
+
+  {
+    const std::lock_guard lock{jet_wind_data.mutex};
+
+    jet_wind_data.validity.Expire(basic.clock, std::chrono::seconds(JET_PROVIDER_WIND_OFFLINE_THRESHOLD_SECS));
   }
 
   livetrack24.OnTimer(basic, calculated);
@@ -114,6 +123,25 @@ TrackingGlue::OnJETTrace(std::map<std::string, JETProvider::PilotTrace> traces,
 
   LogFormat("OnJETTrace pilots:%d success:%d",
     (int) jet_trace_data.traces.size(), success);
+}
+
+void
+TrackingGlue::OnJETWind(std::vector<JETProvider::WindStation> stations,
+                        Validity validity, bool success)
+{
+  const std::lock_guard<Mutex> lock(jet_wind_data.mutex);
+
+  jet_wind_data.validity = validity;
+  jet_wind_data.success = success;
+
+  /* keep the previous stations when a poll failed outright, so a single
+     hiccup does not blank the overlay; an empty *successful* response
+     (the user panned somewhere with no stations) does clear them */
+  if (!stations.empty() || success)
+    jet_wind_data.stations = std::move(stations);
+
+  LogFormat("OnJETWind stations:%d success:%d",
+    (int) jet_wind_data.stations.size(), success);
 }
 
 void TrackingGlue::OnJETProviderReset() {
