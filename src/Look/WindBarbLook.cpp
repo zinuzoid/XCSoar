@@ -3,6 +3,7 @@
 
 #include "WindBarbLook.hpp"
 #include "Screen/Layout.hpp"
+#include "Look/Colors.hpp"
 
 namespace {
 
@@ -20,7 +21,7 @@ void
 WindBarbLook::Band::Initialise(Color color) noexcept
 {
   pen.Create(Layout::ScalePenWidth(1), color);
-  brush.Create(color);
+  brush.Create(ColorWithAlpha(color, ALPHA_OVERLAY));
 }
 
 void
