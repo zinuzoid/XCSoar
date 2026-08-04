@@ -8,6 +8,10 @@
 #include "Math/Screen.hpp"
 #include "Screen/Layout.hpp"
 
+#ifdef ENABLE_OPENGL
+#include "ui/canvas/opengl/Scope.hpp"
+#endif
+
 #include <algorithm>
 
 namespace WindBarb {
@@ -82,6 +86,13 @@ Build(Barb &b, unsigned speed_kt) noexcept
 static void
 Draw(Canvas &canvas, const Barb &b, PixelPoint at, Angle wind_from) noexcept
 {
+  /* both pen and brush carry alpha (see WindBarbLook::Band::Initialise);
+     without this, GL_BLEND is off by default and the alpha channel is
+     silently ignored, rendering everything fully opaque */
+#ifdef ENABLE_OPENGL
+  const ScopeAlphaBlend alpha_blend;
+#endif
+
   const int r = Layout::Scale(CIRCLE_R);
 
   canvas.DrawCircle(at, r);
