@@ -168,3 +168,11 @@ TrackingGlue::OnJETProviderError(std::exception_ptr e)
 {
   LogError(e, "JETProvider error");
 }
+
+void
+TrackingGlue::OnJETProviderStatus(const char *status) noexcept
+{
+  const std::lock_guard<Mutex> lock(jet_provider_data.mutex);
+
+  jet_provider_data.status = status;
+}
