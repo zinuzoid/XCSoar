@@ -74,6 +74,7 @@ private:
   void OnJETTraffic(std::vector<JETProvider::Traffic> traffics, Validity validity, bool success, TimeStamp now) override;
   void OnJETProviderReset() override;
   void OnJETProviderError(std::exception_ptr e) override;
+  void OnJETProviderStatus(const char *status) noexcept override;
 
   /* virtual methods from JETProvider::TraceHandler */
   void OnJETTrace(std::map<std::string, JETProvider::PilotTrace> traces,

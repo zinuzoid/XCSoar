@@ -34,6 +34,14 @@ Copyright_License {
 #include "Form/DataField/Boolean.hpp"
 #include "Form/DataField/Listener.hpp"
 #include "Form/DataField/Base.hpp"
+#include "Components.hpp"
+#include "NetComponents.hpp"
+#include "Tracking/Features.hpp"
+#include "util/StaticString.hxx"
+
+#ifdef HAVE_TRACKING
+#include "Tracking/TrackingGlue.hpp"
+#endif
 
 
 void JETProviderConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &rc) noexcept {
@@ -72,6 +80,11 @@ void JETProviderConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &r
     nullptr,
     settings.radar.access_token);
   SetExpertRow(RADAR_ACCESS_TOKEN);
+
+  AddReadOnly(_("Token Status"),
+    _("Result of the most recent radar request. Reflects the saved "
+      "token, so close this dialog after editing it."));
+  SetExpertRow(RADAR_STATUS);
 
   AddSpacer();
   SetExpertRow(SPACER);
@@ -115,6 +128,63 @@ void JETProviderConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &r
     SetRowVisible(TRACE_SRC, false);
     SetRowVisible(TRACE_PILOT_IDS, false);
   }
+}
+
+void
+JETProviderConfigPanel::UpdateStatus() noexcept
+{
+  const JETProviderSettings &settings =
+    CommonInterface::GetComputerSettings().jet_provider_setting;
+
+  if (!settings.radar.enabled) {
+    SetText(RADAR_STATUS, _("Radar disabled"));
+    return;
+  }
+
+  /* the same guard JETProvider::Glue::OnTimer() uses to skip the
+     request */
+  if (settings.radar.access_token.length() <= 2) {
+    SetText(RADAR_STATUS, _("No access token"));
+    return;
+  }
+
+#ifdef HAVE_TRACKING
+  if (net_components != nullptr && net_components->tracking) {
+    StaticString<128> status;
+
+    {
+      const JETProvider::Data &data =
+        net_components->tracking->GetJETProviderData();
+      const std::lock_guard lock{data.mutex};
+      /* copy it out and drop the lock before touching the window */
+      status = data.status;
+    }
+
+    if (!status.empty()) {
+      SetText(RADAR_STATUS, status);
+      return;
+    }
+  }
+#endif
+
+  SetText(RADAR_STATUS, _("Waiting for first request"));
+}
+
+void
+JETProviderConfigPanel::Show(const PixelRect &rc) noexcept
+{
+  RowFormWidget::Show(rc);
+
+  UpdateStatus();
+  timer.Schedule(std::chrono::seconds(1));
+}
+
+void
+JETProviderConfigPanel::Hide() noexcept
+{
+  timer.Cancel();
+
+  RowFormWidget::Hide();
 }
 
 bool JETProviderConfigPanel::Save(bool &_changed) noexcept {
