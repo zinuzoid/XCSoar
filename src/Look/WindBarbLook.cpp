@@ -20,8 +20,9 @@ constexpr Color band_colors[WindBarbLook::N_BANDS] = {
 void
 WindBarbLook::Band::Initialise(Color color) noexcept
 {
-  pen.Create(Layout::ScalePenWidth(1), color);
-  brush.Create(ColorWithAlpha(color, ALPHA_OVERLAY));
+  const Color translucent = ColorWithAlpha(color, ALPHA_OVERLAY);
+  pen.Create(Layout::ScalePenWidth(1), translucent);
+  brush.Create(translucent);
 }
 
 void
