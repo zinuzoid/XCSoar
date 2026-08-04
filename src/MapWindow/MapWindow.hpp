@@ -323,7 +323,9 @@ protected:
   virtual void DrawThermalEstimate(Canvas &canvas) const noexcept;
 
 #ifdef HAVE_HTTP
-  void DrawWindStations(Canvas &canvas) const noexcept;
+  /* not const: writes into #label_block, like DrawWaypoints() and
+     RenderTopographyLabels() do */
+  void DrawWindStations(Canvas &canvas) noexcept;
 #endif
 
   void DrawGlideThroughTerrain(Canvas &canvas) const noexcept;

@@ -16,7 +16,7 @@
 #include <chrono>
 
 void
-MapWindow::DrawWindStations(Canvas &canvas) const noexcept
+MapWindow::DrawWindStations(Canvas &canvas) noexcept
 {
   if (wind_stations == nullptr || !GetComputerSettings().wind_station.enabled)
     return;
