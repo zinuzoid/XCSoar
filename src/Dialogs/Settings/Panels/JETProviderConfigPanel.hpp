@@ -27,19 +27,29 @@ Copyright_License {
 #include "Widget/Widget.hpp"
 #include "Widget/RowFormWidget.hpp"
 #include "UIGlobals.hpp"
+#include "ui/event/PeriodicTimer.hpp"
 
 #include <memory>
 
 class JETProviderConfigPanel final
   : public RowFormWidget {
+  UI::PeriodicTimer timer{[this]{ UpdateStatus(); }};
+
 public:
   JETProviderConfigPanel()
     :RowFormWidget(UIGlobals::GetDialogLook()) {}
+
+  /**
+   * Refresh the RADAR_STATUS row from the most recent radar request.
+   */
+  void UpdateStatus() noexcept;
 
 public:
   /* methods from Widget */
   void Prepare(ContainerWindow &parent, const PixelRect &rc) noexcept override;
   bool Save(bool &changed) noexcept override;
+  void Show(const PixelRect &rc) noexcept override;
+  void Hide() noexcept override;
 };
 
 enum ControlIndex {
@@ -49,6 +59,7 @@ enum ControlIndex {
   RADAR_ENABLED,
   RADAR_INTERVAL,
   RADAR_ACCESS_TOKEN,
+  RADAR_STATUS,
   SPACER,
   TRACE_ENABLED,
   TRACE_INTERVAL,

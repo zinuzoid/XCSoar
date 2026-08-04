@@ -33,6 +33,10 @@ Copyright_License {
 #include "UIGlobals.hpp"
 #include "Interface.hpp"
 #include "LogFile.hpp"
+#include "time/BrokenDateTime.hpp"
+#include "util/Exception.hxx"
+#include "util/StaticString.hxx"
+#include "util/StringFormat.hpp"
 
 // #define API_ENTPOINT_URL "http://192.168.42.113:3000/api/2/radar"
 #define API_ENTPOINT_URL "http://xcsoar.imjim.im/api/2/radar"
@@ -49,6 +53,23 @@ CoGet(CurlGlobal &curl, const char *url)
   easy.SetAcceptEncoding("gzip");
 
   co_return co_await Curl::CoRequest(curl, std::move(easy));
+}
+
+/**
+ * Hand a status message to the handler, stamped with the local time it
+ * was observed.
+ */
+static void
+ReportStatus(JETProvider::Handler &handler, const char *text) noexcept
+{
+  const BrokenDateTime now = BrokenDateTime::NowLocal();
+
+  StaticString<128> status;
+  status.Format("%s (%02u:%02u:%02u)", text,
+                unsigned(now.hour), unsigned(now.minute),
+                unsigned(now.second));
+
+  handler.OnJETProviderStatus(status);
 }
 
 JETProvider::Glue::Glue(CurlGlobal &_curl, Handler *_handler)
@@ -81,6 +102,7 @@ JETProvider::Glue::OnTimer(const NMEAInfo &basic, [[maybe_unused]] const Derived
       "for the session, stop all JETProvider future request!",
       JET_PROVIDER_EMERGENCY_STOP_MAX_REQUESTS);
     is_emergency_stop = true;
+    ReportStatus(*handler, "Stopped: request limit reached");
     return;
   }
 
@@ -116,12 +138,27 @@ JETProvider::Glue::CoTick(const NMEAInfo &basic) noexcept
     LogFormat("Found unauthorized_access_token: %s, stop all JETProvider "
       "future request!",
       access_token);
+    ReportStatus(*handler, "HTTP 401 Unauthorized");
+    handler->OnJETTraffic(std::vector<JETProvider::Traffic>(), Validity{}, false, basic.clock);
+    co_return;
+  }
+
+  if (response.status != 200) {
+    StaticString<64> text;
+    text.Format("HTTP %u", response.status);
+    ReportStatus(*handler, text);
+    handler->OnJETTraffic(std::vector<JETProvider::Traffic>(), Validity{}, false, basic.clock);
+    co_return;
   }
 
   RadarParser::Radar radar;
   if (RadarParser::ParseRadarBuffer(basic, response.body.c_str(), radar)) {
+    StaticString<64> text;
+    text.Format("OK, %u traffic", radar.count);
+    ReportStatus(*handler, text);
     handler->OnJETTraffic(radar.traffics, radar.validity, true, basic.clock);
   } else {
+    ReportStatus(*handler, "Invalid response");
     handler->OnJETTraffic(std::vector<JETProvider::Traffic>(), radar.validity, false, basic.clock);
   }
 }
@@ -131,6 +168,7 @@ JETProvider::Glue::OnCompletion(std::exception_ptr error) noexcept
 {
   if (error) {
     LogError(error, "JETProvider error");
+    ReportStatus(*handler, GetFullMessage(error).c_str());
     handler->OnJETTraffic(std::vector<JETProvider::Traffic>(), Validity{}, false, TimeStamp::Undefined());
   }
 }
