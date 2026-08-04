@@ -56,4 +56,6 @@ public:
   void AddThermals(std::span<const TIM::Thermal> thermals) noexcept;
 
   void AddWeatherStations(NOAAStore &store);
+
+  void AddWindStations();
 };

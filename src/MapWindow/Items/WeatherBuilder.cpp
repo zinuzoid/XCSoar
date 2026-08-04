@@ -3,10 +3,14 @@
 
 #include "Builder.hpp"
 #include "MapItem.hpp"
+#include "WindStationMapItem.hpp"
 #include "List.hpp"
 #include "NMEA/MoreData.hpp"
 #include "NMEA/Derived.hpp"
 #include "net/client/tim/Thermal.hpp"
+#include "Components.hpp"
+#include "NetComponents.hpp"
+#include "Tracking/TrackingGlue.hpp"
 
 #ifdef HAVE_NOAA
 #include "Weather/NOAAStore.hpp"
@@ -27,6 +31,26 @@ MapItemListBuilder::AddWeatherStations(NOAAStore &store)
   }
 }
 #endif
+
+void
+MapItemListBuilder::AddWindStations()
+{
+#ifdef HAVE_TRACKING
+  if (net_components == nullptr || !net_components->tracking)
+    return;
+
+  const auto &data = net_components->tracking->GetJETProviderWindData();
+  const std::lock_guard lock{data.mutex};
+
+  for (const auto &station : data.stations) {
+    if (list.full())
+      break;
+
+    if (location.DistanceS(station.location) < range)
+      list.append(new WindStationMapItem(station));
+  }
+#endif
+}
 
 void
 MapItemListBuilder::AddThermals(const ThermalLocatorInfo &thermals,

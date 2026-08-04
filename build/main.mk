@@ -165,7 +165,8 @@ DIALOG_SOURCES += \
 	$(SRC)/Dialogs/Weather/PCMetDialog.cpp \
 	$(SRC)/Dialogs/Weather/SkysightDialog.cpp \
 	$(SRC)/Dialogs/Weather/NOAAList.cpp \
-	$(SRC)/Dialogs/Weather/NOAADetails.cpp
+	$(SRC)/Dialogs/Weather/NOAADetails.cpp \
+	$(SRC)/Dialogs/Weather/WindStationDetails.cpp
 endif
 
 XCSOAR_SOURCES := \
@@ -369,6 +370,7 @@ XCSOAR_SOURCES := \
 	$(SRC)/Renderer/WaypointRendererSettings.cpp \
 	$(SRC)/Renderer/WaypointLabelList.cpp \
 	$(SRC)/Renderer/WindArrowRenderer.cpp \
+	$(SRC)/Renderer/WindBarbRenderer.cpp \
 	$(SRC)/Renderer/NextArrowRenderer.cpp \
 	$(SRC)/Renderer/WaveRenderer.cpp \
 	$(SRC)/Projection/ChartProjection.cpp \
@@ -660,7 +662,9 @@ XCSOAR_SOURCES += \
 	$(SRC)/Tracking/JETProvider/JETProvider.cpp \
 	$(SRC)/Tracking/JETProvider/RadarParser.cpp \
 	$(SRC)/Tracking/JETProvider/Trace.cpp \
-	$(SRC)/Tracking/JETProvider/TraceParser.cpp
+	$(SRC)/Tracking/JETProvider/TraceParser.cpp \
+	$(SRC)/Tracking/JETProvider/Wind.cpp \
+	$(SRC)/Tracking/JETProvider/WindParser.cpp
 
 ifeq ($(HAVE_PCM_PLAYER),y)
 XCSOAR_SOURCES += $(SRC)/Audio/VarioGlue.cpp

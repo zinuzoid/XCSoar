@@ -587,11 +587,13 @@ Startup(UI::Display &display)
   if (map_window != nullptr) {
     map_window->SetJETProviderData(&net_components->tracking->GetJETProviderData());
     map_window->SetJETProviderTraceData(&net_components->tracking->GetJETProviderTraceData());
+    map_window->SetJETProviderWindData(&net_components->tracking->GetJETProviderWindData());
   }
 
 #ifdef HAVE_HTTP
-  if (map_window != nullptr)
+  if (map_window != nullptr) {
     map_window->SetThermalInfoMap(net_components->tim.get());
+  }
 #endif
 
   assert(!global_running);

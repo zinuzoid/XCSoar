@@ -112,12 +112,28 @@ void JETProviderConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &r
     settings.trace.pilot_ids);
   SetExpertRow(TRACE_PILOT_IDS);
 
+  AddSpacer();
+  SetExpertRow(WIND_STATION_SPACER);
+
+  AddBoolean(_("Wind Stations"),
+    _("Show nearby wind stations on the map, with direction, "
+      "average and gust speed."),
+    settings.wind.enabled);
+  SetExpertRow(WIND_STATION_ENABLED);
+
   if(!settings.trace.enabled) {
     SetRowVisible(SPACER, false);
     SetRowVisible(TRACE_ENABLED, false);
     SetRowVisible(TRACE_INTERVAL, false);
     SetRowVisible(TRACE_SRC, false);
     SetRowVisible(TRACE_PILOT_IDS, false);
+  }
+
+  if(!settings.radar.enabled) {
+    /* the wind overlay rides on the radar's access token and status
+       row, so it can't be usefully enabled without radar */
+    SetRowVisible(WIND_STATION_SPACER, false);
+    SetRowVisible(WIND_STATION_ENABLED, false);
   }
 }
 
@@ -204,6 +220,20 @@ bool JETProviderConfigPanel::Save(bool &_changed) noexcept {
 
   changed |= SaveValue(TRACE_PILOT_IDS,
     ProfileKeys::JETProviderTracePilotIds, settings.trace.pilot_ids);
+
+  if (!settings.radar.enabled) {
+    /* the row was hidden, so its data field still holds the old value;
+       clear the setting rather than persisting something the user can
+       no longer see or reach */
+    if (settings.wind.enabled) {
+      settings.wind.enabled = false;
+      Profile::Set(ProfileKeys::JETProviderWindEnabled, false);
+      changed = true;
+    }
+  } else {
+    changed |= SaveValue(WIND_STATION_ENABLED,
+      ProfileKeys::JETProviderWindEnabled, settings.wind.enabled);
+  }
 
   _changed |= changed;
 

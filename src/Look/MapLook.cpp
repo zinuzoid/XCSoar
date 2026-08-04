@@ -20,6 +20,7 @@ MapLook::Initialise(const MapSettings &settings,
   trail.Initialise(settings.trail);
   wave.Initialise();
   wind.Initialise(bold_font);
+  wind_station.Initialise(bold_font);
 
 #ifdef HAVE_NOAA
   noaa.Initialise();

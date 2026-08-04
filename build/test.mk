@@ -80,6 +80,7 @@ TEST_NAMES = \
 	TestDateTime TestRoughTime TestWrapClock \
 	TestPolylineDecoder \
 	TestJETProviderTrace \
+	TestJETProviderWind \
 	TestTransponderCode \
 	TestMath \
 	TestMathTables \
@@ -221,6 +222,14 @@ TEST_JET_PROVIDER_TRACE_SOURCES = \
 	$(TEST_SRC_DIR)/TestJETProviderTrace.cpp
 TEST_JET_PROVIDER_TRACE_DEPENDS = FMT GEO MATH UTIL
 $(eval $(call link-program,TestJETProviderTrace,TEST_JET_PROVIDER_TRACE))
+
+TEST_JET_PROVIDER_WIND_SOURCES = \
+	$(SRC)/Tracking/JETProvider/WindParser.cpp \
+	$(TEST_SRC_DIR)/FakeLogFile.cpp \
+	$(TEST_SRC_DIR)/tap.c \
+	$(TEST_SRC_DIR)/TestJETProviderWind.cpp
+TEST_JET_PROVIDER_WIND_DEPENDS = FMT GEO MATH UTIL UNITS
+$(eval $(call link-program,TestJETProviderWind,TEST_JET_PROVIDER_WIND))
 
 TEST_TRANSPONDER_CODE_SOURCES = \
 	$(SRC)/TransponderCode.cpp \

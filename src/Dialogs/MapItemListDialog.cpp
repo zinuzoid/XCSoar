@@ -28,6 +28,9 @@
 #include "Dialogs/Weather/NOAADetails.hpp"
 #endif
 
+#include "Dialogs/Weather/WindStationDetails.hpp"
+#include "MapWindow/Items/WindStationMapItem.hpp"
+
 static bool
 HasDetails(const MapItem &item)
 {
@@ -50,6 +53,7 @@ HasDetails(const MapItem &item)
 #ifdef HAVE_NOAA
   case MapItem::Type::WEATHER:
 #endif
+  case MapItem::Type::WIND_STATION:
   case MapItem::Type::OVERLAY:
   case MapItem::Type::RASP:
     return true;
@@ -286,6 +290,10 @@ ShowMapItemDialog(const MapItem &item,
     dlgNOAADetailsShowModal(((const WeatherStationMapItem &)item).station);
     break;
 #endif
+
+  case MapItem::Type::WIND_STATION:
+    dlgWindStationDetailsShowModal(((const WindStationMapItem &)item).station);
+    break;
 
   case MapItem::Type::OVERLAY:
     ShowWeatherDialog(_T("overlay"));
