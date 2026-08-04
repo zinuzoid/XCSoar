@@ -51,7 +51,7 @@ WindStationDetailsWidget::Prepare([[maybe_unused]] ContainerWindow &parent,
              !station.provider.empty() ? station.provider.c_str() : _T("--"));
 
   if (station.altitude >= 0)
-    AddReadOnly(_("Altitude"), nullptr, _T("%.0f"),
+    AddReadOnly(_("Altitude"), nullptr, _T("%.0f %s"),
                UnitGroup::ALTITUDE, station.altitude);
   else
     AddReadOnly(_("Altitude"), nullptr, _T("--"));
@@ -59,10 +59,10 @@ WindStationDetailsWidget::Prepare([[maybe_unused]] ContainerWindow &parent,
   AddReadOnly(_("Wind direction"), nullptr,
              FormatBearing(station.wind.bearing).c_str());
 
-  AddReadOnly(_("Average"), nullptr, _T("%.0f"),
+  AddReadOnly(_("Average"), nullptr, _T("%.0f %s"),
              UnitGroup::WIND_SPEED, station.wind.norm);
 
-  AddReadOnly(_("Gust"), nullptr, _T("%.0f"),
+  AddReadOnly(_("Gust"), nullptr, _T("%.0f %s"),
              UnitGroup::WIND_SPEED, station.wind_max);
 
   const auto age = duration_cast<seconds>(
