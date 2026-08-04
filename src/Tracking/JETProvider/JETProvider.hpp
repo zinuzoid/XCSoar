@@ -32,6 +32,7 @@ Copyright_License {
 #include "thread/Mutex.hxx"
 #include "lib/curl/Request.hxx"
 #include "co/InjectTask.hxx"
+#include "util/StaticString.hxx"
 #include "RadarParser.hpp"
 
 #include <map>
@@ -72,6 +73,12 @@ struct Data {
   std::map<const char*, Traffic, cmp_str> traffics;
   Validity validity;
   bool success = false;
+
+  /**
+   * Human-readable outcome of the most recent radar request; empty
+   * until the first request has completed.
+   */
+  StaticString<128> status;
 };
 
 class Handler {
@@ -79,6 +86,12 @@ public:
   virtual void OnJETTraffic(std::vector<JETProvider::Traffic> traffics, Validity validity, bool success, TimeStamp now) = 0;
   virtual void OnJETProviderError(std::exception_ptr e) = 0;
   virtual void OnJETProviderReset() = 0;
+
+  /**
+   * The outcome of a radar request, for display in the configuration
+   * panel.
+   */
+  virtual void OnJETProviderStatus(const char *status) noexcept = 0;
 };
 
 class Glue final
