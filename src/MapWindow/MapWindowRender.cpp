@@ -250,6 +250,11 @@ MapWindow::Render(Canvas &canvas, const PixelRect &rc) noexcept
   // Render estimate of thermal location
   DrawThermalEstimate(canvas);
 
+#ifdef HAVE_HTTP
+  // Render nearby wind stations (winds.mobi)
+  DrawWindStations(canvas);
+#endif
+
   //////////////////////////////////////////////// text items
   // Render topography on top of airspace, to keep the text readable
   draw_sw.Mark("RenderTopographyLabels");
