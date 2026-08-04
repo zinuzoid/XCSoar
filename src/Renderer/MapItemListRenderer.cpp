@@ -8,7 +8,7 @@
 #include "MapWindow/Items/OverlayMapItem.hpp"
 #include "MapWindow/Items/RaspMapItem.hpp"
 #include "MapWindow/Items/WindStationMapItem.hpp"
-#include "Look/WindStationLook.hpp"
+#include "Look/WindBarbLook.hpp"
 #include "Renderer/WindBarbRenderer.hpp"
 #include "Units/Units.hpp"
 #include "Math/Util.hpp"
@@ -242,7 +242,7 @@ static void
 Draw(Canvas &canvas, PixelRect rc,
      const WindStationMapItem &item,
      const TwoTextRowsRenderer &row_renderer,
-     const WindStationLook &look)
+     const WindBarbLook &look)
 {
   const unsigned line_height = rc.GetHeight();
   const unsigned text_padding = Layout::GetTextPadding();
@@ -253,8 +253,8 @@ Draw(Canvas &canvas, PixelRect rc,
       std::chrono::system_clock::now() - station.measured_at);
   const bool stale = age > minutes{20};
 
-  const unsigned band = WindStationLook::BandIndex(station.wind_max);
-  const WindBarbLook &barb_look = (stale ? look.stale_bands : look.bands)[band];
+  const unsigned band = WindBarbLook::BandIndex(station.wind_max);
+  const WindBarbLook::Band &barb_look = (stale ? look.stale_bands : look.bands)[band];
 
   const PixelPoint pt(rc.left + line_height / 2, rc.top + line_height / 2);
 

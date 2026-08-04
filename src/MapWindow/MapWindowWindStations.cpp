@@ -37,8 +37,8 @@ MapWindow::DrawWindStations(Canvas &canvas) noexcept
       continue;
 
     const bool stale = now - station.measured_at > std::chrono::minutes(20);
-    const unsigned band = WindStationLook::BandIndex(station.wind_max);
-    const WindBarbLook &barb_look =
+    const unsigned band = WindBarbLook::BandIndex(station.wind_max);
+    const WindBarbLook::Band &barb_look =
       (stale ? look.wind_station.stale_bands : look.wind_station.bands)[band];
 
     /* same convention as the own-ship wind arrow: SpeedVector::bearing

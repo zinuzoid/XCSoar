@@ -16,7 +16,6 @@ LOOK_SOURCES := \
 	$(SRC)/Look/TopographyLook.cpp \
 	$(SRC)/Look/WindArrowLook.cpp \
 	$(SRC)/Look/WindBarbLook.cpp \
-	$(SRC)/Look/WindStationLook.cpp \
 	$(SRC)/Look/ThermalBandLook.cpp \
 	$(SRC)/Look/TraceHistoryLook.cpp \
 	$(SRC)/Look/AirspaceLook.cpp \

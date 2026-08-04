@@ -10,7 +10,7 @@
 #include "TrailLook.hpp"
 #include "WaveLook.hpp"
 #include "WindArrowLook.hpp"
-#include "WindStationLook.hpp"
+#include "WindBarbLook.hpp"
 #include "TopographyLook.hpp"
 #include "OverlayLook.hpp"
 #include "ui/canvas/Icon.hpp"
@@ -34,7 +34,7 @@ struct MapLook {
   TrailLook trail;
   WaveLook wave;
   WindArrowLook wind;
-  WindStationLook wind_station;
+  WindBarbLook wind_station;
 
 #ifdef HAVE_NOAA
   NOAALook noaa;

@@ -4,10 +4,10 @@
 #pragma once
 
 #include "ui/dim/BulkPoint.hpp"
+#include "Look/WindBarbLook.hpp"
 
 class Canvas;
 class Angle;
-struct WindBarbLook;
 
 /**
  * WMO wind barb glyph for a wind station: a station circle, a staff
@@ -57,14 +57,14 @@ Build(Barb &b, unsigned speed_kt) noexcept;
 /**
  * Draws a #WindBarb::Barb at a screen position, scaled and rotated to
  * the meteorological wind bearing.  Mirrors WindArrowRenderer's
- * calling convention: construct with the #WindBarbLook to draw with,
- * then call Draw() once per station.
+ * calling convention: construct with the #WindBarbLook::Band to draw
+ * with, then call Draw() once per station.
  */
 class WindBarbRenderer {
-  const WindBarbLook &look;
+  const WindBarbLook::Band &look;
 
 public:
-  explicit WindBarbRenderer(const WindBarbLook &_look) noexcept
+  explicit WindBarbRenderer(const WindBarbLook::Band &_look) noexcept
     :look(_look) {}
 
   /**
