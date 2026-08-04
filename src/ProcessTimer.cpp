@@ -20,6 +20,7 @@
 #include "Tracking/TrackingGlue.hpp"
 #include "net/client/tim/Glue.hpp"
 #include "net/client/NetworkWidget/Glue.hpp"
+#include "Weather/WindsMobi/Glue.hpp"
 #include "ui/event/Idle.hpp"
 #include "Dialogs/Tracking/CloudEnableDialog.hpp"
 #include "Components.hpp"
