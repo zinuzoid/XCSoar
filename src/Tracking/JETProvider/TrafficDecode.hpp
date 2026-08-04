@@ -5,6 +5,8 @@
 
 #include "FLARM/Traffic.hpp"
 #include "FLARM/Color.hpp"
+#include "FLARM/Id.hpp"
+#include "util/CharUtil.hxx"
 #include "util/NumberParser.hxx"
 
 #include <optional>
@@ -67,6 +69,38 @@ DecodeIconType(int icon_type, bool online) noexcept
   }
 
   return state;
+}
+
+/**
+ * Parse JETProvider::Traffic::traffic_id, the FLARM/OGN device address
+ * as a hexadecimal string.
+ *
+ * The radar feed is only correlated with the local FLARM when the id
+ * really is a device address, so anything else is rejected rather than
+ * turned into an id that would collide with an unrelated aircraft:
+ * FlarmId::Parse() is strtol() underneath and would happily swallow
+ * leading whitespace, a sign, a "0x" prefix or trailing garbage.  The
+ * address space is 24 bit, hence the six digit limit.
+ *
+ * @return the device address, or FlarmId::Undefined() if the value is
+ * not a plain 1..6 digit hexadecimal number
+ */
+[[gnu::pure]]
+inline FlarmId
+ParseTrafficId(const char *traffic_id) noexcept
+{
+  if (traffic_id == nullptr)
+    return FlarmId::Undefined();
+
+  unsigned n = 0;
+  for (const char *p = traffic_id; *p != '\0'; ++p, ++n)
+    if (!IsHexDigit(*p) || n >= 6)
+      return FlarmId::Undefined();
+
+  if (n == 0)
+    return FlarmId::Undefined();
+
+  return FlarmId::Parse(traffic_id, nullptr);
 }
 
 /**

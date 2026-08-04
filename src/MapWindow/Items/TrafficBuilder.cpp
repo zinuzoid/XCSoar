@@ -101,7 +101,8 @@ MapItemListBuilder::AddJETProviderTrace()
 }
 
 void
-MapItemListBuilder::AddJETProviderTraffic()
+MapItemListBuilder::AddJETProviderTraffic([[maybe_unused]]
+                                          const TrafficList &flarm)
 {
 #ifdef HAVE_TRACKING
   if (net_components == nullptr || !net_components->tracking)
@@ -122,7 +123,23 @@ MapItemListBuilder::AddJETProviderTraffic()
         location.DistanceS(traffic.location) >= range)
       continue;
 
+    const FlarmId id = JETProvider::ParseTrafficId(traffic.traffic_id);
+
+    /* AddTraffic() has already appended this aircraft from the local
+       FLARM, whose data is newer */
+    if (id.IsDefined() && flarm.FindTraffic(id) != nullptr)
+      continue;
+
     const auto icon = JETProvider::DecodeIconType(traffic.icon_type, online);
+
+    /* a colour the user assigned in the traffic list wins over the
+       server's, like it does on the map */
+    FlarmColor color = icon.circle;
+    if (id.IsDefined()) {
+      if (const FlarmColor friend_color = FlarmFriends::GetFriendColor(id);
+          friend_color != FlarmColor::NONE)
+        color = friend_color;
+    }
 
     list.append(new JETProviderTrafficMapItem(traffic.traffic_id,
                                               traffic.display, traffic.code,
@@ -130,7 +147,7 @@ MapItemListBuilder::AddJETProviderTraffic()
                                               traffic.speed, traffic.vspeed,
                                               traffic.climb_rate_avg30s,
                                               traffic.track,
-                                              icon.alarm_level, icon.circle));
+                                              icon.alarm_level, color));
   }
 #endif
 }

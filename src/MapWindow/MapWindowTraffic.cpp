@@ -323,17 +323,28 @@ void
 MapWindow::DrawJETProviderTraffic(Canvas &canvas,
   const PixelPoint) const noexcept
 {
-  if (jet_provider_data == nullptr || jet_provider_data->traffics.empty()) {
+  if (jet_provider_data == nullptr)
     return;
-  }
 
   const MoreData &basic = Basic();
 
   const std::lock_guard lock{jet_provider_data->mutex};
 
+  if (jet_provider_data->traffics.empty())
+    return;
+
   const WindowProjection &projection = render_projection;
 
   canvas.Select(*traffic_look.font);
+
+  /* the same aircraft is reported by both sources; the local FLARM
+     wins because its position is a second old instead of up to a
+     minute.  DrawFLARMTraffic() bails out completely in the two cases
+     below, so the radar copy has to stay visible then - suppressing it
+     would make the target disappear from the map altogether */
+  const TrafficList &flarm = basic.flarm.traffic;
+  const bool flarm_drawn = GetMapSettings().show_flarm_on_map &&
+    projection.GetMapScale() <= 7300;
 
   const bool vario_traffic_jet = GetMapSettings().use_vario_traffic_colours;
   const double jet_set_mc = GetComputerSettings().polar.glide_polar_task.GetMC();
@@ -347,6 +358,14 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
       end = jet_provider_data->traffics.end();
       it != end; ++it) {
     const auto &traffic = (*it).second;
+
+    const FlarmId id = JETProvider::ParseTrafficId(traffic.traffic_id);
+
+    if (flarm_drawn && id.IsDefined()) {
+      const FlarmTraffic *live = flarm.FindTraffic(id);
+      if (live != nullptr && live->location_available)
+        continue;
+    }
 
     // Save the location of the FLARM target
     GeoPoint target_loc = traffic.location;
@@ -392,6 +411,16 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
 
     const auto icon = JETProvider::DecodeIconType(traffic.icon_type, online);
 
+    /* a colour the user assigned in the traffic list wins over the
+       server's, so a tagged aircraft looks the same no matter which
+       source it came from */
+    FlarmColor color = icon.circle;
+    if (id.IsDefined()) {
+      if (const FlarmColor friend_color = FlarmFriends::GetFriendColor(id);
+          friend_color != FlarmColor::NONE)
+        color = friend_color;
+    }
+
     FlarmTraffic t;
     t.alarm_level = icon.alarm_level;
     t.type = JETProvider::ParseAircraftType(traffic.type)
@@ -406,7 +435,7 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
       TrafficClimbAltIndicators::GetClimbAltIndicators(t, jet_set_mc, jet_30s_vario);
     TrafficRenderer::Draw(canvas, traffic_look, false, vario_traffic_jet, t,
                           Angle::Degrees(traffic.track) - projection.GetScreenAngle(),
-                          icon.circle, sc, jet_indicators);
+                          color, sc, jet_indicators);
   }
 
 }

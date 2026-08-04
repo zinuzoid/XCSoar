@@ -14,6 +14,7 @@
 #include "FLARM/FlarmNetRecord.hpp"
 #include "FLARM/Details.hpp"
 #include "FLARM/Id.hpp"
+#include "FLARM/List.hpp"
 #include "FLARM/Global.hpp"
 #include "FLARM/TrafficDatabases.hpp"
 #include "util/StaticString.hxx"
@@ -25,13 +26,17 @@
 #include "Formatter/UserUnits.hpp"
 #include "Formatter/AngleFormatter.hpp"
 #include "Blackboard/BlackboardListener.hpp"
+#include "Tracking/Features.hpp"
 #include "Tracking/SkyLines/Data.hpp"
+#include "Tracking/JETProvider/TrafficDecode.hpp"
 #include "Tracking/TrackingGlue.hpp"
 #include "Engine/Waypoint/Waypoints.hpp"
 #include "Components.hpp"
 #include "NetComponents.hpp"
 #include "DataComponents.hpp"
 #include "Pan.hpp"
+
+#include <cmath>
 
 using namespace std::chrono;
 
@@ -62,6 +67,34 @@ class TrafficListWidget : public ListWidget, public DataFieldListener,
     uint32_t skylines_id = 0;
 
     SkyLinesTracking::Data::Time time_of_day;
+#endif
+
+#ifdef HAVE_TRACKING
+    /**
+     * Does this object describe a JETProvider radar target?  The local
+     * FLARM has priority, so this is only set for aircraft it does not
+     * see itself.
+     */
+    bool jet = false;
+
+    /**
+     * The radar API's target id.  This is the same device address as
+     * #id, but kept verbatim because it is the key of
+     * JETProvider::Data::traffics.
+     */
+    NarrowString<32> jet_id;
+
+    /** the competition code reported by the radar feed */
+    NarrowString<16> jet_code;
+
+    /** the display name reported by the radar feed */
+    NarrowString<40> jet_name;
+
+    /** the OGN/FLARM aircraft type code reported by the radar feed */
+    NarrowString<32> jet_type;
+
+    /** vertical speed [m/s] reported by the radar feed */
+    double jet_vspeed;
 #endif
 
     /**
@@ -99,9 +132,14 @@ class TrafficListWidget : public ListWidget, public DataFieldListener,
 #ifdef HAVE_SKYLINES_TRACKING
     StaticString<20> near_name;
     double near_distance;
-
-    int altitude;
 #endif
+
+    /**
+     * Absolute altitude [m] of a SkyLines or JETProvider target.
+     * Meaningless for plain FLARM items, which read it from the live
+     * #TrafficList instead.
+     */
+    int altitude;
 
     explicit Item(FlarmId _id)
       :id(_id) {
@@ -146,6 +184,17 @@ class TrafficListWidget : public ListWidget, public DataFieldListener,
     }
 #endif
 
+#ifdef HAVE_TRACKING
+    /**
+     * Is this object's live data coming from the JETProvider radar
+     * feed?  Such items are also IsFlarm(), because the radar reports
+     * the FLARM/OGN device address.
+     */
+    bool IsJETProvider() const {
+      return jet;
+    }
+#endif
+
     void Load() {
       if (IsFlarm()) {
         record = traffic_databases->flarm_net.FindRecordById(id);
@@ -187,6 +236,16 @@ class TrafficListWidget : public ListWidget, public DataFieldListener,
    */
   Validity last_update;
 
+#ifdef HAVE_TRACKING
+  /**
+   * The #Validity of the JETProvider radar feed the item list was
+   * built from.  The feed replaces all of its targets on every poll,
+   * so the list has to be rebuilt when this changes; #UpdateVolatile()
+   * can only refresh items that already exist.
+   */
+  Validity last_jet_update;
+#endif
+
   TwoTextRowsRenderer row_renderer;
 
 public:
@@ -198,6 +257,10 @@ public:
 
     for (unsigned i = 0; i < count; ++i)
       items.emplace_back(array[i]);
+
+#ifdef HAVE_TRACKING
+    last_jet_update.Clear();
+#endif
   }
 
   TrafficListWidget(WndForm &_dialog,
@@ -205,6 +268,9 @@ public:
                     TrafficListButtons &_buttons)
     :dialog(_dialog), filter_widget(&_filter_widget),
      buttons(&_buttons) {
+#ifdef HAVE_TRACKING
+    last_jet_update.Clear();
+#endif
   }
 
   [[gnu::pure]]
@@ -247,6 +313,29 @@ private:
    * positions).
    */
   void UpdateVolatile();
+
+#ifdef HAVE_TRACKING
+  /**
+   * The #Validity of the JETProvider radar feed, or a cleared one if
+   * this dialog is not showing radar traffic at all.
+   */
+  Validity GetJETProviderValidity() const;
+
+  /**
+   * Append the JETProvider radar targets the local FLARM does not see
+   * itself.
+   */
+  void AddJETProviderTraffic();
+
+  /**
+   * Refresh one item from the JETProvider radar feed.
+   *
+   * @param modified set to true if the target has moved
+   * @return true if this is a radar target that is still being
+   * reported
+   */
+  bool UpdateJETProviderItem(Item &item, bool &modified);
+#endif
 
   void UpdateButtons();
 
@@ -306,6 +395,29 @@ public:
 private:
   /* virtual methods from BlackboardListener */
   virtual void OnGPSUpdate([[maybe_unused]] const MoreData &basic) override {
+#ifdef HAVE_TRACKING
+    if (filter_widget != nullptr &&
+        GetJETProviderValidity().Modified(last_jet_update)) {
+      /* a fresh radar poll can add and drop targets, which only
+         UpdateList() can do; keep the cursor on the same aircraft so
+         it doesn't jump away under the user every few seconds */
+      const unsigned cursor = GetList().GetCursorIndex();
+      const FlarmId cursor_id = cursor < items.size()
+        ? items[cursor].id
+        : FlarmId::Undefined();
+
+      UpdateList();
+
+      if (cursor_id.IsDefined()) {
+        const auto i = FindItem(cursor_id);
+        if (i != items.end())
+          GetList().SetCursorIndex(unsigned(i - items.begin()));
+      }
+
+      return;
+    }
+#endif
+
     UpdateVolatile();
   }
 };
@@ -355,6 +467,13 @@ TrafficListWidget::UpdateList()
 
   items.clear();
   last_update.Clear();
+
+#ifdef HAVE_TRACKING
+  /* remember which radar poll this list was built from, in both
+     branches below - the filtered list has no radar rows, but leaving
+     the stamp behind would make OnGPSUpdate() rebuild forever */
+  last_jet_update = GetJETProviderValidity();
+#endif
 
   const TCHAR *callsign = filter_widget->GetValueString(CALLSIGN);
   if (!StringIsEmpty(callsign)) {
@@ -416,6 +535,10 @@ TrafficListWidget::UpdateList()
       }
     }
 #endif
+
+#ifdef HAVE_TRACKING
+    AddJETProviderTraffic();
+#endif
   }
 
   GetList().SetLength(items.size());
@@ -423,6 +546,129 @@ TrafficListWidget::UpdateList()
   UpdateVolatile();
   UpdateButtons();
 }
+
+#ifdef HAVE_TRACKING
+
+/**
+ * @return the JETProvider radar store, or nullptr if the feed is
+ * switched off
+ */
+[[gnu::pure]]
+static const JETProvider::Data *
+FindJETProviderData() noexcept
+{
+  if (net_components == nullptr || !net_components->tracking)
+    return nullptr;
+
+  const auto &settings =
+    CommonInterface::GetComputerSettings().jet_provider_setting;
+  if (!settings.radar.enabled)
+    return nullptr;
+
+  return &net_components->tracking->GetJETProviderData();
+}
+
+Validity
+TrafficListWidget::GetJETProviderValidity() const
+{
+  Validity validity;
+  validity.Clear();
+
+  /* like SkyLines traffic, radar targets are hidden in the FLARM
+     traffic picker (from dlgTeamCode), which must return a device the
+     user can actually team up with */
+  if (buttons == nullptr)
+    return validity;
+
+  const JETProvider::Data *const data = FindJETProviderData();
+  if (data == nullptr)
+    return validity;
+
+  const std::lock_guard lock{data->mutex};
+
+  return data->validity;
+}
+
+void
+TrafficListWidget::AddJETProviderTraffic()
+{
+  if (buttons == nullptr)
+    return;
+
+  const JETProvider::Data *const data = FindJETProviderData();
+  if (data == nullptr)
+    return;
+
+  const TrafficList &live_list = CommonInterface::Basic().flarm.traffic;
+
+  const std::lock_guard lock{data->mutex};
+
+  for (const auto &i : data->traffics) {
+    const auto &traffic = i.second;
+
+    const FlarmId id = JETProvider::ParseTrafficId(traffic.traffic_id);
+    if (!id.IsDefined())
+      continue;
+
+    /* the local FLARM sees this aircraft itself: its data is a second
+       old instead of up to a minute and carries the relative altitude
+       and the alarm level, so don't add a second row for it */
+    if (live_list.FindTraffic(id) != nullptr)
+      continue;
+
+    /* this may return a row that already exists because the peer has a
+       user-defined colour or name; that peer now gains a live
+       position, which is exactly what we want */
+    Item &item = AddItem(id);
+
+    /* JETProvider::Data's strings are replaced on every poll, so
+       everything kept here has to be a copy */
+    item.jet = true;
+    item.jet_id = traffic.traffic_id;
+    item.jet_name = traffic.display != nullptr ? traffic.display : "";
+    item.jet_code = traffic.code != nullptr ? traffic.code : "";
+    item.jet_type = traffic.type != nullptr ? traffic.type : "";
+    item.jet_vspeed = traffic.vspeed;
+    item.altitude = traffic.altitude;
+    item.location = traffic.location;
+  }
+}
+
+bool
+TrafficListWidget::UpdateJETProviderItem(Item &item, bool &modified)
+{
+  if (!item.IsJETProvider())
+    return false;
+
+  const JETProvider::Data *const data = FindJETProviderData();
+  if (data == nullptr)
+    return false;
+
+  const std::lock_guard lock{data->mutex};
+
+  /* JETProvider::Data::traffics compares its keys with strcmp() */
+  const auto i = data->traffics.find(item.jet_id.c_str());
+  if (i == data->traffics.end())
+    return false;
+
+  const auto &traffic = i->second;
+
+  if (traffic.location != item.location)
+    modified = true;
+
+  item.location = traffic.location;
+  item.altitude = traffic.altitude;
+  item.jet_vspeed = traffic.vspeed;
+
+  if (item.location.IsValid() && CommonInterface::Basic().location_available)
+    item.vector = GeoVector(CommonInterface::Basic().location, item.location);
+  else
+    item.vector.SetInvalid();
+
+  return true;
+}
+
+#endif /* HAVE_TRACKING */
 
 void
 TrafficListWidget::UpdateVolatile()
@@ -453,6 +699,14 @@ TrafficListWidget::UpdateVolatile()
 
         i.location = live->location;
         i.vector = GeoVector(live->distance, live->track);
+
+#ifdef HAVE_TRACKING
+        /* our FLARM has picked this aircraft up since the list was
+           built; stop presenting the row as radar-sourced */
+        i.jet = false;
+      } else if (UpdateJETProviderItem(i, modified)) {
+        /* our FLARM doesn't see it, but the radar feed still does */
+#endif
       } else {
         if (i.location.IsValid() || i.vector.IsValid())
           /* this item has disappeared from our FLARM: redraw the
@@ -592,8 +846,20 @@ TrafficListWidget::OnPaintItem(Canvas &canvas, PixelRect rc,
                  callsign, record->registration.c_str(), tmp_id);
     else if (callsign != nullptr)
       tmp.Format(_T("%s - %s"), callsign, tmp_id);
+#ifdef HAVE_TRACKING
+    else if (item.IsJETProvider() && !item.jet_name.empty())
+      /* neither database knows this device address, but the radar
+         feed came with a name of its own */
+      tmp.Format(_T("%s - %s"), item.jet_name.c_str(), tmp_id);
+#endif
     else
       tmp.Format(_T("%s"), tmp_id);
+
+#ifdef HAVE_TRACKING
+    if (item.IsJETProvider() && !item.jet_code.empty() &&
+        !tmp.Contains(item.jet_code.c_str()))
+      tmp.AppendFormat(_T(" [%s]"), item.jet_code.c_str());
+#endif
 #ifdef HAVE_SKYLINES_TRACKING
   } else if (item.IsSkyLines()) {
     if (!item.name.empty())
@@ -647,6 +913,30 @@ TrafficListWidget::OnPaintItem(Canvas &canvas, PixelRect rc,
                                                FormatBearing(item.vector.bearing).c_str());
   }
 
+#ifdef HAVE_TRACKING
+  if (item.IsJETProvider()) {
+    /* live data beats the FLARMnet identity here: the row is sourced
+       from a feed that can be a minute old, and the pilot only sees
+       that from the altitude and the climb rate */
+    tmp = _("Radar");
+
+    if (const TCHAR *type_string =
+          JETProvider::DecodeAircraftType(item.jet_type.c_str());
+        type_string != nullptr)
+      tmp.AppendFormat(_T(" - %s"), type_string);
+
+    if (item.altitude >= 0)
+      tmp.AppendFormat(_T(" - %s"),
+                       FormatUserAltitude(item.altitude).c_str());
+
+    /* the API reports 0 both for "level" and for "no data" */
+    if (std::fabs(item.jet_vspeed) >= 0.1)
+      tmp.AppendFormat(_T(" - %s"),
+                       FormatUserVerticalSpeed(item.jet_vspeed).c_str());
+
+    row_renderer.DrawSecondRow(canvas, rc, tmp);
+  } else
+#endif
   if (record != nullptr) {
     tmp.clear();
 

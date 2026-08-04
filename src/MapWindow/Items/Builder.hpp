@@ -49,7 +49,12 @@ public:
   void AddTraffic(const TrafficList &flarm);
   void AddSkyLinesTraffic();
   void AddJETProviderTrace();
-  void AddJETProviderTraffic();
+
+  /**
+   * @param flarm the live FLARM traffic already added by AddTraffic();
+   * radar targets the local FLARM sees are skipped
+   */
+  void AddJETProviderTraffic(const TrafficList &flarm);
   void AddThermals(const ThermalLocatorInfo &thermals,
                    const MoreData &basic, const DerivedInfo &calculated);
 
