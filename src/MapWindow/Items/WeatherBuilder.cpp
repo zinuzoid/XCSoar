@@ -3,10 +3,17 @@
 
 #include "Builder.hpp"
 #include "MapItem.hpp"
+#include "WindStationMapItem.hpp"
 #include "List.hpp"
 #include "NMEA/MoreData.hpp"
 #include "NMEA/Derived.hpp"
 #include "net/client/tim/Thermal.hpp"
+#include "Components.hpp"
+#include "NetComponents.hpp"
+
+#ifdef HAVE_HTTP
+#include "Weather/WindsMobi/Glue.hpp"
+#endif
 
 #ifdef HAVE_NOAA
 #include "Weather/NOAAStore.hpp"
@@ -27,6 +34,30 @@ MapItemListBuilder::AddWeatherStations(NOAAStore &store)
   }
 }
 #endif
+
+void
+MapItemListBuilder::AddWindStations()
+{
+#ifdef HAVE_HTTP
+  if (net_components == nullptr || !net_components->wind_stations)
+    return;
+
+  const auto lock = net_components->wind_stations->Lock();
+
+  for (const auto &station : net_components->wind_stations->Get()) {
+    if (list.full())
+      break;
+
+    /* a station with no current wind data draws no arrow, so it isn't
+       tappable on the map either */
+    if (!station.wind_available)
+      continue;
+
+    if (location.DistanceS(station.location) < range)
+      list.append(new WindStationMapItem(station));
+  }
+#endif
+}
 
 void
 MapItemListBuilder::AddThermals(const ThermalLocatorInfo &thermals,

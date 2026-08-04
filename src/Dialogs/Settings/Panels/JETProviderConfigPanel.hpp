@@ -54,6 +54,8 @@ enum ControlIndex {
   TRACE_INTERVAL,
   TRACE_SRC,
   TRACE_PILOT_IDS,
+  WIND_STATION_SPACER,
+  WIND_STATION_ENABLED,
 };
 
 std::unique_ptr<Widget> CreateJETProviderConfigPanel();

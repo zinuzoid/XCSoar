@@ -23,6 +23,7 @@
 #include "net/client/WeGlide/Settings.hpp"
 #include "net/client/NetworkWidget/Settings.hpp"
 #include "Tracking/JETProvider/Settings.hpp"
+#include "Weather/WindsMobi/Settings.hpp"
 
 #include <cstdint>
 #include <type_traits>
@@ -236,6 +237,8 @@ struct ComputerSettings {
   TransponderSettings transponder;
 
   JETProviderSettings jet_provider_setting;
+
+  WindStationSettings wind_station;
 
   NetworkWidgetSettings network_widget;
 

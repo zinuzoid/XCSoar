@@ -590,8 +590,10 @@ Startup(UI::Display &display)
   }
 
 #ifdef HAVE_HTTP
-  if (map_window != nullptr)
+  if (map_window != nullptr) {
     map_window->SetThermalInfoMap(net_components->tim.get());
+    map_window->SetWindStations(net_components->wind_stations.get());
+  }
 #endif
 
   assert(!global_running);

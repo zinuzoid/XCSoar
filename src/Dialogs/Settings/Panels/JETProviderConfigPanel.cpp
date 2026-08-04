@@ -99,6 +99,15 @@ void JETProviderConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &r
     settings.trace.pilot_ids);
   SetExpertRow(TRACE_PILOT_IDS);
 
+  AddSpacer();
+  SetExpertRow(WIND_STATION_SPACER);
+
+  AddBoolean(_("Wind Stations"),
+    _("Show nearby wind stations (winds.mobi) on the map, with direction, "
+      "average and gust speed."),
+    CommonInterface::GetComputerSettings().wind_station.enabled);
+  SetExpertRow(WIND_STATION_ENABLED);
+
   if(!settings.trace.enabled) {
     SetRowVisible(SPACER, false);
     SetRowVisible(TRACE_ENABLED, false);
@@ -134,6 +143,10 @@ bool JETProviderConfigPanel::Save(bool &_changed) noexcept {
 
   changed |= SaveValue(TRACE_PILOT_IDS,
     ProfileKeys::JETProviderTracePilotIds, settings.trace.pilot_ids);
+
+  changed |= SaveValue(WIND_STATION_ENABLED,
+    ProfileKeys::WindStationsEnabled,
+    CommonInterface::SetComputerSettings().wind_station.enabled);
 
   _changed |= changed;
 

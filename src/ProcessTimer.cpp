@@ -20,6 +20,7 @@
 #include "Tracking/TrackingGlue.hpp"
 #include "net/client/tim/Glue.hpp"
 #include "net/client/NetworkWidget/Glue.hpp"
+#include "Weather/WindsMobi/Glue.hpp"
 #include "ui/event/Idle.hpp"
 #include "Dialogs/Tracking/CloudEnableDialog.hpp"
 #include "Components.hpp"
@@ -289,6 +290,9 @@ ProcessTimer() noexcept
       net_components->tim->OnTimer(CommonInterface::Basic());
     if (net_components->networkWidget != nullptr)
       net_components->networkWidget->OnTimer(CommonInterface::Basic());
+    if (net_components->wind_stations != nullptr &&
+        CommonInterface::GetComputerSettings().wind_station.enabled)
+      net_components->wind_stations->OnTimer();
 #endif
   }
 }

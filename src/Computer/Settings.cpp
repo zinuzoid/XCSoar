@@ -68,5 +68,6 @@ ComputerSettings::SetDefaults()
   transponder.SetDefaults();
   weglide.SetDefaults();
   jet_provider_setting.SetDefaults();
+  wind_station.SetDefaults();
   network_widget.SetDefaults();
 }
