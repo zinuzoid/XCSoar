@@ -49,7 +49,7 @@ public:
   void AddTraffic(const TrafficList &flarm);
   void AddSkyLinesTraffic();
   void AddJETProviderTrace();
-  void AddJETProviderTraffic();
+  void AddJETProviderTraffic(const TrafficList &flarm);
   void AddThermals(const ThermalLocatorInfo &thermals,
                    const MoreData &basic, const DerivedInfo &calculated);
 
