@@ -13,6 +13,7 @@
 #include "Math/Util.hpp"
 #include "Screen/Layout.hpp"
 
+#include <algorithm>
 #include <chrono>
 
 void
@@ -59,10 +60,22 @@ MapWindow::DrawWindStations(Canvas &canvas) noexcept
                  iround(Units::ToUserWindSpeed(station.wind.norm)),
                  iround(Units::ToUserWindSpeed(station.wind_max)));
 
+    /* the label can land on any side of the barb depending on wind
+       direction, so size the gap off its own rendered footprint
+       (generally wider than tall for a short digit string) rather
+       than assuming it always sits "above" the tip; convert from real
+       pixels into the barb's own template-unit scale (see
+       PolygonRotateShift: real = template * scale / 100) so it stays
+       correct at every screen DPI */
+    const PixelSize label_size = look.wind_station.font->TextSize(buffer);
+    const int label_gap =
+      int(std::max(label_size.width, label_size.height) / 2 +
+         Layout::GetTextPadding()) * 100 / int(scale);
+
     /* tip_y already accounts for however long the staff grew to fit
        this station's barbs and pennants */
     BulkPixelPoint label[] = {
-      { 0, barb.tip_y - 2 },
+      { 0, barb.tip_y - label_gap },
     };
     PolygonRotateShift(label, *p, wind_from, scale);
 
