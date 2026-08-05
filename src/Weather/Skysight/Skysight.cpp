@@ -42,7 +42,9 @@ Copyright_License {
 #include "LogFile.hpp"
 #include "time/BrokenDateTime.hpp"
 #include <memory>
+#ifdef ENABLE_OPENGL
 #include "MapWindow/OverlayBitmap.hpp"
+#endif
 #include "MapWindow/GlueMapWindow.hpp"
 #include "thread/Debug.hpp"
 
@@ -646,6 +648,7 @@ Skysight::DisplayActiveMetric(const TCHAR *const id)
   if (!SetDisplayedMetric(id, bdt))
     return false;
 
+#ifdef ENABLE_OPENGL
   auto path = AllocatedPath::Build(Skysight::GetLocalPath(), filename.c_str());
   StaticString<256> desc;
   tstring metric_name;
@@ -670,8 +673,11 @@ Skysight::DisplayActiveMetric(const TCHAR *const id)
 
   bmp->SetAlpha(0.6);
   bmp->SetLabel(label);
-#ifdef ENABLE_OPENGL
   map->SetOverlay(std::move(bmp));
-#endif
   return true;
+#else
+  /* MapOverlayBitmap is only implemented for OpenGL; the metric has
+     been selected, but there is nothing to draw on the map */
+  return false;
+#endif
 }
