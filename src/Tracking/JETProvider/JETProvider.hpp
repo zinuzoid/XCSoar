@@ -26,6 +26,7 @@ Copyright_License {
 
 #include "NMEA/Info.hpp"
 #include "NMEA/Derived.hpp"
+#include "Geo/GeoBounds.hpp"
 #include "time/PeriodClock.hpp"
 #include "time/Stamp.hpp"
 #include "Language/Language.hpp"
@@ -97,8 +98,8 @@ Handler *const handler;
 Co::InjectTask inject_task;
 PeriodClock clock;
 
-const char *access_token;
-char unauthorized_access_token[64] = "";
+mutable Mutex mutex;
+StaticString<64> unauthorized_access_token{""};
 bool is_emergency_stop = false;
 unsigned total_requests = 0;
 
@@ -108,7 +109,9 @@ public:
   void OnTimer(const NMEAInfo &basic, const DerivedInfo &calculated);
 
 protected:
-  Co::InvokeTask CoTick(const NMEAInfo &basic) noexcept;
+  Co::InvokeTask CoTick(GeoBounds screen_bounds,
+                        StaticString<64> access_token,
+                        TimeStamp clock) noexcept;
 
   void OnCompletion(std::exception_ptr error) noexcept;
 
