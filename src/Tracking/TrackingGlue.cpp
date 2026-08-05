@@ -34,10 +34,15 @@ TrackingGlue::OnTimer(const MoreData &basic, const DerivedInfo &calculated)
   }
 
   jet_provider.OnTimer(basic, calculated);
-  jet_provider_data.validity.Expire(basic.clock, std::chrono::seconds(JET_PROVIDER_TRAFFIC_OFFLINE_THRESHOLD_SECS));
 
   jet_trace.OnTimer(basic, calculated);
-  jet_trace_data.validity.Expire(basic.clock, std::chrono::seconds(JET_PROVIDER_TRACE_OFFLINE_THRESHOLD_SECS));
+
+  {
+    const std::lock_guard lock{jet_provider_data.mutex};
+
+    jet_provider_data.validity.Expire(basic.clock, std::chrono::seconds(JET_PROVIDER_TRAFFIC_OFFLINE_THRESHOLD_SECS));
+    jet_trace_data.validity.Expire(basic.clock, std::chrono::seconds(JET_PROVIDER_TRACE_OFFLINE_THRESHOLD_SECS));
+  }
 
   livetrack24.OnTimer(basic, calculated);
 }
