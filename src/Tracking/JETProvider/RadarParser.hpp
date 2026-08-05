@@ -26,6 +26,7 @@ Copyright_License {
 
 #include "Geo/GeoPoint.hpp"
 #include "NMEA/Validity.hpp"
+#include "time/Stamp.hpp"
 
 #include <vector>
 
@@ -44,7 +45,12 @@ struct Radar {
   std::vector<JETProvider::Traffic> traffics;
 };
 
-bool ParseRadarBuffer(const NMEAInfo &basic, const char *buffer, Radar &radar);
+/**
+ * @param clock the time the request was started, used to stamp the
+ * result; passed by value because the parser runs on the curl thread
+ * and must not dereference the UI thread's #NMEAInfo
+ */
+bool ParseRadarBuffer(TimeStamp clock, const char *buffer, Radar &radar);
 
 }
 

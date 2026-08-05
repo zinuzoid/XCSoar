@@ -23,7 +23,6 @@ Copyright_License {
 
 #include "RadarParser.hpp"
 #include "JETProvider.hpp"
-#include "Interface.hpp"
 #include "Units/Units.hpp"
 #include "LogFile.hpp"
 
@@ -37,7 +36,7 @@ namespace RadarParser {
 bool ParseHeader(std::string, Radar &radar);
 bool ParseTraffic(std::string line, Radar &radar);
 
-bool ParseRadarBuffer(const NMEAInfo &basic, const char *buffer, Radar &radar) {
+bool ParseRadarBuffer(TimeStamp clock, const char *buffer, Radar &radar) {
   std::istringstream istr{buffer};
 
   std::string line;
@@ -55,7 +54,7 @@ bool ParseRadarBuffer(const NMEAInfo &basic, const char *buffer, Radar &radar) {
       }
   }
 
-  radar.validity.Update(basic.clock);
+  radar.validity.Update(clock);
   return true;
 }
 

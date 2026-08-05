@@ -26,6 +26,7 @@ Copyright_License {
 
 #include "NMEA/Info.hpp"
 #include "NMEA/Derived.hpp"
+#include "Geo/GeoBounds.hpp"
 #include "time/PeriodClock.hpp"
 #include "time/Stamp.hpp"
 #include "Language/Language.hpp"
@@ -89,6 +90,14 @@ public:
   virtual void OnJETProviderStatus(const char *status) noexcept = 0;
 };
 
+/**
+ * Client for the JET radar endpoint.
+ *
+ * Modelled on WindsMobi::Glue (Weather/WindsMobi/Glue.hpp): all
+ * viewport and settings reading happens in OnTimer() on the UI thread;
+ * the coroutine receives only by-value parameters and never touches
+ * UI-thread state.
+ */
 class Glue final
 {
 
@@ -97,8 +106,18 @@ Handler *const handler;
 Co::InjectTask inject_task;
 PeriodClock clock;
 
-const char *access_token;
-char unauthorized_access_token[64] = "";
+/**
+ * Guards #unauthorized_access_token, which the coroutine writes on the
+ * curl thread while OnTimer() reads it on the UI thread.
+ */
+mutable Mutex mutex;
+
+/**
+ * The access token the server last rejected with HTTP 401; polling is
+ * suppressed until the user enters a different one.
+ */
+StaticString<64> unauthorized_access_token{""};
+
 bool is_emergency_stop = false;
 unsigned total_requests = 0;
 
@@ -108,7 +127,9 @@ public:
   void OnTimer(const NMEAInfo &basic, const DerivedInfo &calculated);
 
 protected:
-  Co::InvokeTask CoTick(const NMEAInfo &basic) noexcept;
+  Co::InvokeTask CoTick(GeoBounds screen_bounds,
+                        StaticString<64> access_token,
+                        TimeStamp clock) noexcept;
 
   void OnCompletion(std::exception_ptr error) noexcept;
 

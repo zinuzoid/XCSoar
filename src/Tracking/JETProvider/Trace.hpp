@@ -28,6 +28,7 @@ Copyright_License {
 #include "NMEA/Info.hpp"
 #include "NMEA/Derived.hpp"
 #include "time/PeriodClock.hpp"
+#include "time/Stamp.hpp"
 #include "thread/Mutex.hxx"
 #include "co/InjectTask.hxx"
 #include "util/StaticString.hxx"
@@ -57,6 +58,12 @@ public:
                           Validity validity, bool success) = 0;
 };
 
+/**
+ * Client for the JET trace endpoint.
+ *
+ * Like JETProvider::Glue, all UI-thread state is read in OnTimer(); the
+ * coroutine receives only by-value parameters.
+ */
 class TraceGlue final
 {
   CurlGlobal &curl;
@@ -64,7 +71,13 @@ class TraceGlue final
   Co::InjectTask inject_task;
   PeriodClock clock;
 
-  char unauthorized_access_token[64] = "";
+  /**
+   * Guards #unauthorized_access_token, which the coroutine writes on
+   * the curl thread while OnTimer() reads it on the UI thread.
+   */
+  mutable Mutex mutex;
+
+  StaticString<64> unauthorized_access_token{""};
 
 public:
   TraceGlue(CurlGlobal &curl, TraceHandler *_handler);
@@ -72,7 +85,7 @@ public:
   void OnTimer(const NMEAInfo &basic, const DerivedInfo &calculated);
 
 protected:
-  Co::InvokeTask CoTick(const NMEAInfo &basic,
+  Co::InvokeTask CoTick(TimeStamp clock,
                         StaticString<64> access_token,
                         StaticString<16> src,
                         StaticString<256> pilot_ids,
