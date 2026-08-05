@@ -76,6 +76,7 @@ TEST_NAMES = \
 	test_pressure \
 	test_task \
 	TestOverwritingRingBuffer \
+	TestJETTrafficId \
 	TestDateTime TestRoughTime TestWrapClock \
 	TestPolylineDecoder \
 	TestJETProviderTrace \
@@ -164,6 +165,13 @@ TEST_OVERWRITING_RING_BUFFER_SOURCES = \
 	$(TEST_SRC_DIR)/TestOverwritingRingBuffer.cpp
 TEST_OVERWRITING_RING_BUFFER_DEPENDS = MATH
 $(eval $(call link-program,TestOverwritingRingBuffer,TEST_OVERWRITING_RING_BUFFER))
+
+TEST_JET_TRAFFIC_ID_SOURCES = \
+	$(SRC)/FLARM/Id.cpp \
+	$(TEST_SRC_DIR)/tap.c \
+	$(TEST_SRC_DIR)/TestJETTrafficId.cpp
+TEST_JET_TRAFFIC_ID_DEPENDS = FMT MATH
+$(eval $(call link-program,TestJETTrafficId,TEST_JET_TRAFFIC_ID))
 
 TEST_IGC_PARSER_SOURCES = \
 	$(SRC)/IGC/IGCParser.cpp \
