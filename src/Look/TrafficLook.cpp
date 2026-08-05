@@ -2,6 +2,7 @@
 // Copyright The XCSoar Project
 
 #include "TrafficLook.hpp"
+#include "Colors.hpp"
 #include "Screen/Layout.hpp"
 #include "Resources.hpp"
 
@@ -47,7 +48,7 @@ TrafficLook::Initialise(const Font &_font)
 
   unsigned trace_width = Layout::ScalePenWidth(2);
   for (unsigned i = 0; i < NUM_TRACE_PENS; ++i)
-    trace_pens[i].Create(trace_width, trace_colors[i]);
+    trace_pens[i].Create(trace_width, ColorWithAlpha(trace_colors[i], ALPHA_OVERLAY));
 
   teammate_icon.LoadResource(IDB_TEAMMATE_POS_ALL);
 
