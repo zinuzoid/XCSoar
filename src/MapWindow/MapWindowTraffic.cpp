@@ -15,6 +15,7 @@
 #include "FLARM/TrafficClimbAltIndicators.hpp"
 
 #include <cassert>
+#include <map>
 
 static void
 DrawFlarmTraffic(Canvas &canvas, const WindowProjection &projection,
@@ -77,6 +78,46 @@ DrawFlarmTraffic(Canvas &canvas, const WindowProjection &projection,
 }
 
 /**
+ * Map scale beyond which FLARM traffic icons are hidden.
+ * Extracted from the former magic literal so it can also gate the
+ * JETProvider de-duplication check.
+ */
+static constexpr double TRAFFIC_MAP_SCALE_LIMIT = 7300;
+
+/**
+ * True when the FLARM drawing path will actually paint targets
+ * (setting on AND zoomed in enough).
+ */
+static bool
+IsFlarmTrafficDrawn(const MapSettings &settings,
+                    const WindowProjection &projection) noexcept
+{
+  return settings.show_flarm_on_map &&
+    projection.GetMapScale() <= TRAFFIC_MAP_SCALE_LIMIT;
+}
+
+/**
+ * True when the given JETProvider traffic_id identifies a target that
+ * is (or will be) drawn as FLARM traffic — either as a live target
+ * with a valid position or as a fading ghost.
+ */
+static bool
+IsShownAsFlarmTraffic(const char *traffic_id,
+                      const TrafficList &flarm,
+                      const std::map<FlarmId, FlarmTraffic> &fading) noexcept
+{
+  const FlarmId id = JETProvider::ParseTrafficId(traffic_id);
+  if (!id.IsDefined())
+    return false;
+
+  const FlarmTraffic *t = flarm.FindTraffic(id);
+  if (t != nullptr && t->location_available)
+    return true;
+
+  return fading.contains(id);
+}
+
+/**
  * Draws the FLARM traffic icons onto the given canvas
  * @param canvas Canvas for drawing
  */
@@ -84,20 +125,13 @@ void
 MapWindow::DrawFLARMTraffic(Canvas &canvas,
                             const PixelPoint aircraft_pos) const noexcept
 {
-  // Return if FLARM icons on moving map are disabled
-  if (!GetMapSettings().show_flarm_on_map)
+  if (!IsFlarmTrafficDrawn(GetMapSettings(), render_projection))
     return;
 
   // Return if FLARM data is not available
   const TrafficList &flarm = Basic().flarm.traffic;
 
   const WindowProjection &projection = render_projection;
-
-  // if zoomed in too far out, dont draw traffic since it will be too close to
-  // the glider and so will be meaningless (serves only to clutter, cant help
-  // the pilot)
-  if (projection.GetMapScale() > 7300)
-    return;
 
   canvas.Select(*traffic_look.font);
 
@@ -342,6 +376,15 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
   const bool online = jet_provider_data->validity.IsValid() &&
     jet_provider_data->success;
 
+  /* When FLARM traffic is being drawn, suppress JET targets whose
+     traffic_id matches a live or fading FLARM target.  The check is
+     gated on the same predicate so that disabling FLARM display or
+     zooming out past the scale limit does not erase both copies. */
+  const bool skip_flarm_duplicates =
+    IsFlarmTrafficDrawn(GetMapSettings(), projection);
+  const TrafficList &flarm = basic.flarm.traffic;
+  const auto &fading = GetFadingFlarmTraffic();
+
   // Circle through the FLARM targets
   for (auto it = jet_provider_data->traffics.begin(),
       end = jet_provider_data->traffics.end();
@@ -358,6 +401,10 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
     if (auto p = projection.GeoToScreenIfVisible(target_loc))
       sc = *p;
     else
+      continue;
+
+    if (skip_flarm_duplicates &&
+        IsShownAsFlarmTraffic(traffic.traffic_id.c_str(), flarm, fading))
       continue;
 
     // Draw the name 16 points below the icon
