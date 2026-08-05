@@ -36,6 +36,7 @@ Copyright_License {
 #include "RadarParser.hpp"
 
 #include <map>
+#include <string>
 
 #define JET_PROVIDER_TRAFFIC_OFFLINE_THRESHOLD_SECS 60
 #define JET_PROVIDER_EMERGENCY_STOP_MAX_REQUESTS 10000
@@ -47,9 +48,9 @@ namespace JETProvider
 {
 
 struct Traffic {
-  const char *traffic_id = nullptr;
-  const char *display = nullptr;
-  const char *code = nullptr;
+  std::string traffic_id;
+  std::string display;
+  std::string code;
   uint32_t epoch = 0;
   GeoPoint location;
   int track = -1;
@@ -57,20 +58,14 @@ struct Traffic {
   double speed = -1;
   double vspeed = -1;
   double climb_rate_avg30s = -1;
-  const char *type = nullptr;
+  std::string type;
   int icon_type = -1;
 };
 
 struct Data {
   mutable Mutex mutex;
 
-  struct cmp_str {
-    bool operator()(char const *a, char const *b) const {
-      return std::strcmp(a, b) < 0;
-    }
-  };
-
-  std::map<const char*, Traffic, cmp_str> traffics;
+  std::map<std::string, Traffic> traffics;
   Validity validity;
   bool success = false;
 

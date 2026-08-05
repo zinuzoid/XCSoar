@@ -73,10 +73,10 @@ void TrackingGlue::OnJETTraffic(std::vector<JETProvider::Traffic> traffics, Vali
     jet_provider_data.traffics.clear();
     for (JETProvider::Traffic traffic : traffics) {
       ClimbAverageCalculator &calc =
-        climb_avg_map[std::string(traffic.traffic_id)];
+        climb_avg_map[traffic.traffic_id];
       traffic.climb_rate_avg30s =
         calc.GetAverage(now, traffic.altitude, std::chrono::seconds{30});
-      jet_provider_data.traffics[traffic.traffic_id] = traffic;
+      jet_provider_data.traffics[traffic.traffic_id] = std::move(traffic);
     }
 
     // Prune stale calculators for targets not seen in a while

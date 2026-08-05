@@ -373,8 +373,8 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
     TextInBoxMode mode;
     mode.shape = LabelShape::OUTLINED;
 
-    if (traffic.display && !StringIsEmpty(traffic.display))
-      TextInBox(canvas, traffic.display, sc_name,
+    if (!traffic.display.empty())
+      TextInBox(canvas, traffic.display.c_str(), sc_name,
                 mode, GetClientRect());
 
     char second_text[32];
@@ -394,7 +394,7 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
 
     FlarmTraffic t;
     t.alarm_level = icon.alarm_level;
-    t.type = JETProvider::ParseAircraftType(traffic.type)
+    t.type = JETProvider::ParseAircraftType(traffic.type.c_str())
       .value_or(FlarmTraffic::AircraftType::UNKNOWN);
     t.relative_altitude = (RoughAltitude) 100;
     t.climb_rate_avg30s = traffic.climb_rate_avg30s;
