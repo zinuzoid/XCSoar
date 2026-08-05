@@ -149,10 +149,15 @@ jobs:
           fi
 
       - name: Compile XCSoar - Sanitizer Check
-        if: false
         run: |
           if [ ${{ matrix.target }} = "UNIX" ]; then
-            make -j$(nproc) TARGET=${{ matrix.target }} DEBUG=${{ env.DEBUG }} USE_CCACHE=y V=2 everything check VFB=y SANITIZE=y DEBUG_GLIBCXX=y
+            # Build into a separate output tree: these objects are compiled
+            # with -fsanitize=address and VFB=y, and the release step below
+            # would otherwise reuse them (make considers them up to date) and
+            # link without -fsanitize=address, leaving __asan_* undefined.
+            make -j$(nproc) TARGET=${{ matrix.target }} DEBUG=${{ env.DEBUG }} USE_CCACHE=y V=2 \
+              TARGET_OUTPUT_DIR=output/${{ matrix.target }}-sanitize \
+              everything check VFB=y SANITIZE=y DEBUG_GLIBCXX=y
           fi
 
       - name: Compile XCSoar - Release
