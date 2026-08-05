@@ -36,7 +36,6 @@ namespace RadarParser {
 
 bool ParseHeader(std::string, Radar &radar);
 bool ParseTraffic(std::string line, Radar &radar);
-const char *to_c_str(std::string str);
 
 bool ParseRadarBuffer(const NMEAInfo &basic, const char *buffer, Radar &radar) {
   std::istringstream istr{buffer};
@@ -83,9 +82,9 @@ bool ParseTraffic(std::string line, Radar &radar) {
     // uid,name,lat,long,track,alt,spd,vspd,epoch,type,icon_type
 
     JETProvider::Traffic traffic;
-    traffic.traffic_id = to_c_str(items[0]);
-    traffic.display = to_c_str(items[1]);
-    traffic.code = to_c_str(items[2]);
+    traffic.traffic_id = std::move(items[0]);
+    traffic.display = std::move(items[1]);
+    traffic.code = std::move(items[2]);
     double latitude = atof(items[3].c_str());
     double longitude = atof(items[4].c_str());
     traffic.location = GeoPoint(Angle::Degrees(longitude), Angle::Degrees(latitude));
@@ -94,7 +93,7 @@ bool ParseTraffic(std::string line, Radar &radar) {
     traffic.speed = atof(items[7].c_str());
     traffic.vspeed = atof(items[8].c_str());
     traffic.epoch = atoi(items[9].c_str());
-    traffic.type = to_c_str(items[10]);
+    traffic.type = std::move(items[10]);
     traffic.icon_type = atoi(items[11].c_str());
 
     traffic.altitude = round(Units::ToSysUnit(traffic.altitude, Unit::FEET));
@@ -104,13 +103,6 @@ bool ParseTraffic(std::string line, Radar &radar) {
     radar.traffics.push_back(traffic);
 
     return true;
-}
-
-const char *to_c_str(std::string str) {
-    char *buf = new char[str.size() +1];
-    std::copy(str.begin(), str.end(), buf);
-    buf[str.size()] = '\0';
-    return buf;
 }
 
 }
