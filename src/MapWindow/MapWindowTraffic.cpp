@@ -14,6 +14,10 @@
 #include "util/StringCompare.hxx"
 #include "FLARM/TrafficClimbAltIndicators.hpp"
 
+#ifdef ENABLE_OPENGL
+#include "ui/canvas/opengl/Scope.hpp"
+#endif
+
 #include <cassert>
 #include <map>
 
@@ -321,6 +325,12 @@ MapWindow::DrawJETProviderTrace(Canvas &canvas) const noexcept
   const WindowProjection &projection = render_projection;
   /* generous bounds so a trace leaving the screen still joins up */
   const GeoBounds bounds = projection.GetScreenBounds().Scale(4);
+
+  /* trace pens carry alpha (ALPHA_OVERLAY); enable blending so the
+     alpha channel is honoured rather than silently ignored */
+#ifdef ENABLE_OPENGL
+  const ScopeAlphaBlend alpha_blend;
+#endif
 
   unsigned pen_index = 0;
 
