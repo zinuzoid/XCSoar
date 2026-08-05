@@ -99,14 +99,6 @@ void JETProviderConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &r
     settings.trace.pilot_ids);
   SetExpertRow(TRACE_PILOT_IDS);
 
-  if(!settings.trace.enabled) {
-    SetRowVisible(SPACER, false);
-    SetRowVisible(TRACE_ENABLED, false);
-    SetRowVisible(TRACE_INTERVAL, false);
-    SetRowVisible(TRACE_SRC, false);
-    SetRowVisible(TRACE_PILOT_IDS, false);
-  }
-
   AddSpacer();
   SetExpertRow(WIND_STATION_SPACER);
 
@@ -115,6 +107,14 @@ void JETProviderConfigPanel::Prepare(ContainerWindow &parent, const PixelRect &r
       "average and gust speed."),
     CommonInterface::GetComputerSettings().wind_station.enabled);
   SetExpertRow(WIND_STATION_ENABLED);
+
+  if(!settings.trace.enabled) {
+    SetRowVisible(SPACER, false);
+    SetRowVisible(TRACE_ENABLED, false);
+    SetRowVisible(TRACE_INTERVAL, false);
+    SetRowVisible(TRACE_SRC, false);
+    SetRowVisible(TRACE_PILOT_IDS, false);
+  }
 }
 
 bool JETProviderConfigPanel::Save(bool &_changed) noexcept {
