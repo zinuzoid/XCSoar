@@ -28,6 +28,7 @@ Copyright_License {
 #include "NMEA/Info.hpp"
 #include "NMEA/Derived.hpp"
 #include "time/PeriodClock.hpp"
+#include "time/Stamp.hpp"
 #include "thread/Mutex.hxx"
 #include "co/InjectTask.hxx"
 #include "util/StaticString.hxx"
@@ -64,7 +65,8 @@ class TraceGlue final
   Co::InjectTask inject_task;
   PeriodClock clock;
 
-  char unauthorized_access_token[64] = "";
+  mutable Mutex mutex;
+  StaticString<64> unauthorized_access_token{""};
 
 public:
   TraceGlue(CurlGlobal &curl, TraceHandler *_handler);
@@ -72,7 +74,7 @@ public:
   void OnTimer(const NMEAInfo &basic, const DerivedInfo &calculated);
 
 protected:
-  Co::InvokeTask CoTick(const NMEAInfo &basic,
+  Co::InvokeTask CoTick(TimeStamp clock,
                         StaticString<64> access_token,
                         StaticString<16> src,
                         StaticString<256> pilot_ids,

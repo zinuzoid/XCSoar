@@ -68,11 +68,15 @@ JETProvider::TraceGlue::OnTimer(const NMEAInfo &basic,
     CommonInterface::GetComputerSettings().jet_provider_setting;
 
   if (!settings.trace.enabled || settings.trace.pilot_ids.empty() ||
-      settings.radar.access_token.length() <= 2 ||
-      strcmp(settings.radar.access_token.c_str(),
-             unauthorized_access_token) == 0)
+      settings.radar.access_token.length() <= 2)
   {
     return;
+  }
+
+  {
+    const std::lock_guard lock{mutex};
+    if (settings.radar.access_token == unauthorized_access_token)
+      return;
   }
 
   if (!clock.CheckUpdate(std::chrono::seconds(settings.trace.interval)))
@@ -83,21 +87,19 @@ JETProvider::TraceGlue::OnTimer(const NMEAInfo &basic,
 
   /* time the request out after one interval, so a stalled request costs
      at most the poll it was already occupying */
-  inject_task.Start(CoTick(basic, settings.radar.access_token,
+  inject_task.Start(CoTick(basic.clock, settings.radar.access_token,
                            settings.trace.src, settings.trace.pilot_ids,
                            settings.trace.interval),
                     BIND_THIS_METHOD(OnCompletion));
 }
 
 Co::InvokeTask
-JETProvider::TraceGlue::CoTick(const NMEAInfo &basic,
+JETProvider::TraceGlue::CoTick(TimeStamp clock,
                                StaticString<64> access_token,
                                StaticString<16> src,
                                StaticString<256> pilot_ids,
                                std::chrono::duration<unsigned> timeout) noexcept
 {
-  /* remember the clock now; #basic must not be touched after co_await */
-  const auto clock_value = basic.clock;
 
   std::map<std::string, PilotTrace> traces;
 
@@ -115,7 +117,10 @@ JETProvider::TraceGlue::CoTick(const NMEAInfo &basic,
 
   if (response.status == 401) {
     /* the token is bad - stop asking, exactly like the radar does */
-    strcpy(unauthorized_access_token, access_token.c_str());
+    {
+      const std::lock_guard lock{mutex};
+      unauthorized_access_token = access_token;
+    }
     LogFormat("Found unauthorized_access_token: %s, stop all JETProvider "
               "future trace request!",
               access_token.c_str());
@@ -135,7 +140,7 @@ JETProvider::TraceGlue::CoTick(const NMEAInfo &basic,
               (int)traces.size());
 
   Validity validity;
-  validity.Update(clock_value);
+  validity.Update(clock);
 
   handler->OnJETTrace(std::move(traces), validity, success);
 }
