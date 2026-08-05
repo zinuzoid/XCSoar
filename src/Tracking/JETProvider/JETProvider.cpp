@@ -82,14 +82,31 @@ JETProvider::Glue::OnTimer(const NMEAInfo &basic, [[maybe_unused]] const Derived
   if (is_emergency_stop)
     return;
 
+  /* snapshot settings by value on the UI thread; the coroutine must
+     never touch CommonInterface or UIGlobals from the curl thread
+     (see WindsMobi::Glue::OnTimer for the canonical pattern) */
   const JETProviderSettings &settings =
     CommonInterface::GetComputerSettings().jet_provider_setting;
-  access_token = settings.radar.access_token;
-  if (!settings.radar.enabled || strlen(access_token) <= 2 ||
-      strcmp(access_token, unauthorized_access_token) == 0)
-  {
+  const StaticString<64> access_token = settings.radar.access_token;
+  if (!settings.radar.enabled || access_token.length() <= 2)
     return;
+
+  {
+    const std::lock_guard lock{mutex};
+    if (access_token == unauthorized_access_token)
+      return;
   }
+
+  /* all viewport reading happens here, on the UI thread; Start() only
+     ever receives by-value parameters, so CoTick never touches
+     MapWindow or Interface.hpp from the asio thread */
+  const GlueMapWindow *map = UIGlobals::GetMap();
+  if (map == nullptr)
+    return;
+  const MapWindowProjection projection = map->VisibleProjection();
+  if (!projection.IsValid())
+    return;
+  const GeoBounds screen_bounds = projection.GetScreenBounds();
 
   if (!clock.CheckUpdate(std::chrono::seconds(settings.radar.interval)))
     return;
@@ -106,24 +123,18 @@ JETProvider::Glue::OnTimer(const NMEAInfo &basic, [[maybe_unused]] const Derived
     return;
   }
 
-  inject_task.Start(CoTick(basic), BIND_THIS_METHOD(OnCompletion));
+  inject_task.Start(CoTick(screen_bounds, access_token, basic.clock),
+                    BIND_THIS_METHOD(OnCompletion));
 }
 
 Co::InvokeTask
-JETProvider::Glue::CoTick(const NMEAInfo &basic) noexcept
+JETProvider::Glue::CoTick(GeoBounds screen_bounds,
+                          StaticString<64> access_token,
+                          TimeStamp clock) noexcept
 {
-  const GlueMapWindow *map = UIGlobals::GetMap();
-  if (map == nullptr)
-    co_return;
-  MapWindowProjection projection = map->VisibleProjection();
-  if (!projection.IsValid()) {
-    co_return;
-  }
-  GeoBounds screen_bounds = projection.GetScreenBounds();
-
   char url[256];
   StringFormat(url, 256, "%s?access_token=%s&bounds=%f,%f,%f,%f", API_ENTPOINT_URL,
-    access_token,
+    access_token.c_str(),
     screen_bounds.GetNorth().Degrees(),
     screen_bounds.GetSouth().Degrees(),
     screen_bounds.GetWest().Degrees(),
@@ -134,12 +145,15 @@ JETProvider::Glue::CoTick(const NMEAInfo &basic) noexcept
 
   if(response.status == 401) {
     // Unauthorized
-    strcpy(unauthorized_access_token, access_token);
+    {
+      const std::lock_guard lock{mutex};
+      unauthorized_access_token = access_token;
+    }
     LogFormat("Found unauthorized_access_token: %s, stop all JETProvider "
       "future request!",
-      access_token);
+      access_token.c_str());
     ReportStatus(*handler, "HTTP 401 Unauthorized");
-    handler->OnJETTraffic(std::vector<JETProvider::Traffic>(), Validity{}, false, basic.clock);
+    handler->OnJETTraffic(std::vector<JETProvider::Traffic>(), Validity{}, false, clock);
     co_return;
   }
 
@@ -147,19 +161,19 @@ JETProvider::Glue::CoTick(const NMEAInfo &basic) noexcept
     StaticString<64> text;
     text.Format("HTTP %u", response.status);
     ReportStatus(*handler, text);
-    handler->OnJETTraffic(std::vector<JETProvider::Traffic>(), Validity{}, false, basic.clock);
+    handler->OnJETTraffic(std::vector<JETProvider::Traffic>(), Validity{}, false, clock);
     co_return;
   }
 
   RadarParser::Radar radar;
-  if (RadarParser::ParseRadarBuffer(basic, response.body.c_str(), radar)) {
+  if (RadarParser::ParseRadarBuffer(clock, response.body.c_str(), radar)) {
     StaticString<64> text;
     text.Format("OK, %u traffic", radar.count);
     ReportStatus(*handler, text);
-    handler->OnJETTraffic(radar.traffics, radar.validity, true, basic.clock);
+    handler->OnJETTraffic(radar.traffics, radar.validity, true, clock);
   } else {
     ReportStatus(*handler, "Invalid response");
-    handler->OnJETTraffic(std::vector<JETProvider::Traffic>(), radar.validity, false, basic.clock);
+    handler->OnJETTraffic(std::vector<JETProvider::Traffic>(), radar.validity, false, clock);
   }
 }
 
