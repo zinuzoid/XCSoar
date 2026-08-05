@@ -3,8 +3,10 @@
 
 #pragma once
 
+#include "FLARM/Id.hpp"
 #include "FLARM/Traffic.hpp"
 #include "FLARM/Color.hpp"
+#include "util/CharUtil.hxx"
 #include "util/NumberParser.hxx"
 
 #include <optional>
@@ -107,6 +109,49 @@ DecodeAircraftType(const char *type) noexcept
 
   /* GetTypeString() returns nullptr for codes outside the table */
   return FlarmTraffic::GetTypeString(*value);
+}
+
+/**
+ * Parse a JETProvider traffic_id (hex device address string) into
+ * a FlarmId for de-duplication against FLARM traffic.
+ *
+ * The validation is deliberately strict: FlarmId::Parse() is a bare
+ * strtol(input, endptr, 16) that accepts leading whitespace, a sign,
+ * an 0x prefix, and saturates on overflow — every one of those is a
+ * false positive that would silently delete a real aircraft from the
+ * map.  This function requires 1–8 pure hex digits and nothing else.
+ *
+ * OGN-prefixed ids (e.g. "FLRDDA5BA") contain non-hex characters and
+ * safely degrade to FlarmId::Undefined() — today's no-dedup behaviour.
+ *
+ * @return the parsed FlarmId, or FlarmId::Undefined() on any failure
+ */
+[[gnu::pure]]
+inline FlarmId
+ParseTrafficId(const char *traffic_id) noexcept
+{
+  if (traffic_id == nullptr)
+    return FlarmId::Undefined();
+
+  /* count characters; require 1–8 hex digits, nothing else */
+  unsigned len = 0;
+  for (const char *p = traffic_id; *p != '\0'; ++p) {
+    if (!IsHexDigit(*p))
+      return FlarmId::Undefined();
+    ++len;
+  }
+
+  if (len == 0 || len > 8)
+    return FlarmId::Undefined();
+
+  char *endptr;
+  FlarmId id = FlarmId::Parse(traffic_id, &endptr);
+
+  /* belt-and-suspenders: the whole string must have been consumed */
+  if (*endptr != '\0')
+    return FlarmId::Undefined();
+
+  return id;
 }
 
 } // namespace JETProvider

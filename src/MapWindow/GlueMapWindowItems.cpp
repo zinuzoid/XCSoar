@@ -89,7 +89,7 @@ GlueMapWindow::ShowMapItems(const GeoPoint &location,
   builder.AddJETProviderTrace();
 
   if (computer_settings.jet_provider_setting.radar.enabled)
-    builder.AddJETProviderTraffic();
+    builder.AddJETProviderTraffic(basic.flarm.traffic);
 
 #ifdef ENABLE_OPENGL
   if (!list.full() && overlay && overlay->IsInside(location))

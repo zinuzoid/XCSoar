@@ -101,7 +101,8 @@ MapItemListBuilder::AddJETProviderTrace()
 }
 
 void
-MapItemListBuilder::AddJETProviderTraffic()
+MapItemListBuilder::AddJETProviderTraffic(
+  [[maybe_unused]] const TrafficList &flarm)
 {
 #ifdef HAVE_TRACKING
   if (net_components == nullptr || !net_components->tracking)
@@ -121,6 +122,21 @@ MapItemListBuilder::AddJETProviderTraffic()
     if (!traffic.location.IsValid() ||
         location.DistanceS(traffic.location) >= range)
       continue;
+
+    /* De-duplicate: skip this JET target if a live FLARM target with
+       the same device address exists, has a valid position, and is
+       itself within the tap radius.  The range re-test matters: if
+       the FLARM twin sits just outside the tap radius while the JET
+       target is inside, suppressing on mere existence would delete
+       the only entry the user would have seen. */
+    const FlarmId flarm_id =
+      JETProvider::ParseTrafficId(traffic.traffic_id.c_str());
+    if (flarm_id.IsDefined()) {
+      const FlarmTraffic *twin = flarm.FindTraffic(flarm_id);
+      if (twin != nullptr && twin->location_available &&
+          location.DistanceS(twin->location) < range)
+        continue;
+    }
 
     const auto icon = JETProvider::DecodeIconType(traffic.icon_type, online);
 
