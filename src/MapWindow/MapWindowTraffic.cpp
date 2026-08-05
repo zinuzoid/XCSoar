@@ -367,13 +367,11 @@ void
 MapWindow::DrawJETProviderTraffic(Canvas &canvas,
   const PixelPoint) const noexcept
 {
-  if (jet_provider_data == nullptr || jet_provider_data->traffics.empty()) {
+  if (jet_provider_data == nullptr) {
     return;
   }
 
   const MoreData &basic = Basic();
-
-  const std::lock_guard lock{jet_provider_data->mutex};
 
   const WindowProjection &projection = render_projection;
 
@@ -382,6 +380,12 @@ MapWindow::DrawJETProviderTraffic(Canvas &canvas,
   const bool vario_traffic_jet = GetMapSettings().use_vario_traffic_colours;
   const double jet_set_mc = GetComputerSettings().polar.glide_polar_task.GetMC();
   const double jet_30s_vario = Calculated().average;
+
+  const std::lock_guard lock{jet_provider_data->mutex};
+
+  if(jet_provider_data->traffics.empty()) {
+    return;
+  }
 
   const bool online = jet_provider_data->validity.IsValid() &&
     jet_provider_data->success;
