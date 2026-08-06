@@ -103,6 +103,9 @@ bool CDFDecoder::DecodeSuccess()
 
 bool CDFDecoder::Decode()
 {
+  if (legend.empty())
+    return DecodeError();
+
 #ifdef ANDROID
   NcFile data_file(path.c_str(), NcFile::FileMode::ReadOnly);
   if (!data_file.is_valid())
