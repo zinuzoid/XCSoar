@@ -84,22 +84,20 @@ void CDFDecoder::Tick() noexcept
     LogFormat("CDFDecoder::Tick error: %s", exc.what());
     DecodeError();
   }
+
+  mutex.lock();
 }
 
 bool CDFDecoder::DecodeError() {
   MakeCallback(false);
-  mutex.lock();
   status = Status::Error;
-  mutex.unlock();
   return true;
 }
 
 bool CDFDecoder::DecodeSuccess()
 {
   MakeCallback(true);
-  mutex.lock();
   status = Status::Complete;
-  mutex.unlock();
   return true;
 }
 
