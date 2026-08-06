@@ -150,8 +150,20 @@ void SkysightAPIQueue::Process()
           job_ptr->Process();
         } else {
           if (!IsLoggedIn()) {
-            // inject a login request at the front of the queue
-            SkysightAPI::GenerateLoginRequest();
+            bool login_pending = false;
+            {
+              std::lock_guard lock(request_queue_mutex);
+              for (const auto &req : request_queue) {
+                if (req->GetType() == SkysightCallType::Login) {
+                  login_pending = true;
+                  break;
+                }
+              }
+            }
+            if (!login_pending) {
+              // inject a login request at the front of the queue
+              SkysightAPI::GenerateLoginRequest();
+            }
           } else {
             job_ptr->SetCredentials(key.c_str());
             job_ptr->Process();
