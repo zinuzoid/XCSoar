@@ -510,7 +510,7 @@ SkysightAPI::ParseLogin(const SkysightRequestArgs &args, const tstring &result)
   if ((key != details.not_found()) && (valid_until != details.not_found())) {
     queue.SetKey(key->second.data().c_str(),
 		 static_cast<uint64_t>
-		 (std::strtoull(valid_until->second.data().c_str(), NULL, 0)));
+		 (std::strtoull(valid_until->second.data().c_str(), NULL, 10)));
     success = true;
     LogFormat("SkysightAPI::ParseLogin success with key %s valid_until %s", key->second.data().c_str(), valid_until->second.data().c_str());
 
