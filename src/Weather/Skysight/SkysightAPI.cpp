@@ -82,21 +82,20 @@ SkysightAPI::GetMetric(const tstring id)
   return SkysightMetric(_T(""), _T(""), _T(""));
 }
 
-//TODO: Use auto ptr, use TCHAR for all, try to whittle down to pointer only ver
-SkysightMetric *
-SkysightAPI::GetMetric(const TCHAR *const id)
+bool
+SkysightAPI::TryGetLastUpdate(const TCHAR *const id, uint64_t &out) const
 {
-  const std::lock_guard lock{metrics_mutex};
-  bool metric_exists = false;
-  std::vector<SkysightMetric>::iterator i;
-  for (i = metrics.begin(); i < metrics.end(); ++i)
-    if (!i->id.compare(id)) {
-      metric_exists = true;
-      break;
-    }
-  assert(metric_exists);
+  if (id == nullptr)
+    return false;
 
-  return &(*i);
+  const std::lock_guard lock{metrics_mutex};
+  for (const auto &i : metrics) {
+    if (i.id == id) {
+      out = i.last_update;
+      return true;
+    }
+  }
+  return false;
 }
 
 bool SkysightAPI::MetricExists(const tstring id) {
@@ -580,8 +579,8 @@ SkysightAPI::CacheAvailable(Path path, SkysightCallType calltype,
 {
   uint64_t layer_updated = 0;
   if (layer) {
-    SkysightMetric *m = GetMetric(layer);
-    layer_updated = m->last_update;
+    if (!TryGetLastUpdate(layer, layer_updated))
+      return false;
   }
 
   if (File::Exists(path)) {

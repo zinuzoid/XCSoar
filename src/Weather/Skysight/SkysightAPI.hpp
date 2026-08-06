@@ -63,7 +63,7 @@ public:
   bool IsInited();
   SkysightMetric GetMetric(int index);
   SkysightMetric GetMetric(const tstring id);
-  SkysightMetric *GetMetric(const TCHAR *const id);
+  bool TryGetLastUpdate(const TCHAR *const id, uint64_t &out) const;
   bool MetricExists(const tstring id);
   int NumMetrics();
   bool TryGetMetricName(const tstring &id, tstring &name_out) const;
