@@ -379,7 +379,6 @@ SkysightAPI::ParseLayers(const SkysightRequestArgs &args,
 
         auto colours = legend->second.find("colors");
         if (colours != legend->second.not_found()) {
-          success = true;
           for (auto &j: colours->second) {
             try {
               auto c = j.second.get_child("color").begin();
@@ -397,7 +396,10 @@ SkysightAPI::ParseLayers(const SkysightRequestArgs &args,
               continue;
             }
           }
-          metrics.push_back(m);
+          if (!m.legend.empty()) {
+            metrics.push_back(m);
+            success = true;
+          }
         }
       }
     }
