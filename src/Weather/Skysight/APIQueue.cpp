@@ -236,15 +236,19 @@ SkysightAPIQueue::IsLoggedIn()
 void
 SkysightAPIQueue::DoClearingQueue()
 {
+  std::lock_guard lock(request_queue_mutex);
   LogFormat("SkysightAPIQueue::DoClearingQueue() request_queue: %ld", (long)request_queue.size());
-  for (auto &&i = request_queue.begin(); i<request_queue.end(); ++i) {
+  for (auto i = request_queue.begin(); i != request_queue.end(); ) {
     auto status = (*i)->GetStatus();
     if (status == SkysightRequest::Status::EmergencyStop) {
       is_emergency_stop = true;
       LogFormat("SkysightAPIQueue::DoClearingQueue() is_emergency_stop: %d", is_emergency_stop);
+      ++i;
     } else if (status != SkysightRequest::Status::Busy) {
       (*i)->Done();
-      request_queue.erase(i);
+      i = request_queue.erase(i);
+    } else {
+      ++i;
     }
   }
   timer.Cancel();
