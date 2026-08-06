@@ -19,16 +19,21 @@ ifeq ($(EYE_CANDY),y)
   WINDRESFLAGS += -DEYE_CANDY
 endif
 
-ifeq ($(DEBUG)$(HAVE_WIN32)$(TARGET_IS_DARWIN),nnn)
-  ICF ?= y
-else
-  ICF ?= n
-endif
-
 # Enable gcc/clang sanitizers?  Either "n" to disable, "y" to enable
 # default sanitizers or a comma-separated list of sanitizers
 # (e.g. "address,undefined").
 SANITIZE ?= n
+
+# Identical code folding.  This must stay disabled for sanitizer builds:
+# AddressSanitizer gives each global a one-byte "ODR indicator" object of
+# its own, and the linker happily folds all of those identical objects
+# into one, after which the second global to register itself at startup
+# is reported as an odr-violation of the first.
+ifeq ($(DEBUG)$(HAVE_WIN32)$(TARGET_IS_DARWIN)$(SANITIZE),nnnn)
+  ICF ?= y
+else
+  ICF ?= n
+endif
 
 # show map renderer times?
 STOP_WATCH ?= n
