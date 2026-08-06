@@ -97,7 +97,10 @@ SkysightAPIQueue::AddRequest(std::unique_ptr<SkysightAsyncRequest> request,
 }
 
 void SkysightAPIQueue::AddDecodeJob(std::unique_ptr<CDFDecoder> &&job) {
-  decode_queue.emplace_back(std::move(job));
+  {
+    std::lock_guard lock(request_queue_mutex);
+    decode_queue.emplace_back(std::move(job));
+  }
   if (!is_busy && !timer.IsActive())
       timer.Schedule(std::chrono::milliseconds(100));
 }
@@ -130,71 +133,97 @@ void SkysightAPIQueue::Process()
 
   if(is_clearing) {
     DoClearingQueue();
-  } else if (!request_queue.empty()) {
-    std::vector<std::unique_ptr<SkysightAsyncRequest>>::iterator job = request_queue.begin();
-    SkysightAsyncRequest* job_ptr = (*job).get();
+  } else {
+    SkysightAsyncRequest *job_ptr = nullptr;
+    {
+      std::lock_guard lock(request_queue_mutex);
+      if (!request_queue.empty())
+        job_ptr = request_queue.front().get();
+    }
 
-    switch (job_ptr->GetStatus()) {
-    case SkysightRequest::Status::Idle:
-      //Provide the job with the very latest API key just prior to execution
-      if (job_ptr->GetType() == SkysightCallType::Login) {
-        job_ptr->SetCredentials("XCSoar-JET", email.c_str(), password.c_str());
-        job_ptr->Process();
-      } else {
-        if (!IsLoggedIn()) {
-          // inject a login request at the front of the queue
-          SkysightAPI::GenerateLoginRequest();
-        } else {
-          job_ptr->SetCredentials(key.c_str());
+    if (job_ptr != nullptr) {
+      switch (job_ptr->GetStatus()) {
+      case SkysightRequest::Status::Idle:
+        //Provide the job with the very latest API key just prior to execution
+        if (job_ptr->GetType() == SkysightCallType::Login) {
+          job_ptr->SetCredentials("XCSoar-JET", email.c_str(), password.c_str());
           job_ptr->Process();
+        } else {
+          if (!IsLoggedIn()) {
+            // inject a login request at the front of the queue
+            SkysightAPI::GenerateLoginRequest();
+          } else {
+            job_ptr->SetCredentials(key.c_str());
+            job_ptr->Process();
+          }
         }
-      }
 
-      if (!timer.IsActive())
-	      timer.Schedule(std::chrono::milliseconds(300));
-      break;
-    case SkysightRequest::Status::Complete:
-    case SkysightRequest::Status::Error:
-      job_ptr->Done();
-      {
-        std::lock_guard lock(request_queue_mutex);
-        remove_job_from_queue(request_queue, job_ptr);
+        if (!timer.IsActive())
+          timer.Schedule(std::chrono::milliseconds(300));
+        break;
+      case SkysightRequest::Status::Complete:
+      case SkysightRequest::Status::Error:
+        job_ptr->Done();
+        {
+          std::lock_guard lock(request_queue_mutex);
+          remove_job_from_queue(request_queue, job_ptr);
+        }
+        break;
+      case SkysightRequest::Status::Busy:
+        break;
+      case SkysightRequest::Status::EmergencyStop:
+        LogFormat("SkysightAPIQueue::Process() SkysightRequest::Status::EmergencyStop");
+        job_ptr->Done();
+        {
+          std::lock_guard lock(request_queue_mutex);
+          remove_job_from_queue(request_queue, job_ptr);
+        }
+        Clear("Emergency stop");
+        is_emergency_stop = true;
+        break;
       }
-      break;
-    case SkysightRequest::Status::Busy:
-      break;
-    case SkysightRequest::Status::EmergencyStop:
-      LogFormat("SkysightAPIQueue::Process() SkysightRequest::Status::EmergencyStop");
-      job_ptr->Done();
-      {
-        std::lock_guard lock(request_queue_mutex);
-        remove_job_from_queue(request_queue, job_ptr);
-      }
-      Clear("Emergency stop");
-      is_emergency_stop = true;
-      break;
     }
   }
 
-  if (!empty(decode_queue)) {
-    auto &&decode_job = decode_queue.begin();
-    switch ((*decode_job)->GetStatus()) {
+  CDFDecoder *decode_ptr = nullptr;
+  {
+    std::lock_guard lock(request_queue_mutex);
+    if (!decode_queue.empty())
+      decode_ptr = decode_queue.front().get();
+  }
+
+  if (decode_ptr != nullptr) {
+    switch (decode_ptr->GetStatus()) {
     case CDFDecoder::Status::Idle:
-      (*decode_job)->DecodeAsync();
+      decode_ptr->DecodeAsync();
       if (!timer.IsActive())
-	      timer.Schedule(std::chrono::milliseconds(300));
+        timer.Schedule(std::chrono::milliseconds(300));
       break;
     case CDFDecoder::Status::Complete:
     case CDFDecoder::Status::Error:
-      (*decode_job)->Done();
-      decode_queue.erase(decode_job);
+      decode_ptr->Done();
+      {
+        std::lock_guard lock(request_queue_mutex);
+        auto find = std::find_if(decode_queue.begin(), decode_queue.end(),
+                                 [decode_ptr](const std::unique_ptr<CDFDecoder> &it) {
+                                   return it.get() == decode_ptr;
+                                 });
+        if (find != decode_queue.end())
+          decode_queue.erase(find);
+      }
       break;
     case CDFDecoder::Status::Busy:
       break;
     }
   }
 
-  if (empty(request_queue) && empty(decode_queue))
+  bool queues_empty = false;
+  {
+    std::lock_guard lock(request_queue_mutex);
+    queues_empty = request_queue.empty() && decode_queue.empty();
+  }
+
+  if (queues_empty)
     timer.Cancel();
 
   is_busy = false;
