@@ -37,6 +37,7 @@ Copyright_License {
 #include "io/FileLineReader.hpp"
 
 #include <stdexcept>
+#include <memory>
 
 class SkysightRequestError : public std::runtime_error {
 public:
@@ -78,10 +79,11 @@ public:
   };
 
   class BufferHandler final: public CurlResponseHandler {
-    uint8_t *buffer;
+    std::unique_ptr<uint8_t[]> buffer;
     const size_t max_size;
     size_t received = 0;
     unsigned header_status = 0;
+    bool overflow = false;
     Mutex mutex;
     Cond cond;
 
@@ -90,14 +92,13 @@ public:
     bool done = false;
     
   public:
-    BufferHandler(void *_buffer, size_t _max_size):
-      buffer((uint8_t *)_buffer), max_size(_max_size) {
-        (void)max_size; // UNUSED
-      }
+    explicit BufferHandler(size_t _max_size):
+      buffer(std::make_unique<uint8_t[]>(_max_size)),
+      max_size(_max_size) {}
     size_t GetReceived() const;
     unsigned GetHeaderStatus() const;
-    // void ResponseReceived(int64_t content_length) override;
-    // void DataReceived(const void *data, size_t length) override;
+    bool HasOverflow() const;
+    const uint8_t *GetBuffer() const { return buffer.get(); }
     void OnData(std::span<const std::byte> data) override;
     void OnHeaders(unsigned status, Curl::Headers &&headers) override;
     void OnEnd() override;

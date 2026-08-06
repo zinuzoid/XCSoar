@@ -106,12 +106,19 @@ SkysightRequest::BufferHandler::OnData(std::span<const std::byte> data)
 {
   if(received + data.size() >= max_size) {
     LogFormat("BufferHandler::OnData received + data.size(): %zu is bigger "
-              "than max_size: %zu, skipping the received data.",
+              "than max_size: %zu, aborting request.",
               received + data.size(), max_size);
-    return;
+    overflow = true;
+    throw SkysightRequestError("Response too large for buffer");
   }
-  memcpy(buffer + received, data.data(), data.size());
+  memcpy(buffer.get() + received, data.data(), data.size());
   received += data.size();
+}
+
+bool
+SkysightRequest::BufferHandler::HasOverflow() const
+{
+  return overflow;
 }
 
 void
@@ -347,8 +354,8 @@ SkysightRequest::RequestToBuffer(tstring &response)
 
   bool success = true;
 
-  char buffer[1024 * 100];
-  BufferHandler handler(buffer, sizeof(buffer));
+  static constexpr size_t kBufferSize = 1024 * 100;
+  BufferHandler handler(kBufferSize);
   CurlRequest request(*Net::curl, args.url.c_str(), handler);
   CurlSlist request_headers;
 
@@ -388,8 +395,13 @@ SkysightRequest::RequestToBuffer(tstring &response)
   /* see RequestToFile() */
   request.StopIndirect();
 
-  response = tstring(buffer,
-		     buffer + handler.GetReceived() / sizeof(buffer[0]));
+  if (handler.HasOverflow()) {
+    LogFormat("SkysightRequest::RequestToBuffer response exceeded buffer size");
+    return Status::Error;
+  }
+
+  const auto *buf = reinterpret_cast<const char *>(handler.GetBuffer());
+  response = tstring(buf, buf + handler.GetReceived());
 
   const unsigned header_status = handler.GetHeaderStatus();
   if (header_status == 429) {
