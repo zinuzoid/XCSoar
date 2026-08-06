@@ -68,7 +68,8 @@ SkysightMetric
 SkysightAPI::GetMetric(int index)
 {
   const std::lock_guard lock{metrics_mutex};
-  assert(index < (int)metrics.size());
+  if (index < 0 || index >= (int)metrics.size())
+    return SkysightMetric(_T(""), _T(""), _T(""));
   return metrics.at(index);
 }
 
