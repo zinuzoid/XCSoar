@@ -117,6 +117,7 @@ void
 SkysightRequest::BufferHandler::OnHeaders(unsigned status,
     __attribute__((unused)) Curl::Headers &&headers) {
   LogFormat("BufferHandler::OnHeaders status:%d", status);
+  header_status = status;
 }
 
 void
@@ -360,8 +361,12 @@ SkysightRequest::RequestToBuffer(tstring &response)
 		 username.c_str(), password.c_str());
     pBody = creds.c_str();
     request.SetRequestBody(pBody.c_str(), pBody.length());
-    request.SetFailOnError(false);
   }
+
+  /* CURLOPT_FAILONERROR must stay off here: with it on, curl routes
+     4xx/5xx responses straight to OnError before OnHeaders ever runs,
+     so the 429 rate-limit status below would never be observed. */
+  request.SetFailOnError(false);
 
   request.SetRequestHeaders(request_headers.Get());
   request.SetVerifyPeer(false);
@@ -379,10 +384,15 @@ SkysightRequest::RequestToBuffer(tstring &response)
   response = tstring(buffer,
 		     buffer + handler.GetReceived() / sizeof(buffer[0]));
 
-  if(handler.GetHeaderStatus() == 429) {
+  const unsigned header_status = handler.GetHeaderStatus();
+  if (header_status == 429) {
     // Skysight asked us to stop the session if 429 was returned
     LogFormat("SkysightRequest::RequestToBuffer Received 429 EmergencyStop signal from Skysight.");
     return Status::EmergencyStop;
   }
+
+  if (header_status >= 400)
+    success = false;
+
   return success ? Status::Complete : Status::Error;
 }
