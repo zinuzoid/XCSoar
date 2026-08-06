@@ -34,6 +34,7 @@ Copyright_License {
 #include "LogFile.hpp"
 #include "util/StaticString.hxx"
 #include "lib/curl/Slist.hxx"
+#include "util/ScopeExit.hxx"
 #include "Version.hpp"
 
 void
@@ -41,7 +42,7 @@ SkysightRequest::FileHandler::OnData(std::span<const std::byte> data)
 {
   size_t written = fwrite(data.data(), sizeof(std::byte), data.size(), file);
   if (written != (size_t)data.size())
-    throw SkysightRequestError();
+    throw SkysightRequestError("Failed to write response data to file");
 
   received += written;
 }
@@ -276,6 +277,11 @@ SkysightRequest::RequestToFile()
   if (file == nullptr)
     return Status::Error;
 
+  AtScopeExit(file) {
+    if (file != nullptr)
+      fclose(file);
+  };
+
   bool success = true;
   FileHandler handler(file);
   CurlRequest request(*Net::curl, args.url.c_str(), handler);
@@ -307,6 +313,7 @@ SkysightRequest::RequestToFile()
     request.StartIndirect();
     handler.Wait();
   } catch (const std::exception &exc) {
+    LogFormat("SkysightRequest failed: %s", exc.what());
     success = false;
   }
 
@@ -315,11 +322,11 @@ SkysightRequest::RequestToFile()
      before ~CurlRequest() destroys it */
   request.StopIndirect();
 
-  success &= fclose(file) == 0;
+  if (fclose(file) != 0)
+    success = false;
+  file = nullptr;
 
   if (!success) File::Delete(temp_path);
-
-  file = NULL;
 
   if (success) {
     if (!File::Delete(final_path) && File::ExistsAny(final_path)) {

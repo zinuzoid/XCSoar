@@ -36,9 +36,13 @@ Copyright_License {
 
 #include "io/FileLineReader.hpp"
 
-#include "LogFile.hpp"
+#include <stdexcept>
 
-class SkysightRequestError {};
+class SkysightRequestError : public std::runtime_error {
+public:
+  SkysightRequestError() : std::runtime_error("Skysight request error") {}
+  explicit SkysightRequestError(const char *msg) : std::runtime_error(msg) {}
+};
 
 struct SkysightRequest {
 public:
