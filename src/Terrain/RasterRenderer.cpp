@@ -284,7 +284,7 @@ RasterRenderer::GenerateSlopeImage(unsigned height_scale,
                /* this upper limit keeps "dd2" reasonable for
                   visual quality; square_mag uses 64-bit arithmetic
                   so overflow is no longer a concern here */
-               8192u / (quantisation_effective * quantisation_effective));
+               std::max(1u, 8192u / (quantisation_effective * quantisation_effective)));
   
   const auto *src = height_matrix.GetData();
   const RawColor *oColorBuf = color_table + 64 * 256;
