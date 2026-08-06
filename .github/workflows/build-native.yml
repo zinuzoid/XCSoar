@@ -155,7 +155,14 @@ jobs:
             # with -fsanitize=address and VFB=y, and the release step below
             # would otherwise reuse them (make considers them up to date) and
             # link without -fsanitize=address, leaving __asan_* undefined.
-            make -j$(nproc) TARGET=${{ matrix.target }} DEBUG=${{ env.DEBUG }} USE_CCACHE=y V=2 \
+            #
+            # DEBUG is pinned rather than taken from env.DEBUG, which the
+            # release step flips to "n" on tag pushes: the sanitizer check
+            # would otherwise run one configuration on branches and a
+            # different one on releases, and only ever fail on the tag.  "n"
+            # is the interesting one, because that is where the optimiser
+            # runs and optimisation-dependent bugs show up.
+            make -j$(nproc) TARGET=${{ matrix.target }} DEBUG=n USE_CCACHE=y V=2 \
               TARGET_OUTPUT_DIR=output/${{ matrix.target }}-sanitize \
               everything check VFB=y SANITIZE=y DEBUG_GLIBCXX=y
           fi
