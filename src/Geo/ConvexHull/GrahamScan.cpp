@@ -46,7 +46,11 @@ Direction(const GeoPoint &p0, const GeoPoint &p1, const GeoPoint &p2,
   return Sign(a - b, tolerance);
 }
 
-[[gnu::pure]]
+/* note: this function must not be declared [[gnu::pure]]; it modifies
+   the caller-owned temporary behind the by-value parameter (which is
+   passed by invisible reference) and it allocates - GCC assumes a pure
+   function writes to no memory at all and then caches the caller's
+   std::vector fields across the call */
 static auto
 Sorted(std::vector<SearchPoint> v) noexcept
 {
@@ -71,7 +75,7 @@ struct GrahamPartitions {
   bool pruned = false;
 };
 
-[[gnu::pure]]
+/* not [[gnu::pure]]: this allocates (see Sorted() above) */
 static GrahamPartitions
 PartitionPoints(const std::vector<SearchPoint> &src, double tolerance) noexcept
 {
@@ -204,7 +208,8 @@ struct GrahamHull {
   bool pruned;
 };
 
-[[gnu::pure]]
+/* not [[gnu::pure]]: this moves the vectors out of "partitions", i.e. it
+   writes to memory owned by the caller */
 static GrahamHull
 BuildHull(GrahamPartitions &&partitions, double tolerance) noexcept
 {
