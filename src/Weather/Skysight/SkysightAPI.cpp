@@ -40,6 +40,7 @@ Copyright_License {
 #include "io/FileLineReader.hpp"
 #include "time/BrokenDateTime.hpp"
 #include "Metrics.hpp"
+#include "LogFile.hpp"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -68,9 +69,12 @@ SkysightMetric
 SkysightAPI::GetMetric(int index)
 {
   const std::lock_guard lock{metrics_mutex};
-  if (index < 0 || index >= (int)metrics.size())
+  if (index < 0 || (size_t)index >= metrics.size()) {
+    LogFormat("Skysight: GetMetric index %d out of range (size=%zu)",
+              index, metrics.size());
     return SkysightMetric(_T(""), _T(""), _T(""));
-  return metrics.at(index);
+  }
+  return metrics[index];
 }
 
 SkysightMetric
@@ -80,6 +84,7 @@ SkysightAPI::GetMetric(const tstring id)
   for (auto &i : metrics)
     if (!i.id.compare(id))
       return i;
+  LogFormat("Skysight: GetMetric(id) '%s' not found", id.c_str());
   return SkysightMetric(_T(""), _T(""), _T(""));
 }
 
