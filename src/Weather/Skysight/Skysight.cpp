@@ -385,7 +385,7 @@ Skysight::APIInited(__attribute__((unused)) const tstring details, __attribute__
   if (!self || !self->api)
     return;
 
-  if (self->api->metrics.size()) {
+  if (self->api->NumMetrics() > 0) {
     self->LoadActiveMetrics();
     self->Render(true);
   }
