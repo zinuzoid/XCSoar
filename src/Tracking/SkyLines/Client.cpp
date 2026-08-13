@@ -205,6 +205,48 @@ SkyLinesTracking::Client::OnThermalReceived(const ThermalResponsePacket &packet,
                        FromBE16(thermal.lift) / 256.);
 }
 
+/**
+ * Is this packet a legitimate reply to something this client sends?
+ *
+ * The XCSoar Cloud client only submits fixes and thermals and
+ * requests thermals.  Anything else arriving on that socket is
+ * unsolicited; accepting it would store traffic the user never asked
+ * for and draw it on the map even with every SkyLines tracking
+ * option switched off.
+ */
+[[gnu::const]]
+static bool
+IsAcceptable(SkyLinesTracking::Client::Role role,
+             SkyLinesTracking::Type type) noexcept
+{
+  using Role = SkyLinesTracking::Client::Role;
+  using SkyLinesTracking::Type;
+
+  if (role == Role::TRACKING)
+    return true;
+
+  switch (type) {
+  case Type::ACK:
+  case Type::WAVE_RESPONSE:
+  case Type::THERMAL_RESPONSE:
+    return true;
+
+  case Type::PING:
+  case Type::FIX:
+  case Type::TRAFFIC_REQUEST:
+  case Type::TRAFFIC_RESPONSE:
+  case Type::USER_NAME_REQUEST:
+  case Type::USER_NAME_RESPONSE:
+  case Type::WAVE_SUBMIT:
+  case Type::WAVE_REQUEST:
+  case Type::THERMAL_SUBMIT:
+  case Type::THERMAL_REQUEST:
+    return false;
+  }
+
+  return false;
+}
+
 inline void
 SkyLinesTracking::Client::OnDatagramReceived(void *data, size_t length)
 {
@@ -219,6 +261,10 @@ SkyLinesTracking::Client::OnDatagramReceived(void *data, size_t length)
   if (received_crc != calculated_crc)
     return;
 
+  const Type type = (Type)FromBE16(header.type);
+  if (!IsAcceptable(role, type))
+    return;
+
   const ACKPacket &ack = *(const ACKPacket *)data;
   const TrafficResponsePacket &traffic = *(const TrafficResponsePacket *)data;
   const UserNameResponsePacket &user_name =
@@ -226,7 +272,7 @@ SkyLinesTracking::Client::OnDatagramReceived(void *data, size_t length)
   const auto &wave = *(const WaveResponsePacket *)data;
   const auto &thermal = *(const ThermalResponsePacket *)data;
 
-  switch ((Type)FromBE16(header.type)) {
+  switch (type) {
   case PING:
   case FIX:
   case TRAFFIC_REQUEST:

@@ -27,7 +27,27 @@ struct ThermalResponsePacket;
 class Handler;
 
 class Client final : Cares::SimpleHandler {
+public:
+  /**
+   * Which server this client talks to, and therefore which
+   * server-to-client packets are legitimate on this socket.
+   */
+  enum class Role : uint8_t {
+    /** the SkyLines tracking server; all responses are accepted */
+    TRACKING,
+
+    /**
+     * the XCSoar Cloud server.  We only ever send FIX,
+     * THERMAL_SUBMIT and THERMAL_REQUEST here, so only their
+     * replies (and waves, which the server may push) are accepted.
+     */
+    CLOUD,
+  };
+
+private:
   Handler *const handler;
+
+  const Role role;
 
   /**
    * Protects #resolving, #resolver, #socket.
@@ -43,8 +63,9 @@ class Client final : Cares::SimpleHandler {
 
 public:
   explicit Client(EventLoop &event_loop,
+                  Role _role,
                   Handler *_handler=nullptr)
-    :handler(_handler),
+    :handler(_handler), role(_role),
      socket_event(event_loop, BIND_THIS_METHOD(OnSocketReady)) {}
   ~Client() { Close(); }
 

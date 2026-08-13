@@ -33,7 +33,7 @@ class Handler : public SkyLinesTracking::Handler {
 public:
   explicit Handler(Args &_args, EventLoop &_event_loop)
     :args(_args), event_loop(_event_loop),
-     client(event_loop, this) {}
+     client(event_loop, SkyLinesTracking::Client::Role::TRACKING, this) {}
 
   SkyLinesTracking::Client &GetClient() {
     return client;
