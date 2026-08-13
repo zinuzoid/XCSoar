@@ -56,6 +56,7 @@
         <!-- URI scheme for XCTrack v2 tasks, see
              https://xctrack.org/Competition_Interfaces.html -->
         <data android:scheme="xctsk" />
+        <data android:scheme="XCTSK" />
       </intent-filter>
     </activity>
 
