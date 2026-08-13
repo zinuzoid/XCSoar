@@ -4,14 +4,17 @@
 package org.xcsoar;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.TextView;
 import android.util.Log;
 
 public class ReceiveTaskActivity extends Activity {
   private static final String TAG = "XCSoar";
-  
+
+  private static final String SCHEME = "xctsk:";
+
   /**
    * Hack: this is set by onCreate(), to support the "testing"
    * package.
@@ -24,12 +27,35 @@ public class ReceiveTaskActivity extends Activity {
 
     super.onCreate(savedInstanceState);
 
-    String msg = handleIntent(getIntent());
-    if (msg != null) {
-      TextView tv = new TextView(this);
-      tv.setText(msg);
-      setContentView(tv);
+    final String msg = handleIntent(getIntent());
+    if (msg == null) {
+      /* the data was handled successfully; don't leave this activity
+         behind as an empty window in its own task */
+      finish();
+      return;
     }
+
+    showError(msg);
+  }
+
+  /**
+   * Show the error message in a dismissable dialog; finish this
+   * activity as soon as the user has acknowledged it, so we never get
+   * stuck on a blank screen.
+   */
+  private void showError(final String msg) {
+    Log.w(TAG, "Failed to receive task: " + msg);
+
+    new AlertDialog.Builder(this)
+      .setTitle("XCSoar")
+      .setMessage(msg)
+      .setPositiveButton(android.R.string.ok, null)
+      .setOnDismissListener(new DialogInterface.OnDismissListener() {
+          @Override public void onDismiss(DialogInterface dialog) {
+            finish();
+          }
+        })
+      .show();
   }
 
   private String handleIntent(final Intent intent) {
@@ -41,22 +67,23 @@ public class ReceiveTaskActivity extends Activity {
       return "No action";
 
     if (!Loader.loaded)
-      return "Error";
+      return Loader.error != null ? Loader.error : "Error";
 
     Log.d(TAG, "Received intent data='" + data + "'");
 
-    if (data.startsWith("xctsk:") || data.startsWith("XCTSK:")) {
-      final String msg = NativeView.onReceiveXCTrackTask(data.substring(6));
-      if (msg == null) {
-        /* the data was handled successfully, and the main "XCSoar"
-           activity shows the details - switch to it */
-        Intent myIntent = new Intent(this, mainActivityClass);
-        startActivity(myIntent);
-        return null;
-      }
-
-      return msg;
-    } else
+    /* the URI scheme is case insensitive; XCTrack QR codes use the
+       upper case "XCTSK:" */
+    if (!data.regionMatches(true, 0, SCHEME, 0, SCHEME.length()))
       return "Unknown action";
+
+    final String msg =
+      NativeView.onReceiveXCTrackTask(data.substring(SCHEME.length()));
+    if (msg != null)
+      return msg;
+
+    /* the data was handled successfully, and the main "XCSoar"
+       activity shows the details - switch to it */
+    startActivity(new Intent(this, mainActivityClass));
+    return null;
   }
 }
