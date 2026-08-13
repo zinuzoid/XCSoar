@@ -63,8 +63,8 @@ private:
 
 public:
   explicit Client(EventLoop &event_loop,
-                  Handler *_handler=nullptr,
-                  Role _role=Role::TRACKING)
+                  Role _role,
+                  Handler *_handler=nullptr)
     :handler(_handler), role(_role),
      socket_event(event_loop, BIND_THIS_METHOD(OnSocketReady)) {}
   ~Client() { Close(); }

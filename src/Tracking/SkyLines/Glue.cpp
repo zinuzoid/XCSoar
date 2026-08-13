@@ -20,8 +20,8 @@ static constexpr auto CLOUD_INTERVAL = minutes(1);
 
 SkyLinesTracking::Glue::Glue(EventLoop &event_loop,
                              Handler *_handler)
-  :client(event_loop, _handler),
-   cloud_client(event_loop, _handler, Client::Role::CLOUD)
+  :client(event_loop, Client::Role::TRACKING, _handler),
+   cloud_client(event_loop, Client::Role::CLOUD, _handler)
 {
 }
 
