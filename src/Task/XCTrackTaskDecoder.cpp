@@ -14,9 +14,11 @@
 #include "Engine/Waypoint/Waypoint.hpp"
 #include "util/ConvertString.hpp"
 
+#include <boost/json/object.hpp>
 #include <boost/json/value.hpp>
 
 #include <stdexcept>
+#include <string>
 
 using std::string_view_literals::operator""sv;
 
@@ -50,13 +52,42 @@ DecodeXCTrackZ(std::string_view src)
 }
 
 static WaypointPtr
-MakeWaypoint(GeoPoint location, double elevation, const TCHAR *name)
+MakeWaypoint(GeoPoint location, double elevation, const TCHAR *name,
+             const TCHAR *comment)
 {
   Waypoint *wp = new Waypoint(location);
   wp->name = name;
+  wp->comment = comment;
   wp->elevation = elevation;
   wp->has_elevation = true;
   return WaypointPtr{wp};
+}
+
+/**
+ * Obtain a string field from an XCTrack turn point object; returns an
+ * empty string_view if the field is missing or not a string.
+ */
+static std::string_view
+GetOptionalString(const boost::json::object &j, std::string_view name) noexcept
+{
+  if (const auto *value = j.if_contains(name))
+    if (const auto *s = value->if_string())
+      return {s->data(), s->size()};
+
+  return {};
+}
+
+/**
+ * XCTrack omits the name of plain turn points; synthesize the same
+ * label XCTrack displays for those.
+ */
+static std::string
+MakeTurnPointName(std::string_view name, std::size_t i)
+{
+  if (!name.empty())
+    return std::string{name};
+
+  return "T" + std::to_string(i + 1);
 }
 
 std::unique_ptr<OrderedTask>
@@ -93,16 +124,23 @@ DecodeXCTrackTask(const boost::json::value &_j,
     const auto &j = t[i].as_object();
 
     const auto z = DecodeXCTrackZ(j.at("z"sv).as_string());
-    const auto &name = j.at("n"sv).as_string();
-    if (name.empty())
-      throw std::invalid_argument{"Name is empty"};
 
+    /* the name is optional: XCTrack leaves it empty for plain turn
+       points, and only the takeoff/named ones carry one */
+    const auto name = MakeTurnPointName(GetOptionalString(j, "n"sv), i);
     const UTF8ToWideConverter name_t{name.c_str()};
     if (!name_t.IsValid())
-      throw std::invalid_argument{"Malfored name"};
+      throw std::invalid_argument{"Malformed name"};
+
+    /* "d" is a free-text description, not a name; keep it as comment */
+    const std::string comment{GetOptionalString(j, "d"sv)};
+    const UTF8ToWideConverter comment_t{comment.c_str()};
+    if (!comment_t.IsValid())
+      throw std::invalid_argument{"Malformed description"};
 
     auto oz = std::make_unique<CylinderZone>(z.location, z.radius);
-    auto wp = MakeWaypoint(z.location, z.altitude, name_t.c_str());
+    auto wp = MakeWaypoint(z.location, z.altitude, name_t.c_str(),
+                           comment_t.c_str());
 
     std::unique_ptr<OrderedTaskPoint> tp;
 

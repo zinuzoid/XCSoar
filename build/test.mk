@@ -79,6 +79,7 @@ TEST_NAMES = \
 	TestJETTrafficId \
 	TestDateTime TestRoughTime TestWrapClock \
 	TestPolylineDecoder \
+	TestXCTrackTaskDecoder \
 	TestJETProviderTrace \
 	TestJETProviderWind \
 	TestTransponderCode \
@@ -213,6 +214,14 @@ TEST_POLYLINE_DECODER_SOURCES = \
 	$(TEST_SRC_DIR)/TestPolylineDecoder.cpp
 TEST_POLYLINE_DECODER_DEPENDS = GEO UTIL
 $(eval $(call link-program,TestPolylineDecoder,TEST_POLYLINE_DECODER))
+
+TEST_XCTRACK_TASK_DECODER_SOURCES = \
+	$(SRC)/Engine/Util/Gradient.cpp \
+	$(TEST_SRC_DIR)/tap.c \
+	$(TEST_SRC_DIR)/TestXCTrackTaskDecoder.cpp
+TEST_XCTRACK_TASK_DECODER_DEPENDS = TASKFILE TASK ROUTE GLIDE WAYPOINT JSON \
+	GEO TIME MATH UTIL
+$(eval $(call link-program,TestXCTrackTaskDecoder,TEST_XCTRACK_TASK_DECODER))
 
 TEST_JET_PROVIDER_TRACE_SOURCES = \
 	$(SRC)/Task/PolylineDecoder.cpp \
